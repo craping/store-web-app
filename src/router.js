@@ -6,7 +6,24 @@ Vue.use(Router);
 const routes = [
   {
     path: '*',
-    redirect: '/goods'
+    redirect: '/main/home'
+  },
+  {
+    name: 'main',
+    component: () => import('./view/main'),
+    children: [{
+      name: 'home',
+      component: () => import('./view/home')
+    },{
+      name: 'cart',
+      component: () => import('./view/cart'),
+      meta:{
+        single:false
+      }
+    },{
+      name: 'user',
+      component: () => import('./view/user')
+    }]
   },
   {
     name: 'user',
@@ -19,7 +36,8 @@ const routes = [
     name: 'cart',
     component: () => import('./view/cart'),
     meta: {
-      title: '购物车'
+      title: '购物车',
+      single:true
     }
   },
   {
@@ -34,6 +52,11 @@ const routes = [
 // add route path
 routes.forEach(route => {
   route.path = route.path || '/' + (route.name || '');
+  if(route.children){
+    route.children.forEach(r => {
+      r.path = r.path || (r.name || '');
+    })
+  }
 });
 
 const router = new Router({ routes });

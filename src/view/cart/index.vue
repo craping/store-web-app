@@ -16,7 +16,9 @@
         />
       </van-checkbox>
     </van-checkbox-group>
-    <van-submit-bar
+    <van-submit-bar 
+      :style="{bottom:this.$route.meta.single?'0':'50px'}"
+      :safe-area-inset-bottom="true"
       :price="totalPrice"
       :disabled="!checkedGoods.length"
       :button-text="submitBarText"
@@ -60,6 +62,34 @@ export default {
         price: 2680,
         num: 1,
         thumb: 'https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg'
+      }, {
+        id: '4',
+        title: '美国伽力果',
+        desc: '约680g/3个',
+        price: 2680,
+        num: 1,
+        thumb: 'https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg'
+      }, {
+        id: '5',
+        title: '美国伽力果',
+        desc: '约680g/3个',
+        price: 2680,
+        num: 1,
+        thumb: 'https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg'
+      }, {
+        id: '6',
+        title: '美国伽力果',
+        desc: '约680g/3个',
+        price: 2680,
+        num: 1,
+        thumb: 'https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg'
+      }, {
+        id: '7',
+        title: '美国伽力果',
+        desc: '约680g/3个',
+        price: 2680,
+        num: 1,
+        thumb: 'https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg'
       }]
     };
   },
@@ -81,6 +111,7 @@ export default {
     },
 
     onSubmit() {
+      console.log(this.$route.params)
       Toast('点击结算');
     }
   }
@@ -88,9 +119,14 @@ export default {
 </script>
 
 <style lang="less">
+/* .van-submit-bar {
+  bottom:50px;
+} */
+
 .card-goods {
   padding: 10px 0;
   background-color: #fff;
+  padding-bottom: 50px;
 
   &__item {
     position: relative;
