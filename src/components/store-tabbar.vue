@@ -43,14 +43,6 @@ export default {
           info: ""
         },
         {
-          name: "会员",
-          path: "/main/vip",
-          pathName: "cart",
-          icon: "cart-full",
-          dot: false,
-          info: ""
-        },
-        {
           name: "购物车",
           path: "/main/cart",
           pathName: "cart",
