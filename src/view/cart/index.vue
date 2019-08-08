@@ -111,7 +111,7 @@ export default {
     },
 
     onSubmit() {
-      console.log(this.$route.params)
+      console.log(this.$route.params);
       Toast('点击结算');
     }
   }

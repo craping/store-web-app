@@ -1,19 +1,19 @@
 import axios from 'axios'
 import { Toast, Dialog } from 'vant'
-import store from '../store'
-import { getToken } from '@/utils/auth'
+// import store from '../store'
+// import { getToken } from '@/utils/auth'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: process.env.BASE_API, // api的base_url
+  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   timeout: 15000 // 请求超时时间
 })
 
 // request拦截器
 service.interceptors.request.use(config => {
-  if (store.getters.token) {
-    config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
-  }
+  // if (store.getters.token) {
+  //   config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+  // }
   return config
 }, error => {
   // Do something with request error
@@ -27,12 +27,12 @@ service.interceptors.response.use(
   /**
   * code为非200是抛错 可结合自己业务进行修改
   */
-    const data = response.data
-    if (data.errcode) {
-      Toast.fail(data.msg);
+    const res = response.data
+    if (res.errcode) {
+      Toast.fail(res.msg);
 
       // 401:未登录;
-      if (data.errcode === 401||data.errcode === 403) {
+      if (res.errcode === 401||res.errcode === 403) {
         Dialog.confirm({
           title: '确定登出',
           message: '你已被登出，可以取消继续留在该页面，或者重新登录',
@@ -43,9 +43,9 @@ service.interceptors.response.use(
           // on cancel
         });
       }
-      return Promise.reject('error')
+      return Promise.reject(new Error(res.msg || 'Error'))
     } else {
-      return data
+      return res
     }
   },
   error => {

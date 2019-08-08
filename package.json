@@ -1,15 +1,15 @@
 {
-  "name": "vant-demo",
+  "name": "store",
   "version": "1.0.0",
-  "description": "Collection of vant demos.",
-  "author": "neverland <chenjiahan@neverl.com>",
-  "license": "MIT",
+  "description": "store.",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "axios": "^0.19.0",
+    "js-cookie": "^2.2.1",
     "vant": "^2.0.0",
     "vue": "^2.6.10",
     "vue-router": "^3.0.5"
@@ -32,7 +32,9 @@
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "rules": {},
+    "rules": {
+      "no-console": "off"
+    },
     "parserOptions": {
       "parser": "babel-eslint"
     }
