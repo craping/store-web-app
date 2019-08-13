@@ -9,15 +9,6 @@ module.exports = {
   devServer: {
     port: 8090,
     open: false,
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://localhost/api',
-    //     changeOrigin: true,
-    //     pathRewrite: {
-    //       '^/api': ''
-    //     }
-    //   }
-    // }
     proxy: {
       [process.env.VUE_APP_BASE_API]: {
         target: 'http://localhost/api',
@@ -33,6 +24,18 @@ module.exports = {
       alias: {
         '@': resolve('src'),
         '@assets': resolve('src/assets')
+      }
+    }
+  },
+  chainWebpack: config => {
+    config.plugins.delete('prefetch');
+    config.plugins.delete('preload');
+  },
+  css: {
+    loaderOptions: {
+      sass: {
+        data:
+          '@import "@/assets/scss/_var.scss";'
       }
     }
   }

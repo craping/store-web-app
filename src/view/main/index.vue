@@ -13,8 +13,11 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 .main{
+  background-color: $bg-color;
   margin-bottom: 50px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 </style>
