@@ -20,10 +20,12 @@ const routes = [
       meta:{
         single:false
       }
-    },{
+    },
+    {
       name: 'user',
-      component: () => import('./view/user')
-    }]
+      component: () => import('./view/user'),
+    }     
+  ]
   },
   {
     name: 'user',
@@ -31,6 +33,14 @@ const routes = [
     meta: {
       title: '会员中心'
     }
+  },
+  {
+      name: 'adderss',
+      component: () => import('./view/user/adderss/index.vue') 
+  },
+  {
+    name: 'addAdderss',
+    component: () => import('./view/user/adderss/addAdeerss.vue') 
   },
   {
     name: 'cart',
