@@ -1,19 +1,19 @@
 import axios from 'axios'
 import { Toast, Dialog } from 'vant'
-// import store from '../store'
 // import { getToken } from '@/utils/auth'
 
 // 创建axios实例
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
+  headers: { 'Content-Type': 'application/json;charset=utf-8' },
   timeout: 15000 // 请求超时时间
 })
 
 // request拦截器
 service.interceptors.request.use(config => {
-  // if (store.getters.token) {
-  //   config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
-  // }
+    if(!config.params || !config.params.format)
+      config.params = {...config.params, format: 'json' };
+  // config.data.token = getToken();
   return config
 }, error => {
   // Do something with request error
