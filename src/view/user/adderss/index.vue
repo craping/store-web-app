@@ -1,4 +1,12 @@
 <template>
+<van-row>
+<van-nav-bar
+  title="收货地址列表"
+  left-text="返回"
+  left-arrow
+  @click-left="onClickLeft"
+  @click-right="onClickRight"
+/>
 <van-address-list
   v-model="chosenAddressId"
   :list="list"
@@ -7,12 +15,15 @@
   @add="onAdd"
   @edit="onEdit"
 />
+</van-row>
 </template>
 <script>
 import Vue from 'vue';
 import { AddressList } from 'vant';
 import { scrypt } from 'crypto';
 import { Script } from 'vm';
+import { NavBar } from 'vant';
+Vue.use(NavBar);
 Vue.use(AddressList);
 export default {
   data() {
@@ -43,6 +54,9 @@ export default {
     }
   },
   methods: {
+    onClickLeft() {
+      this.$router.push({name:'user'});
+    },
     onAdd() {
       //Toast('新增地址');
       this.$router.push({name:'addAdderss'});

@@ -129,7 +129,6 @@ export default {
   methods: {
 
     adders:function(){
-       alert("4444")
        this.$router.push({name:'adderss'});
     }
   },

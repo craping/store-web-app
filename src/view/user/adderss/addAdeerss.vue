@@ -1,6 +1,14 @@
 <template>
+<vant-row> 
+  <van-nav-bar
+  title="编辑收货地址"
+  left-text="返回"
+  left-arrow
+  @click-left="onClickLeft"
+  @click-right="onClickRight"
+  />
   <van-address-edit
-    :area-list="areaList"
+    :area-list="areaList" 
     show-postal
     show-delete
     show-set-default
@@ -11,23 +19,19 @@
     @delete="onDelete"
     @change-detail="onChangeDetail"
   />
+</vant-row>
 </template>
 <script>
 import Vue from "vue";
 import { AddressEdit } from "vant";
+import { NavBar } from 'vant';
 import { Area } from "vant";
-
 Vue.use(AddressEdit);
 Vue.use(Area);
-var addreesInfo = this.$route.query.saveOk;
-console.log("ddddd",addreesInfo)
+Vue.use(NavBar);
 export default { 
-
-  
-
   data() {
-    return {
-        
+    return {      
       areaList: {
         province_list: {
           110000: "北京市",
@@ -55,8 +59,10 @@ export default {
       searchResult: []
     };
   },
-
-methods: {
+   methods: {
+     onClickLeft() {
+      this.$router.push({name:'adderss'});
+    },
     onSave() {
       //Toast("save");
      console.log("okkkkk",this.$route.query.saveOk)
