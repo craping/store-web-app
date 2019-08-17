@@ -1,6 +1,6 @@
 <template>
 	<van-tabbar route v-model="active">
-		<van-tabbar-item
+		<van-tabbar-item replace
 			v-for="(tab, index) in tabbar"
 			:icon="tab.icon"
 			:to="tab.path"

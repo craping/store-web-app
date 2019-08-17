@@ -234,7 +234,7 @@
 
       noDataText: {
         type: String,
-        default: '没有更多数据'
+        default: '没有更多了'
       },
 
       width: {

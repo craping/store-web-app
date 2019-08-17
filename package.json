@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
-    "js-cookie": "^2.2.1",
+    "mobile-device-detect": "^0.2.3",
     "vant": "^2.0.0",
     "vue": "^2.6.10",
     "vue-router": "^3.0.5",
