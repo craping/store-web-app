@@ -143,6 +143,9 @@ export default {
 <style lang="scss">
 .home {
 
+  .store-nav-bar.van-hairline--bottom::after {
+    border-bottom-width: 0;
+  }
   .content {
 
     .curtain {
