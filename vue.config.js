@@ -17,7 +17,8 @@ module.exports = {
           ['^' + process.env.VUE_APP_BASE_API]: ''
         }
       }
-    }
+    },
+    disableHostCheck: true
   },
   configureWebpack: {
     resolve: {

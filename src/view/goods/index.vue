@@ -46,16 +46,26 @@
       </div>
     </van-swipe>
 
-    <van-cell-group ref="product">
-      <van-cell class="goods-price">
-        <div class="price">{{ goods.title }}</div>
-        <div class="originalPrice">{{ formatPrice(goods.price) }}</div>
-        <!-- <div class="goods-title">{{ goods.title }}</div>
-        <div class="goods-price">{{ formatPrice(goods.price) }}</div> -->
+    <van-cell-group ref="product" :border="false">
+      <van-cell class="goods-price" :border="false" :center="true">
+        <div class="price">{{ formatPrice(goods.price) }}</div>
+        <div class="originalPrice">
+          价格 <span class="line-through">{{ formatPrice(goods.originalPrice) }}</span>
+        </div>
       </van-cell>
-      <van-cell class="goods-express">
-        <van-col span="10">运费：{{ goods.express }}</van-col>
-        <van-col span="14">剩余：{{ goods.remain }}</van-col>
+      <van-cell :title="goods.name" title-style="font-size:1rem;" :label="goods.subTitle"/>
+      <van-cell :title="'运费：'+goods.express" style="font-size:.8rem;color:#969799" :value="'已售'+goods.remain"/>
+    </van-cell-group>
+
+    <van-cell-group class="goods-cell-group">
+      <van-cell title-class="title" title="7天退换.免费包邮" value="" :is-link="true">
+        <template v-slot:icon class="title">服务：</template>
+      </van-cell>
+      <van-cell  title-class="title" title="7天退换.免费包邮" value="" :is-link="true">
+        <template v-slot:icon class="title">参数：</template>
+      </van-cell>
+      <van-cell  title-class="title" title="7天退换.免费包邮" value="" :is-link="true">
+        <template v-slot:icon class="title">规格：</template>
       </van-cell>
     </van-cell-group>
 
@@ -145,14 +155,16 @@ export default {
         current:0,
       },
       goods: {
-        title: '美国伽力果（约680g/3个）',
+        name: 'HLA海澜之家简约动物印花短袖T恤',
+        subTitle: '2018夏季新品微弹舒适新款短T男生 6月6日-6月20日，满300减30，参与互动赢百元礼券，立即分享赢大奖',
         originalPrice: 3564,
         price: 2680,
         express: '免运费',
         remain: 19,
         thumb: [
           'https://img.yzcdn.cn/public_files/2017/10/24/e5a5a02309a41f9f5def56684808d9ae.jpeg',
-          'https://img.yzcdn.cn/public_files/2017/10/24/1791ba14088f9c2be8c610d0a6cc0f93.jpeg'
+          'https://img.yzcdn.cn/public_files/2017/10/24/1791ba14088f9c2be8c610d0a6cc0f93.jpeg',
+          'http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20181113/movie_ad.jpg'
         ]
       }
     };
@@ -217,8 +229,8 @@ export default {
         startPosition:index
       });
     },
-    formatPrice() {
-      return '¥' + (this.goods.price / 100).toFixed(2);
+    formatPrice(price) {
+      return '¥ ' + (price / 100).toFixed(2);
     },
 
     onClickCart() {
@@ -276,9 +288,15 @@ export default {
   }
 
   &-swipe {
-    img {
-      width: 100%;
-      display: block;
+    height: 55vh;
+    background-color: #fff;
+    .van-swipe-item{
+      display: flex;
+      align-items: center;
+      img {
+        width: 100%;
+        display: block;
+      }
     }
     .custom-indicator {
       position: absolute;
@@ -296,16 +314,16 @@ export default {
     color:#fff;
     .price{
       color:#fff;
+      font-size: 26px;
     }
-
+    .originalPrice{
+      color:#fff;
+    }
   }
 
-  &-title {
-    font-size: 16px;
-  }
-
-  &-originalPrice{
-    color:#fff;
+  .title {
+    font-size:.8rem;
+    color:#969799
   }
 
   &-express {

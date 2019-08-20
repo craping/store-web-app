@@ -121,7 +121,7 @@ export default {
   },
   methods: {
     onRefresh(done) {
-      this.$store.dispatch("home/content").then(() => {
+      this.$store.dispatch("home/content").finally(() => {
         this.isLoading = false;
         if (done) 
           done();
