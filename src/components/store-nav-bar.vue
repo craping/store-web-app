@@ -79,8 +79,4 @@ export default {
       padding-right: 0;
     }
   }
-
-  .store-nav-bar.van-hairline--bottom::after {
-    border-bottom-width: 0;
-  }
 </style>

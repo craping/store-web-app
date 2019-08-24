@@ -1,61 +1,96 @@
 <template>
   <div class="goods">
 
-    <store-nav-bar background="#fff" :opacity="opacityIn" v-show="opacityIn  > 0">
+    <store-nav-bar class="nav-out" :opacity="opacityOut" v-show="opacityOut > 0">
+      <template v-slot:left>
+        <div class="back arrow-left">
+          <van-icon name="arrow-left" color="#fff" size="20" @click="left('out')"/>
+        </div>
+      </template>
+      <template v-slot:right>
+        <div class="back share">
+          <van-icon name="share" color="#fff" size="20"/>
+        </div>
+      </template>
+    </store-nav-bar>
+
+    <store-nav-bar class="nav-in" background="#fff" :opacity="opacityIn" v-show="opacityIn  > 0">
       <template v-slot:left>
         <van-icon name="arrow-left" color="#999" size="20" @click="left('in')"/>
       </template>
       <template v-slot:title>
-        <van-icon name="arrow-left" color="#999" size="20" />
+        <van-tabs v-model="activeTab" line-width="40" :border="false" @click="scrollToAnchor">
+          <van-tab ref="tab-product" title="商品" name="product"></van-tab>
+          <van-tab ref="tab-comment" title="评价" name="comment"></van-tab>
+          <van-tab ref="tab-detail" title="详情" name="detail"></van-tab>
+        </van-tabs>
       </template>
       <template v-slot:right>
-        <van-icon name="chat-o" color="#999" size="20" />
+        <van-icon name="share" color="#999" size="20" />
       </template>
     </store-nav-bar>
+  
 
-    <store-nav-bar :opacity="opacityOut" v-show="opacityOut > 0">
-      <template v-slot:left>
-        <van-icon name="arrow-left" color="#999" size="20" @click="left('out')"/>
-      </template>
-      <template v-slot:right>
-        <van-icon name="chat-o" color="#999" size="20" />
-      </template>
-    </store-nav-bar>
 
-    <div class="content" >
+
+
+
+
+
+    <van-swipe class="goods-swipe" :autoplay="3000" @change="onSwipeChange">
+      <van-swipe-item v-for="(thumb, index) in goods.thumb" :key="index" @click="preview(index)">
+        <img :src="thumb" >
+      </van-swipe-item>
+      <div class="custom-indicator" slot="indicator">
+        {{ swipe.current + 1 }}/{{ goods.thumb.length }}
+      </div>
+    </van-swipe>
+
+    <van-cell-group ref="product" :border="false">
+      <van-cell class="goods-price" :border="false" :center="true">
+        <div class="price">{{ formatPrice(goods.price) }}</div>
+        <div class="originalPrice">
+          价格 <span class="line-through">{{ formatPrice(goods.originalPrice) }}</span>
+        </div>
+      </van-cell>
+      <van-cell :title="goods.name" title-style="font-size:1rem;" :label="goods.subTitle"/>
+      <van-cell :title="'运费：'+goods.express" style="font-size:.8rem;color:#969799" :value="'已售'+goods.remain"/>
+    </van-cell-group>
+
+    <van-cell-group class="goods-cell-group">
+      <van-cell title-class="title" title="7天退换.免费包邮" value="" :is-link="true">
+        <template v-slot:icon class="title">服务：</template>
+      </van-cell>
+      <van-cell  title-class="title" title="7天退换.免费包邮" value="" :is-link="true">
+        <template v-slot:icon class="title">参数：</template>
+      </van-cell>
+      <van-cell  title-class="title" title="7天退换.免费包邮" value="" :is-link="true">
+        <template v-slot:icon class="title">规格：</template>
+      </van-cell>
+    </van-cell-group>
+
+    <van-cell-group class="goods-cell-group" ref="comment">
+      <van-cell title="商品评价" />
+      <van-cell value="单元格" icon="shop-o" is-link @click="sorry" v-for="i in 5" :key="i">
+        <template slot="title">
+          <span class="van-cell-text"></span>
+          <van-tag class="goods-tag" type="danger">标签</van-tag>
+        </template>
+      </van-cell>
+      <van-cell title="线下门店" icon="location-o" is-link @click="sorry" />
+    </van-cell-group>
+    
+    <van-cell-group class="goods-cell-group" ref="detail">
+      <van-cell title="图文详细" @click="sorry" />
+      <van-cell value="单元格" icon="shop-o" is-link @click="sorry" v-for="i in 20" :key="i">
+        <template slot="title">
+          <span class="van-cell-text"></span>
+          <van-tag class="goods-tag" type="danger">标签</van-tag>
+        </template>
+      </van-cell>
+      <van-cell title="线下门店" icon="location-o" is-link @click="sorry" />
+    </van-cell-group>
       
-      <van-swipe ref="swipe" class="goods-swipe" :autoplay="3000">
-        <van-swipe-item v-for="(thumb, index) in goods.thumb" :key="index" @click="preview(index)">
-          <img :src="thumb" >
-        </van-swipe-item>
-      </van-swipe>
-
-      <van-cell-group>
-        <van-cell>
-          <div class="goods-title">{{ goods.title }}</div>
-          <div class="goods-price">{{ formatPrice(goods.price) }}</div>
-        </van-cell>
-        <van-cell class="goods-express">
-          <van-col span="10">运费：{{ goods.express }}</van-col>
-          <van-col span="14">剩余：{{ goods.remain }}</van-col>
-        </van-cell>
-      </van-cell-group>
-
-      <van-cell-group class="goods-cell-group" v-for="i in 10" :key="i">
-        <van-cell value="进入店铺" icon="shop-o" is-link @click="sorry">
-          <template slot="title">
-            <span class="van-cell-text">有赞的店</span>
-            <van-tag class="goods-tag" type="danger">官方</van-tag>
-          </template>
-        </van-cell>
-        <van-cell title="线下门店" icon="location-o" is-link @click="sorry" />
-      </van-cell-group>
-
-      <van-cell-group class="goods-cell-group">
-        <van-cell title="查看商品详情" is-link @click="sorry" />
-      </van-cell-group>
-
-    </div>
 
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" @click="sorry">
@@ -106,6 +141,8 @@ export default {
     [GoodsActionIcon.name]: GoodsActionIcon,
     [GoodsActionButton.name]: GoodsActionButton,
     [ImagePreview.name]: ImagePreview,
+    [Tab.name]:Tab,
+    [Tabs.name]:Tabs,
     storeNavBar
   },
 
@@ -113,14 +150,21 @@ export default {
     return {
       opacityIn:0,
       opacityOut:1,
+      activeTab:"product",
+      swipe:{
+        current:0,
+      },
       goods: {
-        title: '美国伽力果（约680g/3个）',
+        name: 'HLA海澜之家简约动物印花短袖T恤',
+        subTitle: '2018夏季新品微弹舒适新款短T男生 6月6日-6月20日，满300减30，参与互动赢百元礼券，立即分享赢大奖',
+        originalPrice: 3564,
         price: 2680,
         express: '免运费',
         remain: 19,
         thumb: [
           'https://img.yzcdn.cn/public_files/2017/10/24/e5a5a02309a41f9f5def56684808d9ae.jpeg',
-          'https://img.yzcdn.cn/public_files/2017/10/24/1791ba14088f9c2be8c610d0a6cc0f93.jpeg'
+          'https://img.yzcdn.cn/public_files/2017/10/24/1791ba14088f9c2be8c610d0a6cc0f93.jpeg',
+          'http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20181113/movie_ad.jpg'
         ]
       }
     };
@@ -138,9 +182,46 @@ export default {
   methods: {
     handleScroll(e){
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-      this.opacityIn = scrollTop/(this.$refs.swipe.$el.offsetHeight- 66);
-      this.opacityOut = 1 - (scrollTop/(this.$refs.swipe.$el.offsetHeight - 66));
-      console.log("opacityIn:"+this.opacityIn+", opacityOut:"+this.opacityOut)
+      this.opacityIn = scrollTop/(this.$refs.product.offsetTop- 66);
+      this.opacityOut = 1 - (scrollTop/(this.$refs.product.offsetTop - 66));
+
+      if(!this.tabClick){
+        if(scrollTop < this.$refs.comment.offsetTop)
+          this.activeTab = "product"
+        if(scrollTop >= this.$refs.comment.offsetTop - 66 && scrollTop < this.$refs.detail.offsetTop - 66)
+          this.activeTab = "comment"
+        if(scrollTop >= this.$refs.detail.offsetTop - 66)
+          this.activeTab = "detail"
+      }
+      console.log(scrollTop);
+    },
+    scrollToAnchor(e){
+      let offsetTop = 0;
+      switch (e) {
+        case "product":
+          offsetTop = 0;
+          break;
+        case "comment":
+          offsetTop = this.$refs.comment.offsetTop - 66;
+          break;
+        case "detail":
+          offsetTop = this.$refs.detail.offsetTop - 66;
+          break;
+      }
+      this.tabClick = true
+      window.scrollTo({ 
+        top: offsetTop, 
+        behavior: "smooth" 
+      });
+      setTimeout(() => {
+        this.tabClick = false;
+      }, 500);
+    },
+    left(e){
+      this.$router.replace("/main/home");
+    },
+    onSwipeChange(index) {
+      this.swipe.current = index;
     },
     preview(index){
       ImagePreview({
@@ -148,11 +229,8 @@ export default {
         startPosition:index
       });
     },
-    left(e){
-      alert(e)
-    },
-    formatPrice() {
-      return '¥' + (this.goods.price / 100).toFixed(2);
+    formatPrice(price) {
+      return '¥ ' + (price / 100).toFixed(2);
     },
 
     onClickCart() {
@@ -168,28 +246,84 @@ export default {
 
 <style lang="scss">
 .goods {
-  .van-home-nav-bar {
-    background-color: $red;
+  margin-bottom: 50px;
+
+  .back{
+    position: relative;
+  }
+  .back::before{
+    content: '';
+    width: 30px;
+    height: 30px;
+    background-color: #000;
+    border-radius: 50%;
+    opacity: .3;
+    display: block;
+    position: absolute;
+    
+  }
+  .arrow-left.back:before{
+    left: -4px;
+    top: -5px;
+  }
+  .share.back:before{
+    left: -5px;
+    top: -5px;
   }
 
-  .van-hairline--bottom::after {
-    border-bottom-width: 0;
+  .nav-out.van-hairline--bottom::after{
+      border-bottom-width: 0;
   }
-  .content {
-  }
-  &-swipe {
-    img {
-      width: 100%;
-      display: block;
+  .nav-in{
+    .van-nav-bar__title{
+      margin-bottom: -10px;
+      .van-tabs__nav{
+        display: block;
+        .van-tab{
+          display: inline-block;
+          padding: 0 15px;
+        }
+      }
     }
   }
 
-  &-title {
-    font-size: 16px;
+  &-swipe {
+    height: 55vh;
+    background-color: #fff;
+    .van-swipe-item{
+      display: flex;
+      align-items: center;
+      img {
+        width: 100%;
+        display: block;
+      }
+    }
+    .custom-indicator {
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+      padding: 2px 5px;
+      color: #fff;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.1);
+    }
   }
 
   &-price {
-    color: #f44;
+    background-color: $red;
+    color:#fff;
+    .price{
+      color:#fff;
+      font-size: 26px;
+    }
+    .originalPrice{
+      color:#fff;
+    }
+  }
+
+  .title {
+    font-size:.8rem;
+    color:#969799
   }
 
   &-express {

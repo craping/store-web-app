@@ -121,7 +121,7 @@ export default {
   },
   methods: {
     onRefresh(done) {
-      this.$store.dispatch("home/content").then(() => {
+      this.$store.dispatch("home/content").finally(() => {
         this.isLoading = false;
         if (done) 
           done();
@@ -143,6 +143,9 @@ export default {
 <style lang="scss">
 .home {
 
+  .store-nav-bar.van-hairline--bottom::after {
+    border-bottom-width: 0;
+  }
   .content {
 
     .curtain {

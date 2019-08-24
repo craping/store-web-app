@@ -55,3 +55,11 @@ button, input, textarea {
 	-webkit-transform:rotate(0deg);
 	transform:rotate(0deg);
 }
+
+.line-through{
+	text-decoration: line-through;
+}
+
+.border-none.van-hairline--top-bottom::after{
+	border-width:0;
+}
