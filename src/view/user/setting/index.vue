@@ -10,8 +10,7 @@
 <script>
 import Vue from 'vue';
 import { NavBar, Cell, CellGroup } from 'vant';
-Vue.use(Cell).use(CellGroup);
-Vue.use(NavBar);
+Vue.use(Cell).use(CellGroup).use(NavBar);
 export default {
     data(){
         return {

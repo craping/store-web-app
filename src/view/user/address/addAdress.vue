@@ -23,11 +23,7 @@ import Vue from "vue";
 import { Row, NavBar, AddressEdit, Area} from "vant";
 import { createNamespacedHelpers } from 'vuex'
 const {mapState,mapActions} = createNamespacedHelpers('address')
-
-Vue.use(Row)
-Vue.use(AddressEdit);
-Vue.use(Area);
-Vue.use(NavBar);
+Vue.use(Row).use(AddressEdit).use(Area).use(NavBar);
 export default {
   data() {
     return {

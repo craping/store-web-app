@@ -31,9 +31,7 @@
 <script>
 import Vue from 'vue';
 import { NavBar, Cell, CellGroup, ActionSheet, Popup, DatetimePicker } from 'vant';
-Vue.use(Cell).use(CellGroup);
-Vue.use(ActionSheet).use(Popup).use(DatetimePicker);
-Vue.use(NavBar);
+Vue.use(Cell).use(CellGroup).use(ActionSheet).use(Popup).use(DatetimePicker).use(NavBar);
 export default {
     data(){
         return {

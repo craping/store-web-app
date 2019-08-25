@@ -19,12 +19,8 @@
 </template>
 <script>
 import Vue from 'vue';
-import { NavBar, Icon } from 'vant';
-import { Field ,CellGroup} from 'vant';
-
-Vue.use(Field).use(CellGroup);
-Vue.use(Icon);
-Vue.use(NavBar);
+import { NavBar, Icon, Field ,CellGroup } from 'vant';
+Vue.use(Field).use(CellGroup).use(Icon).use(NavBar);
 export default {
     data(){
         return {

@@ -114,11 +114,8 @@
 </template>
 <script>
 import Vue from 'vue';
-import { NavBar, Cell, CellGroup } from 'vant';
-import { Tab, Tabs } from 'vant';
-Vue.use(Tab).use(Tabs);
-Vue.use(Cell).use(CellGroup);
-Vue.use(NavBar);
+import { NavBar, Cell, CellGroup, Tab, Tabs ,Icon } from 'vant';
+Vue.use(Tab).use(Tabs).use(Cell).use(CellGroup).use(NavBar);
 export default {
     data(){
         return {

@@ -10,9 +10,8 @@
 </template>
 <script>
 import Vue from 'vue';
-import { NavBar, Field } from 'vant';
-Vue.use(Field);
-Vue.use(NavBar);
+import { NavBar, Field ,CellGroup} from 'vant';
+Vue.use(Field).use(CellGroup).use(NavBar);
 export default {
     data(){
         return {

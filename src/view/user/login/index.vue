@@ -43,10 +43,7 @@
 import Vue from 'vue';
 import { NavBar, Icon } from 'vant';
 import { CellGroup, Field , Toast} from 'vant';
-Vue.use(CellGroup);
-Vue.use(Field);
-Vue.use(Icon);
-Vue.use(NavBar);
+Vue.use(CellGroup).use(Field).use(Icon).use(NavBar);
 export default {
     data(){
         return {

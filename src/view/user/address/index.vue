@@ -20,9 +20,7 @@ import Vue from 'vue';
 import { createNamespacedHelpers } from 'vuex'
 const {mapState,mapActions} = createNamespacedHelpers('address')
 import { Row, NavBar, AddressList} from 'vant';
-Vue.use(Row)
-Vue.use(NavBar);
-Vue.use(AddressList);
+Vue.use(Row).use(NavBar).use(AddressList);
 export default {
   data() {
     return {
