@@ -1,0 +1,220 @@
+<template>
+    <div class="vip-page">
+        <van-nav-bar title="会员中心" left-arrow @click-left="onClickLeft" fixed />
+        <div class="page-body">
+             <div class="top-card">
+                <div class="card-row-1">
+                    <div >
+                        <div class="title-1">账户余额</div>
+                        <div class="rest-money"> <span class="sign">￥</span> 1632.2</div>
+                    </div>
+                    <div class="btn"><van-icon name="bill" />去提现</div>
+                </div>
+                <div class="card-row-2">
+                    <div> 
+                        <div class="title-2">累计收入(元)</div>
+                        <div>111000.1</div>
+                    </div>
+                    <div>
+                        <div class="title-2">已提现(元)</div>
+                        <div>1112323</div>
+                    </div>
+                    <div>
+                        <div class="title-2">未结算(元)</div>
+                        <div>111</div>
+                    </div>
+                </div>
+            </div>
+            <van-tabs v-model="active" color="#333">
+                <van-tab title="今日收益">
+                    <div class="profit-card card round">
+                        <div style="margin-bottom:10px;">
+                            <div class="row-title">我的订单收益</div>
+                            <div class="row-data">
+                                <div class="col-item">
+                                    <div class="title">订单数</div>
+                                    <div>10</div>
+                                </div>
+                                <div class="col-item">
+                                    <div class="title">预估收益(元)</div>
+                                    <div>1022</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="row-title">团队订单收益</div>
+                            <div class="row-data">
+                                <div class="col-item">
+                                    <div class="title">订单数</div>
+                                    <div>10</div>
+                                </div>
+                                <div class="col-item">
+                                    <div class="title">预估收益(元)</div>
+                                    <div>1022</div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="look-detail">查看详情></p>
+                    </div>
+                </van-tab>
+                <van-tab title="本月收益">
+                    <div class="profit-card card round">
+                        <div style="margin-bottom:10px;">
+                            <div class="row-title">我的订单收益</div>
+                            <div class="row-data">
+                                <div class="col-item">
+                                    <div class="title">订单数</div>
+                                    <div>1022</div>
+                                </div>
+                                <div class="col-item">
+                                    <div class="title">预估收益(元)</div>
+                                    <div>102112</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="row-title">团队订单收益</div>
+                            <div class="row-data">
+                                <div class="col-item">
+                                    <div class="title">订单数</div>
+                                    <div>1000</div>
+                                </div>
+                                <div class="col-item">
+                                    <div class="title">预估收益(元)</div>
+                                    <div>102222</div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="look-detail">查看详情></p>
+                    </div>
+                </van-tab>
+            </van-tabs>
+            <div class="team-card card round">
+                <div style="margin-bottom:10px;">
+                    <div class="row-title">我的团队</div>
+                    <div class="row-data">
+                        <div class="col-item">
+                            <div class="title">会员数</div>
+                            <div>10</div>
+                        </div>
+                        <div class="col-item">
+                            <div class="title">用户数</div>
+                            <div>1022</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="look-detail">查看详情></p>
+            </div>
+            <div class="bottom-bar">
+                <van-cell title="提现记录" is-link />
+                <van-cell title="余额明细" is-link />
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+import Vue from 'vue';
+import { NavBar, Cell, CellGroup } from 'vant';
+import { Tab, Tabs } from 'vant';
+Vue.use(Tab).use(Tabs);
+Vue.use(Cell).use(CellGroup);
+Vue.use(NavBar);
+export default {
+    data(){
+        return {
+            active: 0
+        }
+    },
+    methods:{
+        onClickLeft() {
+            this.$router.go(-1)
+        },   
+        jumpLink(path) {
+            this.$router.push(path)
+        },
+        logout() {
+            
+        }
+    }
+}
+</script>
+<style lang="scss" scoped>
+    .vip-page{
+        .page-body{
+            padding-top: 46px;
+        }
+        .top-card{
+            margin: 5px;
+            border-radius: 5px;
+            background: #50545F;
+            // background: #000;
+            color: #FFF;
+            padding: 15px;
+            .card-row-1{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+                .title-1{
+                    font-size: 16px;
+                    margin-bottom: 10px;
+                }
+                .rest-money{
+                    font-size: 20px;
+                    .sign{
+                        font-size: 14px;
+                    }
+                }
+                .btn{
+                    border-radius: 8px;
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    padding: 2px 6px;
+                    display: flex;
+                    align-items: center;
+                }
+            }   
+            .card-row-2{
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                display: flex;
+                padding-top: 10px;
+                justify-content: space-between;
+                text-align: center;
+                .title-2{
+                    margin-bottom: 10px;
+                }
+            }
+        }
+        .card{
+            background: #FFF;
+            padding: 15px 15px 5px;
+            margin: 10px;
+            .row-title{
+                padding-bottom: 4px;
+                border-bottom: 1px solid #333;
+                font-size: 16px;
+                margin-bottom: 4px;
+            }   
+            .row-data{
+                display: flex;
+                margin: 20px 0;
+                .col-item{
+                    text-align: center;
+                    flex: 1;
+                    font-size: 16px;
+                    .title{
+                        margin-bottom: 10px;
+                        color: #999;
+                        font-size: 12px;
+                    }
+                }
+            }
+            .look-detail{
+                color: #409EFF;
+                text-align: right;
+            }
+        }
+        .bottom-bar{
+            margin: 10px 0;
+        }
+    }
+</style>

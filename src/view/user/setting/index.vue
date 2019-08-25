@@ -26,7 +26,7 @@ export default {
             this.$router.push(path)
         },
         logout() {
-            
+            this.$router.push('/login')
         }
     }
 }

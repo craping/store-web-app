@@ -17,4 +17,13 @@ export default [{
 {
   path: '/nameSet',
   component: () => import('@/view/user/setting/nameSet.vue')
-},];
+},
+{
+  path: '/login',
+  component: () => import('@/view/user/login/index.vue')
+},
+{
+  path: '/accountLogin',
+  component: () => import('@/view/user/login/accountLogin.vue')
+},
+];

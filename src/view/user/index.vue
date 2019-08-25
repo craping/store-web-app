@@ -124,8 +124,8 @@ export default {
           link:'/setting'
         },
         {
-          name:'客服',
-          link:''
+          name:'会员中心',
+          link:'/vip'
         },
       ],
     };
@@ -267,7 +267,7 @@ export default {
         padding: 0 15px;
         margin: 0 15px 20px;
         border-radius: 5px;
-        .van-grid-item__content{
+        /deep/ .van-grid-item__content{
           padding: 16px 0;
         }
         .grid-top{
