@@ -36,6 +36,7 @@
                   v-for="item in proEventList[`event${product.status}`]"
                   :key="item.id"
                   size="mini"
+                  :class="item == '立即付款' ? 'tored' : ''"
                   @click="proEventClick(product.pid,item)"
                 >{{item}}</van-button>
               </div>
@@ -49,19 +50,8 @@
 <script>
 import Vue from 'vue'
 import storeScroller from '@/components/store-scroller'
-import {
-  AddressList,
-  Tab,
-  Tabs,
-  NavBar,
-  Card,
-  Button,
-  Tag,
-  Row,
-  Toast
-} from 'vant'
+import { Tab, Tabs, NavBar, Card, Button, Tag, Row, Toast } from 'vant'
 Vue.use(NavBar)
-  .use(AddressList)
   .use(Tab)
   .use(Tabs)
   .use(Card)
@@ -220,6 +210,10 @@ export default {
       border-radius: 15px;
       border: 1px solid #ccc;
       color: $font-color-gray;
+    }
+    .tored {
+      background: red;
+      color: #fff;
     }
   }
   /deep/.van-tabs__nav {
