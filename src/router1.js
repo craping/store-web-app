@@ -32,13 +32,28 @@ const routes = [{
   meta: {
     title: '会员中心'
   }
-}, {
-  path: '/adderss',
-  component: () => import('./view/user/adderss/index.vue')
-}, {
-  path: '/addAdderss',
-  component: () => import('./view/user/adderss/addAdeerss.vue')
-}, {
+}, 
+{
+  path: '/address',
+  component: () => import('./view/user/address/index.vue')
+}, 
+{
+  path: '/addAddress',
+  component: () => import('./view/user/address/addAdress.vue')
+}, 
+{
+  path: '/setting',
+  component: () => import('./view/user/setting/index.vue')
+},
+{
+  path: '/userInfo',
+  component: () => import('./view/user/setting/userInfo.vue')
+},
+{
+  path: '/nameSet',
+  component: () => import('./view/user/setting/nameSet.vue')
+},
+{
   path: '/cart',
   component: () => import('./view/cart'),
   meta: {
