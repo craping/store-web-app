@@ -50,7 +50,7 @@
 <script>
 import Vue from 'vue'
 import storeScroller from '@/components/store-scroller'
-import { Tab, Tabs, NavBar, Card, Button, Tag, Row, Toast } from 'vant'
+import { Tab, Tabs, NavBar, Card, Button, Tag, Row, Toast, Dialog } from 'vant'
 Vue.use(NavBar)
   .use(Tab)
   .use(Tabs)
@@ -59,6 +59,7 @@ Vue.use(NavBar)
   .use(Tag)
   .use(Row)
   .use(Toast)
+  .use(Dialog)
 export default {
   name: 'order',
   components: {
@@ -168,7 +169,88 @@ export default {
 
     /************产品按钮点击点击事件*********/
     proEventClick(pid, event) {
-      Toast.success(event)
+      switch (event) {
+        case '取消订单':
+          this.confirmDialog('cancel', pid)
+          break
+        case '删除订单':
+          this.confirmDialog('delete', pid)
+          break
+        case '查看物流':
+          this.$router.push({
+            name: 'productExpress',
+            params: {
+              pid
+            }
+          })
+          break
+        case '评价商品':
+          Toast.success('去评价商品')
+          break
+        case '退款':
+          this.$router.push({
+            name: 'refund',
+            params: {
+              pid,
+              refund: 'noPro'
+            }
+          })
+          break
+        case '退货退款':
+          this.$router.push({
+            name: 'refund',
+            params: {
+              pid,
+              refund: 'hasPro'
+            }
+          })
+          break
+        case '立即付款':
+          Toast.success('去付款')
+          break
+        case '确认收货':
+          this.$router.push({
+            name: 'successfulOrder',
+            params: {
+              pid
+            }
+          })
+          break
+      }
+    },
+
+    /***********点击取消订单和删除订单弹窗事件*********/
+    confirmDialog(type, pid) {
+      let title = ''
+      let message = ''
+      if (type == 'cancel') {
+        title = '取消订单'
+        message = '确定取消这个订单吗？'
+      } else {
+        title = '删除订单'
+        message = '确定删除这个订单吗？'
+      }
+      Dialog.confirm({
+        title,
+        message
+      })
+        .then(() => {
+          // on confirm
+          type == 'cancel' ? this.cancelOrder(pid) : this.deleteOrder(pid)
+        })
+        .catch(() => {
+          // on cancel
+        })
+    },
+
+    /***********取消订单事件*********/
+    cancelOrder(pid) {
+      console.log('取消订单')
+    },
+
+    /***********删除订单事件*********/
+    deleteOrder(pid) {
+      console.log('删除订单')
     },
 
     /***********下拉刷新事件*********/
