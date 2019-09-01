@@ -1,5 +1,7 @@
 <template>
-  <div class="_v-container" :id="containerId"
+  <div
+    class="_v-container"
+    :id="containerId"
     @touchstart="touchStart($event)"
     @touchmove="touchMove($event)"
     @touchend="touchEnd($event)"
@@ -8,39 +10,110 @@
     @mouseup="mouseUp($event)"
   >
     <div class="_v-content" :id="contentId">
-      <div v-if="onRefresh" class="pull-to-refresh-layer"
+      <div
+        v-if="onRefresh"
+        class="pull-to-refresh-layer"
         :class="{'active': state == 1, 'active refreshing': state == 2}"
       >
         <span class="spinner-holder">
           <arrow class="arrow" :fillColor="refreshLayerColor" v-if="state != 2"></arrow>
 
-          <span class="text" v-if="state != 2" :style="{color: refreshLayerColor}" v-text="refreshText"></span>
+          <span
+            class="text"
+            v-if="state != 2"
+            :style="{color: refreshLayerColor}"
+            v-text="refreshText"
+          ></span>
 
           <span v-if="state == 2">
             <slot name="refresh-spinner">
-              <svg class="spinner" :style="{fill: refreshLayerColor, stroke: refreshLayerColor}" viewBox="0 0 64 64">
+              <svg
+                class="spinner"
+                :style="{fill: refreshLayerColor, stroke: refreshLayerColor}"
+                viewBox="0 0 64 64"
+              >
                 <g stroke-width="7" stroke-linecap="round">
                   <line x1="10" x2="10" y1="27.3836" y2="36.4931">
-                    <animate attributeName="y1" dur="750ms" values="16;18;28;18;16;16" repeatCount="indefinite"></animate>
-                    <animate attributeName="y2" dur="750ms" values="48;46;36;44;48;48" repeatCount="indefinite"></animate>
-                    <animate attributeName="stroke-opacity" dur="750ms" values="1;.4;.5;.8;1;1" repeatCount="indefinite"></animate>
+                    <animate
+                      attributeName="y1"
+                      dur="750ms"
+                      values="16;18;28;18;16;16"
+                      repeatCount="indefinite"
+                    ></animate>
+                    <animate
+                      attributeName="y2"
+                      dur="750ms"
+                      values="48;46;36;44;48;48"
+                      repeatCount="indefinite"
+                    ></animate>
+                    <animate
+                      attributeName="stroke-opacity"
+                      dur="750ms"
+                      values="1;.4;.5;.8;1;1"
+                      repeatCount="indefinite"
+                    ></animate>
                   </line>
                   <line x1="24" x2="24" y1="18.6164" y2="45.3836">
-                    <animate attributeName="y1" dur="750ms" values="16;16;18;28;18;16" repeatCount="indefinite"></animate>
-                    <animate attributeName="y2" dur="750ms" values="48;48;46;36;44;48" repeatCount="indefinite"></animate>
-                    <animate attributeName="stroke-opacity" dur="750ms" values="1;1;.4;.5;.8;1" repeatCount="indefinite"></animate>
+                    <animate
+                      attributeName="y1"
+                      dur="750ms"
+                      values="16;16;18;28;18;16"
+                      repeatCount="indefinite"
+                    ></animate>
+                    <animate
+                      attributeName="y2"
+                      dur="750ms"
+                      values="48;48;46;36;44;48"
+                      repeatCount="indefinite"
+                    ></animate>
+                    <animate
+                      attributeName="stroke-opacity"
+                      dur="750ms"
+                      values="1;1;.4;.5;.8;1"
+                      repeatCount="indefinite"
+                    ></animate>
                   </line>
                   <line x1="38" x2="38" y1="16.1233" y2="47.8767">
-                    <animate attributeName="y1" dur="750ms" values="18;16;16;18;28;18" repeatCount="indefinite"></animate>
-                    <animate attributeName="y2" dur="750ms" values="44;48;48;46;36;44" repeatCount="indefinite"></animate>
-                    <animate attributeName="stroke-opacity" dur="750ms" values=".8;1;1;.4;.5;.8" repeatCount="indefinite"></animate>
+                    <animate
+                      attributeName="y1"
+                      dur="750ms"
+                      values="18;16;16;18;28;18"
+                      repeatCount="indefinite"
+                    ></animate>
+                    <animate
+                      attributeName="y2"
+                      dur="750ms"
+                      values="44;48;48;46;36;44"
+                      repeatCount="indefinite"
+                    ></animate>
+                    <animate
+                      attributeName="stroke-opacity"
+                      dur="750ms"
+                      values=".8;1;1;.4;.5;.8"
+                      repeatCount="indefinite"
+                    ></animate>
                   </line>
                   <line x1="52" x2="52" y1="16" y2="48">
-                    <animate attributeName="y1" dur="750ms" values="28;18;16;16;18;28" repeatCount="indefinite"></animate>
-                    <animate attributeName="y2" dur="750ms" values="36;44;48;48;46;36" repeatCount="indefinite"></animate>
-                    <animate attributeName="stroke-opacity" dur="750ms" values=".5;.8;1;1;.4;.5" repeatCount="indefinite"></animate
-                    ></line>
-                  </g>
+                    <animate
+                      attributeName="y1"
+                      dur="750ms"
+                      values="28;18;16;16;18;28"
+                      repeatCount="indefinite"
+                    ></animate>
+                    <animate
+                      attributeName="y2"
+                      dur="750ms"
+                      values="36;44;48;48;46;36"
+                      repeatCount="indefinite"
+                    ></animate>
+                    <animate
+                      attributeName="stroke-opacity"
+                      dur="750ms"
+                      values=".5;.8;1;1;.4;.5"
+                      repeatCount="indefinite"
+                    ></animate>
+                  </line>
+                </g>
               </svg>
               <!-- <spinner :style="{fill: refreshLayerColor, stroke: refreshLayerColor}"></spinner> -->
             </slot>
@@ -53,504 +126,566 @@
       <div v-if="showInfiniteLayer" class="loading-layer">
         <span class="spinner-holder" :class="{'active': showLoading}">
           <slot name="infinite-spinner">
-            <svg class="spinner" :style="{fill: loadingLayerColor, stroke: loadingLayerColor}" viewBox="0 0 64 64">
+            <svg
+              class="spinner"
+              :style="{fill: loadingLayerColor, stroke: loadingLayerColor}"
+              viewBox="0 0 64 64"
+            >
               <g>
                 <circle cx="16" cy="32" stroke-width="0" r="3">
-                  <animate attributeName="fill-opacity" dur="750ms" values=".5;.6;.8;1;.8;.6;.5;.5" repeatCount="indefinite"></animate>
-                  <animate attributeName="r" dur="750ms" values="3;3;4;5;6;5;4;3" repeatCount="indefinite"></animate>
+                  <animate
+                    attributeName="fill-opacity"
+                    dur="750ms"
+                    values=".5;.6;.8;1;.8;.6;.5;.5"
+                    repeatCount="indefinite"
+                  ></animate>
+                  <animate
+                    attributeName="r"
+                    dur="750ms"
+                    values="3;3;4;5;6;5;4;3"
+                    repeatCount="indefinite"
+                  ></animate>
                 </circle>
                 <circle cx="32" cy="32" stroke-width="0" r="3.09351">
-                  <animate attributeName="fill-opacity" dur="750ms" values=".5;.5;.6;.8;1;.8;.6;.5" repeatCount="indefinite"></animate>
-                  <animate attributeName="r" dur="750ms" values="4;3;3;4;5;6;5;4" repeatCount="indefinite"></animate>
+                  <animate
+                    attributeName="fill-opacity"
+                    dur="750ms"
+                    values=".5;.5;.6;.8;1;.8;.6;.5"
+                    repeatCount="indefinite"
+                  ></animate>
+                  <animate
+                    attributeName="r"
+                    dur="750ms"
+                    values="4;3;3;4;5;6;5;4"
+                    repeatCount="indefinite"
+                  ></animate>
                 </circle>
                 <circle cx="48" cy="32" stroke-width="0" r="4.09351">
-                  <animate attributeName="fill-opacity" dur="750ms" values=".6;.5;.5;.6;.8;1;.8;.6" repeatCount="indefinite"></animate>
-                  <animate attributeName="r" dur="750ms" values="5;4;3;3;4;5;6;5" repeatCount="indefinite"></animate>
-                </circle></g>
+                  <animate
+                    attributeName="fill-opacity"
+                    dur="750ms"
+                    values=".6;.5;.5;.6;.8;1;.8;.6"
+                    repeatCount="indefinite"
+                  ></animate>
+                  <animate
+                    attributeName="r"
+                    dur="750ms"
+                    values="5;4;3;3;4;5;6;5"
+                    repeatCount="indefinite"
+                  ></animate>
+                </circle>
+              </g>
             </svg>
             <!-- <spinner :style="{fill: loadingLayerColor, stroke: loadingLayerColor}"></spinner> -->
           </slot>
         </span>
 
-        <div class="no-data-text"
-          :class="{'active': !showLoading && loadingState == 2}" :style="{color: loadingLayerColor}" 
-          v-text="noDataText">
-        </div>
+        <div
+          class="no-data-text"
+          :class="{'active': !showLoading && loadingState == 2}"
+          :style="{color: loadingLayerColor}"
+          v-text="noDataText"
+        ></div>
       </div>
     </div>
   </div>
 </template>
 <style lang="css" scoped>
+._v-container {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
-  ._v-container {
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
 
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow: hidden;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
 
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-  }
+._v-container > ._v-content {
+  width: 100%;
 
-  ._v-container > ._v-content {
-    width: 100%;
+  -webkit-transform-origin: left top;
+  -webkit-transform: translateZ(0);
+  -moz-transform-origin: left top;
+  -moz-transform: translateZ(0);
+  -ms-transform-origin: left top;
+  -ms-transform: translateZ(0);
+  -o-transform-origin: left top;
+  -o-transform: translateZ(0);
+  transform-origin: left top;
+  transform: translateZ(0);
+}
 
-    -webkit-transform-origin: left top;
-    -webkit-transform: translateZ(0);
-    -moz-transform-origin: left top;
-    -moz-transform: translateZ(0);
-    -ms-transform-origin: left top;
-    -ms-transform: translateZ(0);
-    -o-transform-origin: left top;
-    -o-transform: translateZ(0);
-    transform-origin: left top;
-    transform: translateZ(0);
-  }
+._v-container > ._v-content > .pull-to-refresh-layer {
+  width: 100%;
+  height: 60px;
+  margin-top: -60px;
+  text-align: center;
+  font-size: 16px;
+  color: #aaa;
+}
 
-  ._v-container > ._v-content > .pull-to-refresh-layer {
-    width: 100%;
-    height: 60px;
-    margin-top: -60px;
-    text-align: center;
-    font-size: 16px;
-    color: #AAA;
-  }
+._v-container > ._v-content > .loading-layer {
+  width: 100%;
+  height: 60px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 60px;
+  color: #aaa;
+  position: relative;
+}
 
-  ._v-container > ._v-content > .loading-layer {
-    width: 100%;
-    height: 60px;
-    text-align: center;
-    font-size: 16px;
-    line-height: 60px;
-    color: #AAA;
-    position: relative;
-  }
+._v-container > ._v-content > .loading-layer > .no-data-text {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
 
-  ._v-container > ._v-content > .loading-layer > .no-data-text
-  {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-  }
+._v-container > ._v-content > .loading-layer > .spinner-holder,
+._v-container > ._v-content > .loading-layer > .no-data-text {
+  opacity: 0;
+  transition: opacity 0.15s linear;
+  -webkit-transition: opacity 0.15s linear;
+}
 
-  ._v-container > ._v-content > .loading-layer > .spinner-holder,
-  ._v-container > ._v-content > .loading-layer > .no-data-text
-  {
-    opacity: 0;
-    transition: opacity .15s linear;
-    -webkit-transition: opacity .15s linear;
-  }
+._v-container > ._v-content > .loading-layer > .spinner-holder.active,
+._v-container > ._v-content > .loading-layer > .no-data-text.active {
+  opacity: 1;
+}
 
-  ._v-container > ._v-content > .loading-layer > .spinner-holder.active,
-  ._v-container > ._v-content > .loading-layer > .no-data-text.active
-  {
-    opacity: 1;
-  }
+._v-container > ._v-content > .pull-to-refresh-layer .spinner-holder,
+._v-container > ._v-content > .loading-layer .spinner-holder {
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+}
 
-  ._v-container > ._v-content > .pull-to-refresh-layer .spinner-holder,
-  ._v-container > ._v-content > .loading-layer .spinner-holder {
-    text-align: center;
-    -webkit-font-smoothing: antialiased;
-  }
+._v-container > ._v-content > .pull-to-refresh-layer .spinner-holder .arrow,
+._v-container > ._v-content > .loading-layer .spinner-holder .arrow {
+  width: 20px;
+  height: 20px;
+  margin: 8px auto 0 auto;
 
-  ._v-container > ._v-content > .pull-to-refresh-layer .spinner-holder .arrow,
-  ._v-container > ._v-content > .loading-layer .spinner-holder .arrow {
-    width: 20px;
-    height: 20px;
-    margin: 8px auto 0 auto;
+  -webkit-transform: translate3d(0, 0, 0) rotate(0deg);
+  transform: translate3d(0, 0, 0) rotate(0deg);
 
-    -webkit-transform: translate3d(0,0,0) rotate(0deg);
-    transform: translate3d(0,0,0) rotate(0deg);
+  -webkit-transition: -webkit-transform 0.2s linear;
+  transition: transform 0.2s linear;
+}
 
-    -webkit-transition: -webkit-transform .2s linear;
-    transition: transform .2s linear;
-  }
+._v-container > ._v-content > .pull-to-refresh-layer .spinner-holder .text,
+._v-container > ._v-content > .loading-layer .spinner-holder .text {
+  display: block;
+  margin: 0 auto;
+  font-size: 14px;
+  line-height: 20px;
+  color: #aaa;
+}
 
-  ._v-container > ._v-content > .pull-to-refresh-layer .spinner-holder .text,
-  ._v-container > ._v-content > .loading-layer .spinner-holder .text {
-    display: block;
-    margin: 0 auto;
-    font-size: 14px;
-    line-height: 20px;
-    color: #aaa;
-  }
+._v-container > ._v-content > .pull-to-refresh-layer .spinner-holder .spinner,
+._v-container > ._v-content > .loading-layer .spinner-holder .spinner {
+  margin-top: 14px;
+  width: 32px;
+  height: 32px;
+  fill: #444;
+  stroke: #69717d;
+}
 
-  ._v-container > ._v-content > .pull-to-refresh-layer .spinner-holder .spinner,
-  ._v-container > ._v-content > .loading-layer .spinner-holder .spinner {
-    margin-top: 14px;
-    width: 32px;
-    height: 32px;
-    fill: #444;
-    stroke: #69717d;
-  }
-
-  ._v-container > ._v-content > .pull-to-refresh-layer.active .spinner-holder .arrow {
-    -webkit-transform: translate3d(0,0,0) rotate(180deg);
-    transform: translate3d(0,0,0) rotate(180deg);
-  }
+._v-container
+  > ._v-content
+  > .pull-to-refresh-layer.active
+  .spinner-holder
+  .arrow {
+  -webkit-transform: translate3d(0, 0, 0) rotate(180deg);
+  transform: translate3d(0, 0, 0) rotate(180deg);
+}
 </style>
 <script>
-  import Scroller from '../module/core'
-  import getContentRender from '../module/render'
-  import Spinner from './Spinner.vue'
-  import Arrow from './Arrow.vue'
+import Scroller from '../module/core'
+import getContentRender from '../module/render'
+import Spinner from './Spinner.vue'
+import Arrow from './Arrow.vue'
 
-  const re = /^[\d]+(\%)?$/
+const re = /^[\d]+(\%)?$/
 
-  const widthAndHeightCoerce = (v) => {
-    if (v[v.length - 1] != '%') return v + 'px'
-    return v
-  }
+const widthAndHeightCoerce = v => {
+  if (v[v.length - 1] != '%') return v + 'px'
+  return v
+}
 
-  const widthAndHeightValidator = (v) => {
-    return re.test(v)
-  }
+const widthAndHeightValidator = v => {
+  return re.test(v)
+}
 
-  export default {
-    components: {
-      Spinner,
-      Arrow
+export default {
+  components: {
+    Spinner,
+    Arrow
+  },
+
+  props: {
+    onRefresh: Function,
+    onInfinite: Function,
+    onScroll: Function,
+
+    refreshText: {
+      type: String,
+      default: '下拉刷新'
     },
 
-    props: {
-      onRefresh: Function,
-      onInfinite: Function,
-      onScroll: Function,
-
-      refreshText: {
-        type: String,
-        default: '下拉刷新'
-      },
-
-      noDataText: {
-        type: String,
-        default: '没有更多了'
-      },
-
-      width: {
-        type: String,
-        default: '100%',
-        validator: widthAndHeightValidator
-      },
-
-      height: {
-        type: String,
-        default: '100%',
-        validator: widthAndHeightValidator
-      },
-
-      snapping: {
-        type: Boolean,
-        default: false
-      },
-
-      snapWidth: {
-        type: Number,
-        default: 100
-      },
-
-      snapHeight: {
-        type: Number,
-        default: 100
-      },
-
-      animating: {
-        type: Boolean,
-        default: true
-      },
-
-      animationDuration: {
-        type: Number,
-        default: 250
-      },
-
-      bouncing: {
-        type: Boolean,
-        default: true
-      },
-
-      refreshLayerColor: {
-        type: String,
-        default: '#AAA'
-      },
-
-      loadingLayerColor: {
-        type: String,
-        default: '#AAA'
-      },
-
-      cssClass: String, // content css class
-
-      minContentHeight: {
-        type: Number,
-        default: 0 // px
-      }
+    noDataText: {
+      type: String,
+      default: '没有更多了'
     },
 
-    computed: {
-      w: function () {
-        return widthAndHeightCoerce(this.width)
-      },
-
-      h: function () {
-        return widthAndHeightCoerce(this.height)
-      },
-
-      showInfiniteLayer () {
-        let contentHeight = 0 
-        this.content
-          ? contentHeight = this.content.offsetHeight
-          : void 666
-
-        return this.onInfinite
-          ? contentHeight > this.minContentHeight
-          : false
-      }
+    width: {
+      type: String,
+      default: '100%',
+      validator: widthAndHeightValidator
     },
 
-    data() {
-      return {
-        containerId: 'outer-' + Math.random().toString(36).substring(3, 8),
-        contentId: 'inner-' + Math.random().toString(36).substring(3, 8),
-        state: 0, // 0: pull to refresh, 1: release to refresh, 2: refreshing
-        loadingState: 0, // 0: stop, 1: loading, 2: stopping loading
-
-        showLoading: false,
-
-        container: undefined,
-        content: undefined,
-        scroller: undefined,
-        pullToRefreshLayer: undefined,
-        mousedown: false,
-        infiniteTimer: undefined,
-        resizeTimer: undefined,
-        leftTopZoom:{
-          left:0,
-          top:0,
-          zoom:1
-        }
-      }
+    height: {
+      type: String,
+      default: '100%',
+      validator: widthAndHeightValidator
     },
 
-    mounted () {
-      this.container = document.getElementById(this.containerId)
-      this.container.style.width = this.w
-      this.container.style.height = this.h
+    snapping: {
+      type: Boolean,
+      default: false
+    },
 
-      this.content = document.getElementById(this.contentId)
-      if (this.cssClass) this.content.classList.add(this.cssClass)
-      this.pullToRefreshLayer = this.content.getElementsByTagName("div")[0]
+    snapWidth: {
+      type: Number,
+      default: 100
+    },
 
-      let render = getContentRender(this.content, ({left, top, zoom}) =>{
-        let flag = Math.abs(this.leftTopZoom.left - left) > 1
-        flag = flag || Math.abs(this.leftTopZoom.top - top) > 1
-        flag = flag || Math.abs(this.leftTopZoom.zoom - zoom) > .01
-        if (flag) {
-          let data = {left, top, zoom}
-          this.leftTopZoom = data
-          this.onScroll(this.leftTopZoom)
-        }
-      })
+    snapHeight: {
+      type: Number,
+      default: 100
+    },
 
-      let scrollerOptions = {
-        scrollingX: false
+    animating: {
+      type: Boolean,
+      default: true
+    },
+
+    animationDuration: {
+      type: Number,
+      default: 250
+    },
+
+    bouncing: {
+      type: Boolean,
+      default: true
+    },
+
+    refreshLayerColor: {
+      type: String,
+      default: '#AAA'
+    },
+
+    loadingLayerColor: {
+      type: String,
+      default: '#AAA'
+    },
+
+    cssClass: String, // content css class
+
+    minContentHeight: {
+      type: Number,
+      default: 0 // px
+    }
+  },
+
+  computed: {
+    w: function() {
+      return widthAndHeightCoerce(this.width)
+    },
+
+    h: function() {
+      return widthAndHeightCoerce(this.height)
+    },
+
+    showInfiniteLayer() {
+      let contentHeight = 0
+      this.content ? (contentHeight = this.content.offsetHeight) : void 666
+
+      return this.onInfinite ? contentHeight > this.minContentHeight : false
+    }
+  },
+
+  data() {
+    return {
+      containerId:
+        'outer-' +
+        Math.random()
+          .toString(36)
+          .substring(3, 8),
+      contentId:
+        'inner-' +
+        Math.random()
+          .toString(36)
+          .substring(3, 8),
+      state: 0, // 0: pull to refresh, 1: release to refresh, 2: refreshing
+      loadingState: 0, // 0: stop, 1: loading, 2: stopping loading
+
+      showLoading: false,
+
+      container: undefined,
+      content: undefined,
+      scroller: undefined,
+      pullToRefreshLayer: undefined,
+      mousedown: false,
+      infiniteTimer: undefined,
+      resizeTimer: undefined,
+      leftTopZoom: {
+        left: 0,
+        top: 0,
+        zoom: 1
       }
+    }
+  },
 
-      this.scroller = new Scroller(render, {
-        scrollingX: false,
-        snapping: this.snapping,
-        animating: this.animating,
-        animationDuration: this.animationDuration,
-        bouncing: this.bouncing
-      })
+  mounted() {
+    this.container = document.getElementById(this.containerId)
+    this.container.style.width = this.w
+    this.container.style.height = this.h
 
-      // enable PullToRefresh
-      if (this.onRefresh) {
-        this.scroller.activatePullToRefresh(60, () => {
-          if(this.state != 2)
-            this.state = 1
-        }, () => {
-          if(this.state != 2)
-            this.state = 0
-        }, () => {
+    this.content = document.getElementById(this.contentId)
+    if (this.cssClass) this.content.classList.add(this.cssClass)
+    this.pullToRefreshLayer = this.content.getElementsByTagName('div')[0]
 
+    let render = getContentRender(this.content, ({ left, top, zoom }) => {
+      let flag = Math.abs(this.leftTopZoom.left - left) > 1
+      flag = flag || Math.abs(this.leftTopZoom.top - top) > 1
+      flag = flag || Math.abs(this.leftTopZoom.zoom - zoom) > 0.01
+      if (flag) {
+        let data = { left, top, zoom }
+        this.leftTopZoom = data
+        this.onScroll(this.leftTopZoom)
+      }
+    })
+
+    let scrollerOptions = {
+      scrollingX: false
+    }
+
+    this.scroller = new Scroller(render, {
+      scrollingX: false,
+      snapping: this.snapping,
+      animating: this.animating,
+      animationDuration: this.animationDuration,
+      bouncing: this.bouncing
+    })
+
+    // enable PullToRefresh
+    if (this.onRefresh) {
+      this.scroller.activatePullToRefresh(
+        60,
+        () => {
+          if (this.state != 2) this.state = 1
+        },
+        () => {
+          if (this.state != 2) this.state = 0
+        },
+        () => {
           // this.$on('$finishPullToRefresh', () => {
           //   setTimeout(() => {
           //     this.state = 0
           //     this.finishPullToRefresh()
           //   })
           // })
-          if(this.state != 2)
-            this.onRefresh(this.finishPullToRefresh)
+          if (this.state != 2) this.onRefresh(this.finishPullToRefresh)
           this.state = 2
-        })
+        }
+      )
+    }
+
+    // enable infinite loading
+    if (this.onInfinite) {
+      this.infiniteTimer = setInterval(() => {
+        let { left, top, zoom } = this.scroller.getValues()
+
+        // 在 keep alive 中 deactivated 的组件长宽变为 0
+        if (
+          this.content.offsetHeight > 0 &&
+          top + 60 > this.content.offsetHeight - this.container.clientHeight
+        ) {
+          if (this.loadingState) return
+          this.loadingState = 1
+          this.showLoading = true
+          this.onInfinite(this.finishInfinite)
+        }
+      }, 10)
+    }
+
+    // setup scroller
+    let rect = this.container.getBoundingClientRect()
+    this.scroller.setPosition(
+      rect.left + this.container.clientLeft,
+      rect.top + this.container.clientTop
+    )
+
+    // snapping
+    if (this.snapping) {
+      // console.log(this.snapWidth, this.snapHeight)
+      this.scroller.setSnapSize(this.snapWidth, this.snapHeight)
+    }
+
+    // onContentResize
+    const contentSize = () => {
+      return {
+        width: this.content.offsetWidth,
+        height: this.content.offsetHeight
       }
+    }
 
-      // enable infinite loading
-      if (this.onInfinite) {
-        this.infiniteTimer = setInterval(() => {
-          let {left, top, zoom} = this.scroller.getValues()
+    let { content_width, content_height } = contentSize()
 
-          // 在 keep alive 中 deactivated 的组件长宽变为 0 
-          if (this.content.offsetHeight > 0 && 
-            top + 60 > this.content.offsetHeight - this.container.clientHeight) {
-            if (this.loadingState) return
-            this.loadingState = 1
-            this.showLoading = true
-            this.onInfinite(this.finishInfinite)
+    this.resizeTimer = setInterval(() => {
+      let { width, height } = contentSize()
+      if (width !== content_width || height !== content_height) {
+        content_width = width
+        content_height = height
+        this.resize()
+      }
+    }, 10)
+  },
+
+  destroyed() {
+    clearInterval(this.resizeTimer)
+    if (this.infiniteTimer) clearInterval(this.infiniteTimer)
+  },
+
+  methods: {
+    resize() {
+      let container = this.container
+      let content = this.content
+      this.scroller.setDimensions(
+        container.clientWidth,
+        container.clientHeight,
+        content.offsetWidth,
+        content.offsetHeight
+      )
+    },
+
+    finishPullToRefresh() {
+      this.state = 0
+      this.scroller.finishPullToRefresh()
+    },
+
+    finishInfinite(hideSpinner) {
+      this.loadingState = hideSpinner ? 2 : 0
+      this.showLoading = false
+
+      if (this.loadingState == 2) {
+        this.resetLoadingState()
+      }
+    },
+
+    triggerPullToRefresh() {
+      this.scroller.triggerPullToRefresh()
+    },
+
+    scrollTo(x, y, animate) {
+      this.scroller.scrollTo(x, y, animate)
+    },
+
+    scrollBy(x, y, animate) {
+      this.scroller.scrollBy(x, y, animate)
+    },
+
+    touchStart(e) {
+      // Don't react if initial down happens on a form element
+      if (e.target.tagName.match(/input|textarea|select/i)) {
+        return
+      }
+      this.scroller.doTouchStart(e.touches, e.timeStamp)
+    },
+
+    touchMove(e) {
+      e.preventDefault()
+      this.scroller.doTouchMove(e.touches, e.timeStamp)
+    },
+
+    touchEnd(e) {
+      this.scroller.doTouchEnd(e.timeStamp)
+    },
+
+    mouseDown(e) {
+      // Don't react if initial down happens on a form element
+      if (e.target.tagName.match(/input|textarea|select/i)) {
+        return
+      }
+      this.scroller.doTouchStart(
+        [
+          {
+            pageX: e.pageX,
+            pageY: e.pageY
           }
-        }, 10);
-      }
-
-      // setup scroller
-      let rect = this.container.getBoundingClientRect()
-      this.scroller.setPosition(rect.left + this.container.clientLeft, rect.top + this.container.clientTop)
-
-      // snapping
-      if (this.snapping) {
-        // console.log(this.snapWidth, this.snapHeight)
-        this.scroller.setSnapSize(this.snapWidth, this.snapHeight)
-      }
-
-      // onContentResize
-      const contentSize = () => {
-        return {
-          width: this.content.offsetWidth,
-          height: this.content.offsetHeight
-        }
-      }
-
-      let { content_width, content_height } = contentSize()
-      
-      this.resizeTimer = setInterval(() => {
-        let {width, height} = contentSize()
-        if (width !== content_width || height !== content_height) {
-          content_width = width
-          content_height = height
-          this.resize()
-        }
-      }, 10);
+        ],
+        e.timeStamp
+      )
+      this.mousedown = true
     },
 
-    destroyed () {
-      clearInterval(this.resizeTimer);
-      if (this.infiniteTimer) clearInterval(this.infiniteTimer);
+    mouseMove(e) {
+      if (!this.mousedown) {
+        return
+      }
+      this.scroller.doTouchMove(
+        [
+          {
+            pageX: e.pageX,
+            pageY: e.pageY
+          }
+        ],
+        e.timeStamp
+      )
+      this.mousedown = true
     },
 
-    methods: {
-      resize() {
-        let container = this.container;
-        let content = this.content;
-        this.scroller.setDimensions(container.clientWidth, container.clientHeight, content.offsetWidth, content.offsetHeight);
-      },
+    mouseUp(e) {
+      if (!this.mousedown) {
+        return
+      }
+      this.scroller.doTouchEnd(e.timeStamp)
+      this.mousedown = false
+    },
 
-      finishPullToRefresh() {
-        this.state = 0
-        this.scroller.finishPullToRefresh()
-      },
+    // 获取位置
+    getPosition() {
+      let v = this.scroller.getValues()
 
-      finishInfinite(hideSpinner) {
-        this.loadingState = hideSpinner ? 2 : 0
-        this.showLoading = false
+      return {
+        left: parseInt(v.left),
+        top: parseInt(v.top)
+      }
+    },
 
-        if (this.loadingState == 2) {
+    resetLoadingState() {
+      let { left, top, zoom } = this.scroller.getValues()
+      let container = this.container
+      let content = this.content
+
+      if (top + 60 > this.content.offsetHeight - this.container.clientHeight) {
+        setTimeout(() => {
           this.resetLoadingState()
-        }
-      },
-
-      triggerPullToRefresh() {
-        this.scroller.triggerPullToRefresh()
-      },
-
-      scrollTo(x, y, animate) {
-        this.scroller.scrollTo(x, y, animate)
-      },
-
-      scrollBy(x, y, animate) {
-        this.scroller.scrollBy(x, y, animate)
-      },
-
-      touchStart(e) {
-        // Don't react if initial down happens on a form element
-        if (e.target.tagName.match(/input|textarea|select/i)) {
-          return
-        }
-        this.scroller.doTouchStart(e.touches, e.timeStamp)
-      },
-
-      touchMove(e) {
-        e.preventDefault()
-        this.scroller.doTouchMove(e.touches, e.timeStamp)
-      },
-
-      touchEnd(e) {
-        this.scroller.doTouchEnd(e.timeStamp)
-      },
-
-      mouseDown(e) {
-        // Don't react if initial down happens on a form element
-        if (e.target.tagName.match(/input|textarea|select/i)) {
-          return
-        }
-        this.scroller.doTouchStart([{
-          pageX: e.pageX,
-          pageY: e.pageY
-        }], e.timeStamp)
-        this.mousedown = true
-      },
-
-      mouseMove(e) {
-        if (!this.mousedown) {
-          return
-        }
-        this.scroller.doTouchMove([{
-          pageX: e.pageX,
-          pageY: e.pageY
-        }], e.timeStamp)
-        this.mousedown = true
-      },
-
-      mouseUp(e) {
-        if (!this.mousedown) {
-          return
-        }
-        this.scroller.doTouchEnd(e.timeStamp)
-        this.mousedown = false
-      },
-
-      // 获取位置
-      getPosition() {
-        let v = this.scroller.getValues()
-
-        return {
-          left: parseInt(v.left),
-          top: parseInt(v.top)
-        }
-      },
-
-      resetLoadingState() {
-        let {left, top, zoom} = this.scroller.getValues()
-        let container = this.container;
-        let content = this.content;
-
-        if (top + 60 > this.content.offsetHeight - this.container.clientHeight) {
-          setTimeout(() => {
-            this.resetLoadingState()
-          }, 1000)
-        } else {
-          this.loadingState = 0
-        }
+        }, 1000)
+      } else {
+        this.loadingState = 0
       }
     }
   }
+}
 </script>

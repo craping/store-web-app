@@ -9,8 +9,8 @@
       @click-left="onClickLeft"
     />
     <van-tabs @click="onClick">
-      <store-scroller @onRefresh="onRefresh">
-        <van-tab v-for="item in productStatus" :key="item.id" :title="item.title">
+      <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad">
+        <van-tab v-for="(item,index) in productStatus" :key="item.id" :title="item.title">
           <div v-for="product in showProductList" :key="product.id" class="pro-container">
             <div class="status">{{proStatus[product.status]}}</div>
             <van-card
@@ -19,6 +19,7 @@
               :desc="product.desc"
               :price="product.price"
               thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"
+              @click="checkInfo(product.pid)"
             >
               <div slot="tags">
                 <van-tag plain type="danger">{{product.tag}}</van-tag>
@@ -36,10 +37,20 @@
                   v-for="item in proEventList[`event${product.status}`]"
                   :key="item.id"
                   size="mini"
-                  @click="proEventClick(product.pid,item)"
+                  :class="item == '立即付款' ? 'tored' : ''"
+                  @click.stop="proEventClick(product.pid,item)"
                 >{{item}}</van-button>
               </div>
             </van-card>
+          </div>
+          <div class="mayLike" v-show="index != 0">
+            <div class="mayLikeTitle">
+              <div class="leftLine"></div>
+              <van-icon name="like"/>
+              <p>可能有你喜欢的</p>
+              <div class="roghtLine"></div>
+            </div>
+            <storeCard :proData="productList"></storeCard>
           </div>
         </van-tab>
       </store-scroller>
@@ -49,8 +60,8 @@
 <script>
 import Vue from 'vue'
 import storeScroller from '@/components/store-scroller'
+import storeCard from '@/components/store-card'
 import {
-  AddressList,
   Tab,
   Tabs,
   NavBar,
@@ -58,10 +69,11 @@ import {
   Button,
   Tag,
   Row,
-  Toast
+  Toast,
+  Dialog,
+  Icon
 } from 'vant'
 Vue.use(NavBar)
-  .use(AddressList)
   .use(Tab)
   .use(Tabs)
   .use(Card)
@@ -69,10 +81,13 @@ Vue.use(NavBar)
   .use(Tag)
   .use(Row)
   .use(Toast)
+  .use(Dialog)
+  .use(Icon)
 export default {
   name: 'order',
   components: {
-    storeScroller
+    storeScroller,
+    storeCard
   },
   data() {
     return {
@@ -165,6 +180,16 @@ export default {
       this.$router.go(-1)
     },
 
+    /*************点击查看详情事件***************/
+    checkInfo(id) {
+      this.$router.push({
+        name: 'orderinfo',
+        params: {
+          id
+        }
+      })
+    },
+
     /*************tab切换标签点击事件*********/
     onClick(name, title) {
       if (name != 0) {
@@ -178,15 +203,104 @@ export default {
 
     /************产品按钮点击点击事件*********/
     proEventClick(pid, event) {
-      Toast.success(event)
+      switch (event) {
+        case '取消订单':
+          this.confirmDialog('cancel', pid)
+          break
+        case '删除订单':
+          this.confirmDialog('delete', pid)
+          break
+        case '查看物流':
+          this.$router.push({
+            name: 'productExpress',
+            params: {
+              pid
+            }
+          })
+          break
+        case '评价商品':
+          this.$router.push({
+            name: 'comment',
+            params: {
+              pid
+            }
+          })
+          break
+        case '退款':
+          this.$router.push({
+            name: 'refund',
+            params: {
+              pid
+            }
+          })
+          break
+        case '退货退款':
+          this.$router.push({
+            name: 'refund',
+            params: {
+              pid
+            }
+          })
+          break
+        case '立即付款':
+          Toast.success('去付款')
+          break
+        case '确认收货':
+          this.$router.push({
+            name: 'successfulOrder',
+            params: {
+              pid
+            }
+          })
+          break
+      }
+    },
+
+    /***********点击取消订单和删除订单弹窗事件*********/
+    confirmDialog(type, pid) {
+      let title = ''
+      let message = ''
+      if (type == 'cancel') {
+        title = '取消订单'
+        message = '确定取消这个订单吗？'
+      } else {
+        title = '删除订单'
+        message = '确定删除这个订单吗？'
+      }
+      Dialog.confirm({
+        title,
+        message
+      })
+        .then(() => {
+          // on confirm
+          type == 'cancel' ? this.cancelOrder(pid) : this.deleteOrder(pid)
+        })
+        .catch(() => {
+          // on cancel
+        })
+    },
+
+    /***********取消订单事件*********/
+    cancelOrder(pid) {
+      console.log('取消订单')
+    },
+
+    /***********删除订单事件*********/
+    deleteOrder(pid) {
+      console.log('删除订单')
     },
 
     /***********下拉刷新事件*********/
     onRefresh(done) {
       this.$store.dispatch('home/content').finally(() => {
-        // this.isLoading = false;
+        this.isLoading = false
         if (done) done()
       })
+    },
+    onLoad(done) {
+      if (done) done(true)
+      this.loading = false
+      // this.finished = true
     }
   }
 }
@@ -212,6 +326,8 @@ export default {
   /deep/.van-tabs__content {
     margin-top: 52px;
     height: 100vh;
+    position: fixed;
+    width: 100%;
     .van-button {
       margin: 0 5px;
       padding: 0 10px;
@@ -221,10 +337,56 @@ export default {
       border: 1px solid #ccc;
       color: $font-color-gray;
     }
+    .tored {
+      background: red;
+      color: #fff;
+    }
   }
   /deep/.van-tabs__nav {
     .van-tab {
       flex-basis: 20% !important;
+    }
+  }
+
+  .mayLike {
+    .mayLikeTitle {
+      display: flex;
+      align-items: center;
+      height: 50px;
+      justify-content: center;
+      color: $red;
+      font-size: 16px;
+      .leftLine,
+      .roghtLine {
+        height: 1px;
+        width: 20px;
+        background: $red;
+        position: relative;
+        &::before {
+          content: '';
+          position: absolute;
+          top: -2px;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: $red;
+        }
+      }
+      .leftLine {
+        margin-right: 5px;
+        &::before {
+          left: 0;
+        }
+      }
+      .roghtLine {
+        margin-left: 5px;
+        &::before {
+          right: 0;
+        }
+      }
+    }
+    .store-card {
+      margin-top: 0;
     }
   }
   .van-tab__pane {
