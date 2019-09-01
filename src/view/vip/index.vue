@@ -106,8 +106,8 @@
                 <p class="look-detail">查看详情></p>
             </div>
             <div class="bottom-bar">
-                <van-cell title="提现记录" @click="jumpLink('/withdrawLog')" is-link />
-                <van-cell title="余额明细" is-link />
+                <van-cell title="提现记录" @click="jumpLink('/bill')" is-link />
+                <van-cell title="余额明细" @click="jumpLink('/bill')" is-link />
             </div>
         </div>
     </div>

@@ -104,8 +104,8 @@
             position="bottom"
             :style="{ height: '40%' }">
             <div class="tool-bar">
-                <div class="cancel">取消</div>
-                <div class="sure">确定</div>
+                <div class="cancel" @click="dateSelectshow=false">取消</div>
+                <div class="sure" @click="selectDate">确定</div>
             </div>
             <van-tabs v-model="active" color="#ff4444">
                 
