@@ -46,7 +46,7 @@ Vue.use(NavBar)
   .use(Toast)
   .use(Icon)
 export default {
-  name: 'order',
+  name: 'successfulOrder',
   components: {
     storeScroller,
     storeCard
@@ -113,7 +113,12 @@ export default {
     },
     /*************点击立即评价事件*********/
     toAssess() {
-      console.log('去评价页面')
+      this.$router.push({
+        name: 'comment',
+        params: {
+          pid: this.$route.params.pid
+        }
+      })
     },
 
     /***********下拉刷新事件*********/

@@ -18,5 +18,25 @@ export default [
     path: '/refund',
     name: 'refund',
     component: () => import('@/view/order/refund/index.vue')
+  },
+  {
+    path: '/applyrefund',
+    name: 'applyrefund',
+    component: () => import('@/view/order/refund/applyrefund.vue')
+  },
+  {
+    path: '/orderinfo',
+    name: 'orderinfo',
+    component: () => import('@/view/order/orderinfo/index.vue')
+  },
+  {
+    path: '/comment',
+    name: 'comment',
+    component: () => import('@/view/order/comment/index.vue')
+  },
+  {
+    path: '/aftersale',
+    name: 'aftersale',
+    component: () => import('@/view/order/afterSale/index.vue')
   }
 ]

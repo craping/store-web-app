@@ -9,8 +9,8 @@
       @click-left="onClickLeft"
     />
     <van-tabs @click="onClick">
-      <store-scroller @onRefresh="onRefresh">
-        <van-tab v-for="item in productStatus" :key="item.id" :title="item.title">
+      <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad">
+        <van-tab v-for="(item,index) in productStatus" :key="item.id" :title="item.title">
           <div v-for="product in showProductList" :key="product.id" class="pro-container">
             <div class="status">{{proStatus[product.status]}}</div>
             <van-card
@@ -19,6 +19,7 @@
               :desc="product.desc"
               :price="product.price"
               thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"
+              @click="checkInfo(product.pid)"
             >
               <div slot="tags">
                 <van-tag plain type="danger">{{product.tag}}</van-tag>
@@ -37,10 +38,19 @@
                   :key="item.id"
                   size="mini"
                   :class="item == '立即付款' ? 'tored' : ''"
-                  @click="proEventClick(product.pid,item)"
+                  @click.stop="proEventClick(product.pid,item)"
                 >{{item}}</van-button>
               </div>
             </van-card>
+          </div>
+          <div class="mayLike" v-show="index != 0">
+            <div class="mayLikeTitle">
+              <div class="leftLine"></div>
+              <van-icon name="like"/>
+              <p>可能有你喜欢的</p>
+              <div class="roghtLine"></div>
+            </div>
+            <storeCard :proData="productList"></storeCard>
           </div>
         </van-tab>
       </store-scroller>
@@ -50,7 +60,19 @@
 <script>
 import Vue from 'vue'
 import storeScroller from '@/components/store-scroller'
-import { Tab, Tabs, NavBar, Card, Button, Tag, Row, Toast, Dialog } from 'vant'
+import storeCard from '@/components/store-card'
+import {
+  Tab,
+  Tabs,
+  NavBar,
+  Card,
+  Button,
+  Tag,
+  Row,
+  Toast,
+  Dialog,
+  Icon
+} from 'vant'
 Vue.use(NavBar)
   .use(Tab)
   .use(Tabs)
@@ -60,10 +82,12 @@ Vue.use(NavBar)
   .use(Row)
   .use(Toast)
   .use(Dialog)
+  .use(Icon)
 export default {
   name: 'order',
   components: {
-    storeScroller
+    storeScroller,
+    storeCard
   },
   data() {
     return {
@@ -156,6 +180,16 @@ export default {
       this.$router.go(-1)
     },
 
+    /*************点击查看详情事件***************/
+    checkInfo(id) {
+      this.$router.push({
+        name: 'orderinfo',
+        params: {
+          id
+        }
+      })
+    },
+
     /*************tab切换标签点击事件*********/
     onClick(name, title) {
       if (name != 0) {
@@ -185,14 +219,18 @@ export default {
           })
           break
         case '评价商品':
-          Toast.success('去评价商品')
+          this.$router.push({
+            name: 'comment',
+            params: {
+              pid
+            }
+          })
           break
         case '退款':
           this.$router.push({
             name: 'refund',
             params: {
-              pid,
-              refund: 'noPro'
+              pid
             }
           })
           break
@@ -200,8 +238,7 @@ export default {
           this.$router.push({
             name: 'refund',
             params: {
-              pid,
-              refund: 'hasPro'
+              pid
             }
           })
           break
@@ -256,9 +293,14 @@ export default {
     /***********下拉刷新事件*********/
     onRefresh(done) {
       this.$store.dispatch('home/content').finally(() => {
-        // this.isLoading = false;
+        this.isLoading = false
         if (done) done()
       })
+    },
+    onLoad(done) {
+      if (done) done(true)
+      this.loading = false
+      // this.finished = true
     }
   }
 }
@@ -284,6 +326,8 @@ export default {
   /deep/.van-tabs__content {
     margin-top: 52px;
     height: 100vh;
+    position: fixed;
+    width: 100%;
     .van-button {
       margin: 0 5px;
       padding: 0 10px;
@@ -301,6 +345,48 @@ export default {
   /deep/.van-tabs__nav {
     .van-tab {
       flex-basis: 20% !important;
+    }
+  }
+
+  .mayLike {
+    .mayLikeTitle {
+      display: flex;
+      align-items: center;
+      height: 50px;
+      justify-content: center;
+      color: $red;
+      font-size: 16px;
+      .leftLine,
+      .roghtLine {
+        height: 1px;
+        width: 20px;
+        background: $red;
+        position: relative;
+        &::before {
+          content: '';
+          position: absolute;
+          top: -2px;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: $red;
+        }
+      }
+      .leftLine {
+        margin-right: 5px;
+        &::before {
+          left: 0;
+        }
+      }
+      .roghtLine {
+        margin-left: 5px;
+        &::before {
+          right: 0;
+        }
+      }
+    }
+    .store-card {
+      margin-top: 0;
     }
   }
   .van-tab__pane {

@@ -47,7 +47,15 @@
     </div>
     <div class="content-container">
       <store-scroller @onRefresh="onRefresh">
-        <storeCard :proData="productList"></storeCard>
+        <div class="mayLike">
+          <div class="mayLikeTitle">
+            <div class="leftLine"></div>
+            <van-icon name="like"/>
+            <p>可能有你喜欢的</p>
+            <div class="roghtLine"></div>
+          </div>
+          <storeCard :proData="productList"></storeCard>
+        </div>
       </store-scroller>
     </div>
   </van-row>
@@ -84,7 +92,7 @@ Vue.use(NavBar)
   .use(Step)
   .use(Steps)
 export default {
-  name: 'order',
+  name: 'productExpress',
   components: {
     storeScroller,
     storeCard
@@ -218,6 +226,47 @@ export default {
           margin-right: 10px;
         }
       }
+    }
+  }
+  .mayLike {
+    .mayLikeTitle {
+      display: flex;
+      align-items: center;
+      height: 50px;
+      justify-content: center;
+      color: $red;
+      font-size: 16px;
+      .leftLine,
+      .roghtLine {
+        height: 1px;
+        width: 20px;
+        background: $red;
+        position: relative;
+        &::before {
+          content: '';
+          position: absolute;
+          top: -2px;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: $red;
+        }
+      }
+      .leftLine {
+        margin-right: 5px;
+        &::before {
+          left: 0;
+        }
+      }
+      .roghtLine {
+        margin-left: 5px;
+        &::before {
+          right: 0;
+        }
+      }
+    }
+    .store-card {
+      margin-top: 0;
     }
   }
   .content-container {
