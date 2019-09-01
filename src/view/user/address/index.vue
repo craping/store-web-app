@@ -6,10 +6,18 @@
       @click-left="onClickLeft"
     />
     <van-address-list
+      v-if="0"
       v-model="chosenAddressId"
       :list="list"
       :disabled-list="disabledList"
       disabled-text="以下地址超出配送范围"
+      @add="onAdd"
+      @edit="onEdit"
+    />
+    <van-address-list
+      :switchable="false"
+      v-model="chosenAddressId"
+      :list="list"
       @add="onAdd"
       @edit="onEdit"
     />
