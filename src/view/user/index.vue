@@ -16,13 +16,13 @@
           <span class="vip-grade-bar">会员等级</span>
         </div>
       </div>
-      <div class="vip-card">
+      <div class="vip-card" @click="jumpLink('/vip')">
         <div class="vip-row-1">
           <span class="word-text">
             <span>可提现余额(元) </span>
             <span class="money">142</span>
           </span>
-          <span class="btn">提现</span>
+          <span class="btn" @click.stop.prevent="jumpLink('/withdraw')">提现</span>
         </div>
         <div class="vip-row-2">
           <div class="gird-item">
@@ -124,8 +124,8 @@ export default {
           link:'/setting'
         },
         {
-          name:'会员中心',
-          link:'/vip'
+          name:'客服',
+          link:''
         },
       ],
     };
@@ -133,7 +133,7 @@ export default {
    methods: {
     jumpLink(path) {
        this.$router.push(path)
-    }
+    },
   },
 };
 </script>
@@ -275,7 +275,7 @@ export default {
           display: flex;
           justify-content: space-between;
           .link{
-            color: #409EFF;
+            color: $red;
           }
         }
       }

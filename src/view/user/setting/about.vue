@@ -1,0 +1,58 @@
+<template>
+    <div class="about-page">
+        <van-nav-bar title="关于我们" left-arrow @click-left="onClickLeft" />
+        <div class="top-view">
+            <div class="logo"><img src="" alt=""></div>
+            <div class="appName">商城名字</div>
+            <div class="version">V1.0</div>
+        </div>
+        <van-cell title="用户服务协议书" is-link @click="jumpLink('用户服务协议书')" />
+        <van-cell title="隐私政策" is-link @click="jumpLink('隐私政策')" />
+        <div class="bottom-bar">copyright 2018-1019xxxx 版权所有</div>
+    </div>
+</template>
+<script>
+import Vue from 'vue';
+import { NavBar, Cell, CellGroup } from 'vant';
+Vue.use(Cell).use(CellGroup).use(NavBar);
+export default {
+    methods:{
+        onClickLeft() {
+            this.$router.go(-1)
+        },   
+        jumpLink(title) {
+            this.$router.push({path:'about-detail',query:{title}})
+        }
+    }
+}
+</script>
+<style lang="scss" scoped>
+    .about-page{
+        .top-view{
+            .logo{
+                width: 70px;
+                height: 70px;
+                background: #FFF;
+                border-radius: 5px;
+                margin: 30px auto 0;
+            }
+            .appName{
+                font-weight: bold;
+                text-align: center;
+                margin-top: 10px;
+            }
+            .version{
+                margin: 5px 0 80px;
+                text-align: center;
+                color: #999;
+            }
+        }
+        .bottom-bar{
+            width: 100%;
+            text-align: center;
+            color: #999;
+            position: absolute;
+            bottom: 10px;
+        }
+    }
+</style>

@@ -8,7 +8,7 @@
                         <div class="title-1">账户余额</div>
                         <div class="rest-money"> <span class="sign">￥</span> 1632.2</div>
                     </div>
-                    <div class="btn"><van-icon name="bill" />去提现</div>
+                    <div class="btn" @click="jumpLink('/withdraw')"><van-icon name="bill" />去提现</div>
                 </div>
                 <div class="card-row-2">
                     <div> 
@@ -25,7 +25,7 @@
                     </div>
                 </div>
             </div>
-            <van-tabs v-model="active" color="#333">
+            <van-tabs v-model="active" color="#ff4444">
                 <van-tab title="今日收益">
                     <div class="profit-card card round">
                         <div style="margin-bottom:10px;">
@@ -106,8 +106,8 @@
                 <p class="look-detail">查看详情></p>
             </div>
             <div class="bottom-bar">
-                <van-cell title="提现记录" is-link />
-                <van-cell title="余额明细" is-link />
+                <van-cell title="提现记录" @click="jumpLink('/bill')" is-link />
+                <van-cell title="余额明细" @click="jumpLink('/bill')" is-link />
             </div>
         </div>
     </div>
@@ -143,8 +143,7 @@ export default {
         .top-card{
             margin: 5px;
             border-radius: 5px;
-            background: #50545F;
-            // background: #000;
+            background: rgba(255, 68, 68, 0.7);
             color: #FFF;
             padding: 15px;
             .card-row-1{
@@ -187,7 +186,7 @@ export default {
             margin: 10px;
             .row-title{
                 padding-bottom: 4px;
-                border-bottom: 1px solid #333;
+                border-bottom: 1px solid #EEE;
                 font-size: 16px;
                 margin-bottom: 4px;
             }   
@@ -206,7 +205,7 @@ export default {
                 }
             }
             .look-detail{
-                color: #409EFF;
+                color: $red;
                 text-align: right;
             }
         }
