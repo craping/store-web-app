@@ -31,7 +31,7 @@
                 size="mini"
                 plain
                 type="danger"
-                @click.stop="proEventClick(product.pid)"
+                @click.stop="toRefundInfo(product.pid)"
               >查看详情</van-button>
             </div>
           </van-card>
@@ -150,8 +150,14 @@ export default {
     },
 
     /************点击查看详情事件*********/
-    proEventClick(id) {
+    toRefundInfo(id) {
       console.log('查看详情', id)
+      this.$router.push({
+        name: 'refundInfo',
+        params: {
+          id
+        }
+      })
     },
 
     /***********下拉刷新事件*********/
