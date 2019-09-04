@@ -2,13 +2,16 @@
     <div class="about-page">
         <van-nav-bar title="关于我们" left-arrow @click-left="onClickLeft" />
         <div class="top-view">
-            <div class="logo"><img src="" alt=""></div>
-            <div class="appName">商城名字</div>
+            <div class="logo"><img width="100%" height="100%" src="@assets/images/logo.png" alt=""></div>
+            <div class="appName">5G云购</div>
             <div class="version">V1.0</div>
         </div>
         <van-cell title="用户服务协议书" is-link @click="jumpLink('用户服务协议书')" />
         <van-cell title="隐私政策" is-link @click="jumpLink('隐私政策')" />
-        <div class="bottom-bar">copyright 2018-1019xxxx 版权所有</div>
+        <div class="bottom-bar">
+            <div>Copyright@2019-2020</div>
+            <div>湖南省惠德电子商务有限公司</div> 
+        </div>
     </div>
 </template>
 <script>
@@ -30,15 +33,15 @@ export default {
     .about-page{
         .top-view{
             .logo{
-                width: 70px;
-                height: 70px;
-                background: #FFF;
+                width: 80px;
+                height: 80px;
                 border-radius: 5px;
                 margin: 30px auto 0;
             }
             .appName{
                 font-weight: bold;
                 text-align: center;
+                font-size: .9rem;
                 margin-top: 10px;
             }
             .version{
@@ -52,7 +55,7 @@ export default {
             text-align: center;
             color: #999;
             position: absolute;
-            bottom: 10px;
+            margin-top: 50px;
         }
     }
 </style>
