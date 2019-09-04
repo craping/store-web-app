@@ -121,7 +121,7 @@ export default {
     if (isIOS)
       inobounce.disable();
     else
-      window.removeEventListener('scroll', this.handleScroll);
+      window.removeEventListener('scroll', this.handleScroll, true);
   },
   methods: {
     handleScroll(e){

@@ -16,8 +16,8 @@ export default {
   actions: {
     content({commit}){
       return new Promise((resolve, reject) => {
-        request.get("/home/content", {}).then(response => {
-          commit('SET_CONTENT', response.data.info)
+        request.get("/home/content", {}).then(data => {
+          commit('SET_CONTENT', data.info)
           resolve()
         }).catch(error => {
           reject(error)

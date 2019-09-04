@@ -9,6 +9,25 @@ import request from './utils/request'
 Vue.use(VueScroller);
 Vue.use(Lazyload);
 Vue.prototype.$http = request
+
+var onPlusReady = function (callback, context = this) {
+  if (window.plus) {
+    callback.call(context);
+  } else {
+    document.addEventListener('plusready', callback.bind(context));
+  }
+};
+Vue.mixin({
+  beforeCreate: function () {
+    onPlusReady(function () {
+      this.plusReady = true;
+    }, this);
+  },
+  methods: {
+    onPlusReady: onPlusReady
+  }
+});
+
 new Vue({
   el: '#app',
   router,
