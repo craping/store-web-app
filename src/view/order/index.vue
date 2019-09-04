@@ -55,12 +55,14 @@
         </van-tab>
       </store-scroller>
     </van-tabs>
+    <store-pay-dialog @closeDialog="closeDialog" @toPay="toPay" :show="showPayDialog"></store-pay-dialog>
   </van-row>
 </template>
 <script>
 import Vue from 'vue'
 import storeScroller from '@/components/store-scroller'
 import storeCard from '@/components/store-card'
+import storePayDialog from '@/components/store-pay-dialog'
 import {
   Tab,
   Tabs,
@@ -87,7 +89,8 @@ export default {
   name: 'order',
   components: {
     storeScroller,
-    storeCard
+    storeCard,
+    storePayDialog
   },
   data() {
     return {
@@ -168,7 +171,9 @@ export default {
         event2: ['取消订单'],
         event3: ['确认收货', '查看物流', '退款'],
         event4: ['评价商品', '退货退款', '删除订单']
-      }
+      },
+      showPayDialog: false, //支付弹框默认隐藏
+      patyType: '' //获取支付方式
     }
   },
   created() {
@@ -243,7 +248,8 @@ export default {
           })
           break
         case '立即付款':
-          Toast.success('去付款')
+          this.showPayDialog = true
+          console.log('sadfkjskdfj', this.showPayDialog)
           break
         case '确认收货':
           this.$router.push({
@@ -289,6 +295,19 @@ export default {
     deleteOrder(pid) {
       console.log('删除订单')
     },
+
+    /*************支付弹框事件群start******/
+    /***********隐藏弹框*********/
+    closeDialog(bool) {
+      this.showPayDialog = bool
+    },
+    /***********点击支付按钮事件并获取支付方式*********/
+    toPay(type) {
+      Toast.success('去支付页面')
+      this.patyType = type
+      console.log('sfsdf', this.patyType)
+    },
+    /*************支付弹框事件群end******/
 
     /***********下拉刷新事件*********/
     onRefresh(done) {
