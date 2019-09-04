@@ -176,8 +176,8 @@ export default {
     window.addEventListener("scroll", this.handleScroll, true);
     console.log("mounted:"+this.$route.params.id)
   },
-   beforeDestroy() {
-    window.removeEventListener('scroll', this.handleScroll);
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll, true);
   },
   methods: {
     handleScroll(e){

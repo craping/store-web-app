@@ -36,9 +36,9 @@ export default {
         },
         {
           name: "砍价",
-          path: "/main/free",
+          path: "/main/home",
           pathName: "class",
-          icon: "class-full",
+          icon: "discount",
           dot: false,
           info: ""
         },
