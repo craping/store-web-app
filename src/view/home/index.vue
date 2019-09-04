@@ -82,7 +82,6 @@ import Arrow from "@/components/vue-scroller/components/Arrow.vue";
 import storeNavBar from "@/components/store-nav-bar";
 import storeScroller from "@/components/store-scroller";
 import { isIOS } from "mobile-device-detect";
-import inobounce from "inobounce";
 
 export default {
   components: {
@@ -118,6 +117,11 @@ export default {
   },
   created() {
     this.$store.dispatch("home/content");
+  },
+  mounted (){
+    this.onPlusReady(() =>{
+      Toast.success('plus加载成功');
+    })
   },
   methods: {
     onRefresh(done) {
