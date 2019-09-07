@@ -112,7 +112,7 @@ export default {
 <style lang="scss" scoped>
     .bill-detial-page{
         .content{
-            padding-top: 46px;
+            padding-top: 66px;
             background: #FFF;
             .top-row{
                 padding: 20px 15px 50px;

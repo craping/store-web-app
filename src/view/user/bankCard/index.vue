@@ -47,7 +47,7 @@ export default {
 <style lang="scss" scoped>
     .bankcard-page{
         .banl-list{
-            padding-top: 46px;
+            padding-top: 66px;
             margin-top: 15px;
         }
         .bank-bar{

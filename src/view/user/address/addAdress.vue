@@ -54,6 +54,7 @@ export default {
         
       })
     },
+    
     onDelete(data) {
       console.log(data)
       this.$http.get("api", {}).then(res => {

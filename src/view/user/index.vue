@@ -50,7 +50,7 @@
           <van-grid-item 
             v-for="(tab,index) in orderTabs"
             :key="index"
-            icon="gift"
+            :icon="tab.icon"
             :text="tab.name"
           />
         </van-grid>
@@ -63,7 +63,7 @@
           <van-grid-item 
             v-for="(tab,index) in serviceTabs"
             :key="index"
-            icon="gift"
+            :icon="tab.icon"
             :text="tab.name"
             @click="jumpLink(tab.link)"
           />
@@ -90,42 +90,52 @@ export default {
       orderTabs:[
         {
           name:'待付款',
-          link:''
+          link:'',
+          icon:'paid'
         },
         {
           name:'待发货',
-          link:''
+          link:'',
+          icon:'send-gift-o'
 
         },
         {
           name:'待收货',
-          link:''
+          link:'',
+          icon:'logistics'
+          
         },
         {
           name:'待评论',
-          link:''
+          link:'',
+          icon:'label-o'
         },
         {
           name:'退款/售后',
-          link:''
+          link:'',
+          icon:'refund-o'
         },
       ],
       serviceTabs:[
         {
           name:'收货地址',
-          link:'/address'
+          link:'/address',
+          icon:'location-o'
         },
         {
           name:'我的收藏',
-          link:''
+          link:'',
+          icon:'like-o'
         },
         {
           name:'设置',
-          link:'/setting'
+          link:'/setting',
+          icon:'setting-o'
         },
         {
           name:'客服',
-          link:''
+          link:'',
+          icon:'service-o'
         },
       ],
     };
@@ -184,10 +194,10 @@ export default {
       padding: 0 15px;
       .row-1{
         text-align: right;
-        padding-top: 15px;
+        padding-top: 20px;
       }
       .row-2{
-        margin-top: 20px;
+        margin-top: 16px;
         display: flex;
         .head-img{
           width: 60px;
