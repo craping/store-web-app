@@ -34,11 +34,12 @@
       </div>
     </store-scroller>
     <van-submit-bar
+      v-show='!isOperate'
       :style="{bottom:this.$route.meta.single?'0':'50px'}"
       :safe-area-inset-bottom="true"
       :price="totalPrice"
       :disabled="!checkedGoods.length"
-      :button-text="submitBarText"
+      :button-text="'结算'+selectCount"
       @submit="onSubmit"
     >
       <van-checkbox
@@ -48,6 +49,16 @@
         @change="changeAll"
       >全选</van-checkbox>
     </van-submit-bar>
+    <div class="operate-bar" v-show='isOperate'>
+      <van-checkbox
+        icon-size="16px"
+        checked-color="#ff4444"
+        v-model="isSelectAll"
+        @change="changeAll"
+      >全选</van-checkbox>
+      <div class="white"></div>
+      <button class="btn" :disabled="!checkedGoods.length" :class="{'disable_btn':!checkedGoods.length}" @click="deleteItem">删除{{selectCount}}</button>
+    </div>
   </div>
 </template>
 
@@ -141,14 +152,14 @@ export default {
     };
   },
   computed: {
-    submitBarText() {
+    selectCount() {
       const count = this.checkedGoods.length;
-      if(count == this.goods.length){
-        this.isSelectAll = true
-      }else{
-        this.isSelectAll = false
+      if (count == this.goods.length && count != 0) {
+        this.isSelectAll = true;
+      } else {
+        this.isSelectAll = false;
       }
-      return "结算" + (count ? `(${count})` : "");
+      return count ? `(${count})` : "";
     },
     totalPrice() {
       return this.goods.reduce(
@@ -167,11 +178,11 @@ export default {
       this.isOperate = !this.isOperate;
     },
     changeAll(val) {
-      if(this.isSelectAll){
-        this.checkedGoods = this.goods.map(item=>item.id)
-      }else{
-        if(this.checkedGoods.length == this.goods.length){
-          this.checkedGoods = []
+      if (this.isSelectAll) {
+        this.checkedGoods = this.goods.map(item => item.id);
+      } else {
+        if (this.checkedGoods.length == this.goods.length) {
+          this.checkedGoods = [];
         }
       }
     },
@@ -182,8 +193,15 @@ export default {
       item.num = val;
     },
     onSubmit() {
-      console.log(this.$route.params);
       Toast("点击结算");
+    },
+    deleteItem(){
+      this.goods = this.goods.filter((ele,index)=>{
+        if(!this.checkedGoods.includes(ele.id)){
+          return ele
+        }
+      })
+      this.checkedGoods = []
     },
     onRefresh(done) {
       setTimeout(() => {
@@ -276,6 +294,39 @@ export default {
   .van-submit-bar {
     .van-checkbox {
       margin-left: 15px;
+    }
+  }
+  .operate-bar {
+    position: fixed;
+    bottom: 50px;
+    left: 0;
+    z-index: 100;
+    width: 100%;
+    background-color: #fff;
+    -webkit-user-select: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 14px;
+    .van-checkbox {
+      margin-left: 15px;
+    }
+    .white {
+      flex: 1;
+    }
+    .btn {
+      width: 110px;
+      color: #fff;
+      background-color: #f44;
+      border: 1px solid #f44;
+      height: 50px;
+      line-height: 48px;
+      font-size: 16px;
+      text-align: center;
+      &.disable_btn{
+        opacity: 0.5;
+      }
     }
   }
 }

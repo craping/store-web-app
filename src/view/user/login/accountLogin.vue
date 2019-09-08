@@ -7,7 +7,7 @@
             <van-cell-group >
                 <van-field v-model="userName" />
             </van-cell-group>
-            <p>密码</p>
+            <p class="mt-10">密码</p>
             <van-cell-group>
                 <van-field v-model="password" type="password"/>
             </van-cell-group>
@@ -67,6 +67,9 @@ export default {
             color: #FFF;
             font-size: 16px;
             text-align: center;
+        }
+        .mt-10{
+            margin-top: 10px;
         }
     }
 </style>
