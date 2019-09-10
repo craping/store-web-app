@@ -113,6 +113,9 @@ export default {
   padding-top: 46px;
   display: flex;
   flex-direction: column;
+  .van-nav-bar {
+    padding-top: 0;
+  }
   .proInfo {
     .van-card {
       background: #fff;

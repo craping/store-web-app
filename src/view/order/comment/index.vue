@@ -13,16 +13,10 @@
       <van-card desc="描述信息" title="商品标题" thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"/>
     </div>
     <div class="commentStar" style="background:#fff">
-      <div class="item" v-for="(item,index) in starts" :key="item.name">
-        <h2>{{item.name}}</h2>
-        <van-rate
-          v-model="item.initStar"
-          :size="25"
-          color="#ff4444"
-          void-icon="star"
-          void-color="#999"
-          @change="getStar(item.initStar,index)"
-        />
+      <div class="item">
+        <h2>{{starts.name}}</h2>
+        <van-rate v-model="starts.initStar" @change="getStar" icon="like" void-icon="like-o"/>
+        <p>请选择评分</p>
       </div>
     </div>
     <div class="commentWord">
@@ -59,11 +53,7 @@ export default {
   components: {},
   data() {
     return {
-      starts: [
-        { name: '描述相符', initStar: 0 },
-        { name: '服务态度', initStar: 0 },
-        { name: '物流服务', initStar: 0 }
-      ],
+      starts: { name: '商品评分', initStar: 0 },
       describeStar: 0, //获取三个星的数量
       serviceStar: 0,
       logisticsStar: 0,
@@ -85,22 +75,8 @@ export default {
     },
 
     /*************修改星数量事件*********/
-    getStar(num, index) {
-      console.log()
-      switch (index) {
-        case 0:
-          this.describeStar = num
-          break
-        case 1:
-          this.serviceStar = num
-          break
-        case 2:
-          this.logisticsStar = num
-          break
-
-        default:
-          break
-      }
+    getStar(num) {
+      console.log(num)
     },
 
     /************获取评论内容*********/
@@ -155,6 +131,9 @@ export default {
   padding-top: 46px;
   display: flex;
   flex-direction: column;
+  .van-nav-bar {
+    padding-top: 0;
+  }
   .proInfo {
     .van-card {
       background: #fff;
@@ -172,6 +151,11 @@ export default {
         font-size: 16px;
         margin-right: 5px;
         line-height: 30px;
+      }
+      p {
+        padding-left: 20px;
+        font-size: 14px;
+        color: #999;
       }
     }
   }
