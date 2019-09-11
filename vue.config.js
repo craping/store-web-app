@@ -5,9 +5,10 @@ function resolve(dir) {
 }
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? '/store/' : '/',
+  publicPath: './',
+  assetsDir: './',
   devServer: {
-    port: 8090,
+    port: 9090,
     open: false,
     proxy: {
       [process.env.VUE_APP_BASE_API]: {

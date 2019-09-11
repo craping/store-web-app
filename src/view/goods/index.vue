@@ -127,6 +127,7 @@ import {
   Tabs
 } from 'vant';
 import storeNavBar from "@/components/store-nav-bar";
+import Big from "big.js";
 
 export default {
   components: {
@@ -157,14 +158,14 @@ export default {
       goods: {
         name: 'HLA海澜之家简约动物印花短袖T恤',
         subTitle: '2018夏季新品微弹舒适新款短T男生 6月6日-6月20日，满300减30，参与互动赢百元礼券，立即分享赢大奖',
-        originalPrice: 3564,
-        price: 2680,
+        originalPrice: 98,
+        price: 98,
         express: '免运费',
         remain: 19,
         thumb: [
-          'https://img.yzcdn.cn/public_files/2017/10/24/e5a5a02309a41f9f5def56684808d9ae.jpeg',
-          'https://img.yzcdn.cn/public_files/2017/10/24/1791ba14088f9c2be8c610d0a6cc0f93.jpeg',
-          'http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20181113/movie_ad.jpg'
+          'http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20180615/5ad83a4fN6ff67ecd.jpg!cc_350x449.jpg',
+          'http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20180615/5ac98b64N70acd82f.jpg!cc_350x449.jpg',
+          'http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20180615/5a51eb88Na4797877.jpg'
         ]
       }
     };
@@ -230,7 +231,7 @@ export default {
       });
     },
     formatPrice(price) {
-      return '¥ ' + (price / 100).toFixed(2);
+      return '¥ ' + new Big(price).toFixed(2);
     },
 
     onClickCart() {

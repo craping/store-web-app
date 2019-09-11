@@ -44,7 +44,9 @@
       <div class="my-order grid-panel">
         <div class="grid-top">
           <span>订单中心</span>
-          <span class="link">查看全部订单></span>
+          <router-link :to="'/order'">
+            <span class="link">查看全部订单></span>
+          </router-link>
         </div>
         <van-grid :border="false" :column-num="5">
           <van-grid-item 
