@@ -31,7 +31,7 @@ export default {
 <style lang="scss" scoped>
     .about-detail{
         .content{
-            padding-top: 46px;
+            padding-top: 66px;
         }
     }
 </style>

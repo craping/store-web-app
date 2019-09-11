@@ -5,12 +5,14 @@ export default [
     },
     {
         path: '/withdraw',
-        component: () => import('@/view/vip/withdraw.vue')
+        component: () => import('@/view/vip/withdraw/index.vue')
     },
     {
-        path: '/withdrawLog',
-        component: () => import('@/view/vip/withdrawLog.vue')
+        path: '/team',
+        component: () => import('@/view/vip/team/index.vue')
     },
-    
-    
+    {
+        path: '/vipGrade',
+        component: () => import('@/view/vip/vipGrade.vue')
+    },
 ];

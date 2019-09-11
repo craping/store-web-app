@@ -1,10 +1,13 @@
+<!--
+ * @Description: 
+ -->
 <template>
     <div class="vip-page">
         <van-nav-bar title="会员中心" left-arrow @click-left="onClickLeft" fixed />
         <div class="page-body">
              <div class="top-card">
                 <div class="card-row-1">
-                    <div >
+                    <div>
                         <div class="title-1">账户余额</div>
                         <div class="rest-money"> <span class="sign">￥</span> 1632.2</div>
                     </div>
@@ -54,7 +57,7 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="look-detail">查看详情></p>
+                        <p class="look-detail" @click="toBill(1,0)">查看详情></p>
                     </div>
                 </van-tab>
                 <van-tab title="本月收益">
@@ -85,7 +88,7 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="look-detail">查看详情></p>
+                        <p class="look-detail" @click="toBill(1,0)">查看详情></p>
                     </div>
                 </van-tab>
             </van-tabs>
@@ -103,17 +106,19 @@
                         </div>
                     </div>
                 </div>
-                <p class="look-detail">查看详情></p>
+                <p class="look-detail" @click="jumpLink('team')">查看详情></p>
             </div>
             <div class="bottom-bar">
-                <van-cell title="提现记录" @click="jumpLink('/bill')" is-link />
-                <van-cell title="余额明细" @click="jumpLink('/bill')" is-link />
+                <van-cell title="提现记录" @click="toBill(2,4)" is-link />
+                <van-cell title="余额明细" @click="toBill()" is-link />
             </div>
         </div>
     </div>
 </template>
 <script>
 import Vue from 'vue';
+import { createNamespacedHelpers } from "vuex";
+const { mapActions } = createNamespacedHelpers("bill");
 import { NavBar, Cell, CellGroup, Tab, Tabs ,Icon } from 'vant';
 Vue.use(Tab).use(Tabs).use(Cell).use(CellGroup).use(NavBar).use(Icon);
 export default {
@@ -123,22 +128,30 @@ export default {
         }
     },
     methods:{
+        ...mapActions(['setQueryparams']),
         onClickLeft() {
             this.$router.go(-1)
         },   
         jumpLink(path) {
             this.$router.push(path)
         },
-        logout() {
-            
-        }
+        /**
+         * @method: 
+         * @param {type} 
+         * @return: 
+         */     
+        toBill(inExType,typeFilter) {
+            this.setQueryparams({inExType,typeFilter})
+            this.jumpLink('/bill')
+        },
+        
     }
 }
 </script>
 <style lang="scss" scoped>
     .vip-page{
         .page-body{
-            padding-top: 46px;
+            padding-top: 66px;
         }
         .top-card{
             margin: 5px;

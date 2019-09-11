@@ -134,6 +134,9 @@ export default {
 <style lang="scss" scoped>
 .successOrder {
   padding-top: 46px;
+  .van-nav-bar {
+    padding-top: 0;
+  }
   .successTip {
     background: #fff;
     height: 180px;

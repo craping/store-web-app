@@ -257,6 +257,9 @@ export default {
 <style lang="scss" scoped>
 .refundInfo {
   padding-top: 46px;
+  .van-nav-bar {
+    padding-top: 0;
+  }
   .ordercontent {
     padding: 46px 0px;
     height: 100vh;

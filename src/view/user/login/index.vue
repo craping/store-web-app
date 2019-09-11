@@ -8,7 +8,7 @@
         </van-nav-bar>
         <div class="login-body">
             <div class="welcome-word">
-                欢迎来到商城 <br>
+                欢迎来到5G云购 <br>
                 请您登录/注册
             </div>
             <div class="field-group">

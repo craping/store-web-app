@@ -43,5 +43,10 @@ export default [
     path: '/refundInfo', //退货详情
     name: 'refundInfo',
     component: () => import('@/view/order/refundInfo/index.vue')
+  },
+  {
+    path: '/confirmOrder', //退货详情
+    name: 'confirmOrder',
+    component: () => import('@/view/order/confirmOrder/index.vue')
   }
 ]

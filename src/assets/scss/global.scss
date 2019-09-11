@@ -72,3 +72,13 @@ textarea {
 .border-none.van-hairline--top-bottom::after {
   border-width: 0;
 }
+.van-nav-bar{
+  box-sizing: content-box;
+  padding-top: 20px;
+  height: 46px;
+  .van-nav-bar__left{
+    .van-icon{
+      color: $red;
+    }
+  }
+}

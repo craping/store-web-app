@@ -48,7 +48,6 @@ export default {
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    height: 66px;
     line-height: normal;
     padding-bottom: 10px;
     .van-search {
