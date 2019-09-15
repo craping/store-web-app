@@ -80,7 +80,7 @@
           </div>
         </div>
       </div>
-      <van-popup v-model="dateSelectshow" position="bottom" :style="{ height: '40%' }">
+      <van-popup v-model="dateSelectshow" position="bottom" :style="{ height: '50%' }">
         <div class="tool-bar">
           <div class="cancel" @click="dateSelectshow=false">取消</div>
           <div class="sure" @click="queryHandle">确定</div>
@@ -88,7 +88,7 @@
         <van-tabs v-model="dateType" color="#ff4444">
           <van-tab title="按月选择">
             <van-datetime-picker
-              v-model="currentDate"
+              v-model="currentMonth"
               type="year-month"
               :show-toolbar="false"
               @confirm="selectDate"
@@ -96,10 +96,16 @@
             />
           </van-tab>
           <van-tab title="按日选择">
+            <div class="date-select-wrapper">
+              <div class="date-input" :class="{active:dateInputType==0}" @click="selectInput(0,'startDate')">{{startDate|| '开始日期'}}</div>
+              <span>至</span>
+              <div class="date-input" :class="{active:dateInputType==1}" @click="selectInput(1,'endDate')">{{endDate|| '结束日期'}}</div>
+            </div>
             <van-datetime-picker
               v-model="currentDate"
               type="date"
               :show-toolbar="false"
+              @change="changeCurrentDate"
               @confirm="selectDate"
               @cancel="dateSelectshow=false"
             />
@@ -111,6 +117,7 @@
 </template>
 <script>
 import Vue from "vue";
+import { format } from "@/utils/util";
 import { createNamespacedHelpers } from "vuex";
 const { mapState, mapActions } = createNamespacedHelpers("bill");
 import {
@@ -177,14 +184,18 @@ export default {
           id: 4
         }
       ],
+      currentMonth: new Date(),
       currentDate: new Date(),
-      dateType: 0 // 0按月，1按日
+      startDate: "2019-09-02",
+      endDate: "",
+      dateType: 0, // 0按月，1按日
+      dateInputType: 0 //0开始，1结束
     };
   },
   mounted() {
     this.container1 = this.$refs.monthItem;
     window.scrollTo(0, 0);
-    this.queryBill()
+    this.queryBill();
   },
   computed: {
     ...mapState({
@@ -218,6 +229,28 @@ export default {
           this.filterShow = false;
         })
         .catch(() => {});
+    },
+    formatTime(time) {
+      return format(time, "yyyy-MM-dd");
+    },
+    selectInput(type, name) {
+      this.dateInputType = type;
+      if (this[name]) {
+        this.currentDate = new Date(this[name]);
+      } else {
+        this.currentDate = new Date()
+        this[name] = this.formatTime(new Date())
+      }
+    },
+    changeCurrentDate(picker){
+      let currentVal = picker.getValues().join('-')
+
+      if(this.dateInputType){
+        this.endDate = currentVal
+      }else{
+        this.startDate = currentVal
+
+      }
     }
   }
 };
@@ -354,6 +387,27 @@ export default {
           text-align: right;
         }
       }
+    }
+  }
+  .date-select-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    height: 50px;
+    .date-input {
+      width: 40%;
+      flex: 1;
+      text-align: center;
+      border-bottom: 1px solid #333;
+      padding-bottom: 4px;
+      &.active{
+        border-bottom: 1px solid $red;
+        color: $red;
+      }
+    }
+    span {
+      padding: 0 20px;
     }
   }
 }
