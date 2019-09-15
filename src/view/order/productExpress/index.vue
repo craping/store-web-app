@@ -199,6 +199,9 @@ export default {
   padding-top: 46px;
   display: flex;
   flex-direction: column;
+  .van-nav-bar {
+    padding-top: 0;
+  }
   .expressInfo {
     background: #fff;
     height: 100px;

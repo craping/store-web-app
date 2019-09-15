@@ -8,7 +8,7 @@
       left-arrow
       @click-left="onClickLeft"
     />
-    <van-tabs @click="onClick">
+    <van-tabs @click="onClick" v-model="active">
       <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad">
         <van-tab v-for="(item,index) in productStatus" :key="item.id" :title="item.title">
           <div v-for="product in showProductList" :key="product.id" class="pro-container">
@@ -94,7 +94,7 @@ export default {
   },
   data() {
     return {
-      chosenAddressId: '1',
+      active: 0, //默认为1
       productStatus: [
         { id: '1', title: '全部' },
         { id: '2', title: '待付款' },
@@ -178,6 +178,7 @@ export default {
   },
   created() {
     this.showProductList = this.productList
+    this.active = this.$route.query.tabId
   },
   methods: {
     /*************返回点击事件***************/
@@ -196,7 +197,7 @@ export default {
     },
 
     /*************tab切换标签点击事件*********/
-    onClick(name, title) {
+    onClick(name) {
       if (name != 0) {
         this.showProductList = this.productList.filter(item => {
           return item.status == name
@@ -321,12 +322,20 @@ export default {
       this.loading = false
       // this.finished = true
     }
+  },
+  watch: {
+    active(newValue, oldValue) {
+      this.onClick(newValue)
+    }
   }
 }
 </Script>
 <style lang="scss" scoped>
 .order {
   padding-top: 46px;
+  .van-nav-bar {
+    padding-top: 0;
+  }
   .status {
     text-align: right;
     padding-right: 10px;

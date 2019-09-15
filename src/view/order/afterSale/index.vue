@@ -177,6 +177,9 @@ export default {
 </Script>
 <style lang="scss" scoped>
 .aftersale {
+  .van-nav-bar {
+    padding-top: 0;
+  }
   .content {
     position: relative;
     top: 46px;
