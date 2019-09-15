@@ -2,7 +2,7 @@
     <div class="login-page">
         <van-nav-bar title="" :border="false" class="right-tips">
             <template slot="right" >
-                <span @click="toHome">跳过，看好货</span>
+                <span @click="jumpLink('/main/home')">跳过，看好货</span>
                 <van-icon  name="arrow" color="#ccc" />  
             </template>
         </van-nav-bar>
@@ -19,6 +19,7 @@
                         <span :class="{gray:countDownSecond >= 0}">{{codeText}}</span>
                     </div>
                 </van-cell-group>
+                <p class="goRegister" @click="jumpLink('register')">去注册></p>
             </div>
             <div class="login-btn" @click="login">
                 登录
@@ -30,10 +31,10 @@
                         <img src="./img/wechat.png" alt="">
                         <p>微信</p>
                     </div>
-                     <div class="way-item" @click="toAccountLogin">
+                     <!-- <div class="way-item" @click="jumpLink('accountLogin')">
                         <img src="./img/usericon.png" alt="">
                         <p>账号</p>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -52,11 +53,17 @@ export default {
             codeText: '获取验证码',
             countDownSecond: -1,
             codeTimer: null,
-
+            aweixin:null, // 微信授权登录对象
         }
     },
     destroyed() {
         this.clearTimeCount(this.codeTimer);
+    },
+    mounted (){
+        this.onPlusReady(() =>{
+            // this.initWexin()
+            Toast.success('plus加载成功');
+        })
     },
     methods:{
         onClickLeft() {
@@ -71,9 +78,6 @@ export default {
         login() {
 
         },  
-        toAccountLogin() {
-            this.$router.push('/accountLogin')
-        },
         getCode() {
             if(this.countDownSecond > 0){ 
                 return;
@@ -133,6 +137,26 @@ export default {
             }
             return flag;
         },
+        initWeChatService(){
+            // 微信授权登录对象
+            // 获取登录授权认证服务列表，单独保存微信登录授权对象
+            // 5+APP在plusready事件中调用，uni-app在vue页面的onLoad中调用
+            plus.oauth.getServices(function(services){
+                this.prototype.weService = services['weixin'];
+            }, function(e){
+                alert("获取登录授权服务列表失败："+JSON.stringify(e));
+            } );
+        },
+        wechatLogin() {  
+            if (!aweixin.authResult) {  
+                aweixin.authorize((e)=> {  
+                    console.log(e.code);//app端获取到的code  
+                
+                }, function(e) {  
+                    alert('微信授权失败'+JSON.stringify(e))  
+                });  
+            }
+        },  
     }
 }
 </script>
@@ -166,13 +190,19 @@ export default {
                     color: #CCC;
                 }
             }
+            .goRegister{
+                text-align: right;
+                color: $red;
+                margin-top: 20px;
+                text-decoration: underline;
+            }
             .login-btn{
                 background: $red;
                 height: 40px;
                 line-height: 40px;
                 width: 80%;
                 border-radius: 6px;
-                margin: 40px auto 0;
+                margin: 20px auto 0;
                 color: #FFF;
                 font-size: 16px;
                 text-align: center;

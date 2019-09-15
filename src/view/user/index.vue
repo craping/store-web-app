@@ -9,7 +9,7 @@
     </div>
     <div class="top-info">
       <div class="row-1">
-        <van-icon name="chat-o" color="#fff" size="30"/>
+        <van-icon name="chat-o" @click="jumpLink('/message')" color="#fff" size="30"/>
       </div>
       <div class="row-2">
         <div class="head-img" src></div>
@@ -131,7 +131,7 @@ export default {
         },
         {
           name: '我的收藏',
-          link: '',
+          link: '/like',
           icon: 'like-o'
         },
         {
