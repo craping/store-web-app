@@ -31,6 +31,10 @@ export default [{
   component: () => import('@/view/user/login/index.vue')
 },
 {
+  path: '/register',
+  component: () => import('@/view/user/login/register.vue')
+},
+{
   path: '/accountLogin',
   component: () => import('@/view/user/login/accountLogin.vue')
 }
@@ -50,4 +54,24 @@ export default [{
   path: '/billDetail',
   component: () => import('@/view/user/bill/billDetail.vue')
 },
+{
+  path: '/unliquidated',
+  component: () => import('@/view/user/bill/unliquidated.vue')
+},
+{
+  path: '/like',
+  component: () => import('@/view/user/like/index.vue')
+},
+{
+  path: '/message',
+  component: () => import('@/view/user/message/index.vue')
+},
+{
+  path: '/messageList',
+  component: () => import('@/view/user/message/list.vue')
+},
+{
+  path: '/messageDetail',
+  component: () => import('@/view/user/message/detail.vue')
+}
 ];

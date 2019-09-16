@@ -2,155 +2,150 @@
  提现页面
  -->
 <template>
-    <div class="withdraw-page">
-        <van-nav-bar title="提现" left-arrow @click-left="onClickLeft" />
-        <div class="bank-bar" @click="jumpLink('/bankCard')">
-            <div class="col-left">
-                <img class="bank-icon" src="">
-                <div class="col-mid">
-                    <div class="title">招商银行</div>
-                    <div class="info">尾号1223 快捷</div>
-                </div>
-            </div>
-            <div>
-                <van-icon name="arrow" color="#999"/>
-            </div>
+  <div class="withdraw-page">
+    <van-nav-bar title="提现" left-arrow @click-left="onClickLeft" />
+    <div class="bank-bar" @click="jumpLink('bankCard',{from:'choose'})">
+      <div class="col-left">
+        <img class="bank-icon" src />
+        <div class="col-mid">
+          <div class="title">招商银行</div>
+          <div class="info">尾号1223 快捷</div>
         </div>
-        <div class="withdraw-info">
-            <div class="tip">
-                提现金额（免收服务费）
-            </div>
-            <div class="input-wrapper">
-                <span>￥</span>
-                <input type="text" v-model="money" :maxlength="10">
-            </div>
-            <div class="bottom-bar">
-                <div class="can-use">可用余额 {{balance}}元</div>
-                <div class="btn-text" @click="getAll">全部提现</div>
-            </div>
-        </div>
-        <div class="btn" :class="{'disable':!money}" @click="sureHandle">立即到账，确认提现</div>
+      </div>
+      <div>
+        <van-icon name="arrow" color="#999" />
+      </div>
     </div>
+    <div class="withdraw-info">
+      <div class="tip">提现金额（免收服务费）</div>
+      <div class="input-wrapper">
+        <span>￥</span>
+        <input type="text" v-model="money" :maxlength="10" />
+      </div>
+      <div class="bottom-bar">
+        <div class="can-use">可用余额 {{balance}}元</div>
+        <div class="btn-text" @click="getAll">全部提现</div>
+      </div>
+    </div>
+    <div class="btn" :class="{'disable':!money}" @click="sureHandle">立即到账，确认提现</div>
+  </div>
 </template>
 <script>
-import Vue from 'vue';
-import { NavBar, Icon ,Field} from 'vant';
-Vue.use(Field).use(NavBar).use(Icon);
+import Vue from "vue";
+import { NavBar, Icon, Field } from "vant";
+Vue.use(Field)
+  .use(NavBar)
+  .use(Icon);
 export default {
-    data(){
-        return {
-            money: '',
-            balance:'12.3'
-        }
+  data() {
+    return {
+      money: "",
+      balance: "12.3"
+    };
+  },
+  methods: {
+    onClickLeft() {
+      this.$router.go(-1);
     },
-    methods:{
-        onClickLeft() {
-            this.$router.go(-1)
-        },   
-        getAll(){
-            this.money = this.balance
-        },
-        jumpLink(path) {
-            this.$router.push(path)
-        },
-        sureHandle() {
-            if(money){
-
-            }
-        }
-        
+    getAll() {
+      this.money = this.balance;
+    },
+    jumpLink(path, query) {
+      this.$router.push({ path, query });
+    },
+    sureHandle() {
+      if (money) {
+      }
     }
-}
+  }
+};
 </script>
 <style lang="scss" scoped>
-    .withdraw-page{
-        .bank-bar{
-            margin: 15px 0 20px;
-            height: 60px;
-            background: #FFF;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 15px;
-            .col-left{
-                display: flex;
-            }
-            .bank-icon{
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: #EEE;
-                margin-right: 15px;
-            }
-            .col-mid{
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                .title{
-                    color: #333;
-                    font-size: 16px;
-                }
-                .info{
-                    font-size: 14px;
-                    color: #999;
-                }
-            }
-        }
-        .withdraw-info{
-            background: #FFF;
-            overflow: hidden;
-            padding: 0 15px;
-            color: #888;
-
-            .tip{
-                font-size: 14px;
-                margin-top: 20px
-            }
-            .input-wrapper{
-                margin: 20px 0 10px;
-                height: 60px;
-                display: flex;
-                color: #000;
-                border-bottom: 1px solid rgba($color: #000000, $alpha: 0.08);
-                span{
-                    width: 50px;
-                    font-size: 40px;
-                }
-                input{
-                    flex: 1;
-                    height: 100%;
-                    border: 0;
-                    font-size: 30px;
-                    text-align: right;
-                }
-            }
-            .bottom-bar{
-                display: flex;
-                justify-content: space-between;
-                padding-bottom: 10px;
-                font-size: 13px;
-                .can-use{
-
-                }
-                .btn-text{
-                    color:$red;
-                }
-                
-            }
-        }
-        .btn{
-            margin: 30px 15px;
-            height: 40px;
-            line-height: 40px;
-            background: $red;
-            border-radius: 5px;
-            text-align: center;
-            font-size: 16px;
-            color: #FFF;
-            &.disable{
-                background: rgba($color: $red, $alpha: 0.5) 
-            }
-        }
-        
+.withdraw-page {
+  .bank-bar {
+    margin: 15px 0 20px;
+    height: 60px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    .col-left {
+      display: flex;
     }
+    .bank-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #eee;
+      margin-right: 15px;
+    }
+    .col-mid {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      .title {
+        color: #333;
+        font-size: 16px;
+      }
+      .info {
+        font-size: 14px;
+        color: #999;
+      }
+    }
+  }
+  .withdraw-info {
+    background: #fff;
+    overflow: hidden;
+    padding: 0 15px;
+    color: #888;
+
+    .tip {
+      font-size: 14px;
+      margin-top: 20px;
+    }
+    .input-wrapper {
+      margin: 20px 0 10px;
+      height: 60px;
+      display: flex;
+      color: #000;
+      border-bottom: 1px solid rgba($color: #000000, $alpha: 0.08);
+      span {
+        width: 50px;
+        font-size: 40px;
+      }
+      input {
+        flex: 1;
+        height: 100%;
+        border: 0;
+        font-size: 30px;
+        text-align: right;
+      }
+    }
+    .bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      font-size: 13px;
+      .can-use {
+      }
+      .btn-text {
+        color: $red;
+      }
+    }
+  }
+  .btn {
+    margin: 30px 15px;
+    height: 40px;
+    line-height: 40px;
+    background: $red;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    &.disable {
+      background: rgba($color: $red, $alpha: 0.5);
+    }
+  }
+}
 </style>

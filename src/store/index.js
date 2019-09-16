@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import home from './modules/home'
 import address from './modules/address'
 import bill from './modules/bill'
+import bankCard from './modules/bankCard'
 
 
 
@@ -12,6 +13,7 @@ export default new Vuex.Store({
   modules: {
     home,
     address,
-    bill
+    bill,
+    bankCard
   }
 })
