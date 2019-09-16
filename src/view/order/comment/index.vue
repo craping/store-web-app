@@ -31,7 +31,7 @@
     </div>
     <div class="commentPicture">
       <div class="title">上传图片</div>
-      <van-uploader v-model="fileList" multiple :max-count="3"/>
+      <van-uploader v-model="fileList" :before-read="beforeRead" multiple :max-count="3"/>
     </div>
     <div class="confirm">
       <van-button type="danger" size="large" @click="doSubmit">提交</van-button>
@@ -40,6 +40,7 @@
 </template>
 <script>
 import Vue from 'vue'
+import {UUID} from '@/utils/util'
 import { NavBar, Rate, Button, Card, Row, Field, Uploader } from 'vant'
 Vue.use(NavBar)
   .use(Rate)
@@ -62,7 +63,7 @@ export default {
       commentWord: '', //获取评论内容
       maxWord: 50, //最大评论字数
       commentStyle: { maxHeight: 150, minHeight: 100 },
-      fileList: [{ url: 'https://img.yzcdn.cn/vant/cat.jpeg' }]
+      fileList: [],
     }
   },
   created() {
@@ -82,6 +83,32 @@ export default {
     /************获取评论内容*********/
     getWord(e) {
       this.commentWord = e.target.value
+    },
+
+    /***********上传图片之前事件*********/
+    beforeRead(file){
+      console.log("beforeRead");
+      console.log(file);
+      this.$http.post("aliyun/oss/policy",{}).then(data => {
+        console.log(data.info)
+        let form = new FormData();
+        const filename = UUID()+"."+file.name.split(".")[1];
+        form.append("policy", data.info.policy);
+        form.append("signature", data.info.signature);
+        form.append("key", data.info.dir + "/"+filename);
+        form.append("ossaccessKeyId", data.info.accessKeyId);
+        form.append("dir", data.info.dir);
+        form.append("host", data.info.host);
+        form.append("file", file);
+
+        this.$http.post(data.info.host, form, {
+          headers: {
+          	'Content-Type': 'multipart/form-data'
+        }}).then(()=>{
+          this.fileList.push({url:data.info.host + '/' + data.info.dir + '/' + filename})
+        })
+      })
+      return false;
     },
 
     /***********上传图片事件*********/
