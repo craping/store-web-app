@@ -3,9 +3,11 @@ import App from './App';
 import { Lazyload } from 'vant';
 import router from './router';
 import store from './store';
+import Icon from 'vue-svg-icon/Icon.vue';
 import VueScroller from './components/vue-scroller'
 import request from './utils/request'
 
+Vue.component('icon', Icon);
 Vue.use(VueScroller);
 Vue.use(Lazyload);
 Vue.prototype.$http = request

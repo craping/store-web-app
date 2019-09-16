@@ -8,7 +8,7 @@
         </div>
       </template>
       <template v-slot:right>
-        <div class="back share">
+        <div class="back share" @click="share.show = true">
           <van-icon name="share" color="#fff" size="20"/>
         </div>
       </template>
@@ -26,7 +26,7 @@
         </van-tabs>
       </template>
       <template v-slot:right>
-        <van-icon name="share" color="#999" size="20" />
+        <van-icon name="share" color="#999" size="20" @click="share.show = true"/>
       </template>
     </store-nav-bar>
   
@@ -90,7 +90,8 @@
       </van-cell>
       <van-cell title="线下门店" icon="location-o" is-link @click="sorry" />
     </van-cell-group>
-      
+    
+    <store-share :show="share.show" @cancel="share.show=false"></store-share>
 
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" @click="sorry">
@@ -127,6 +128,7 @@ import {
   Tabs
 } from 'vant';
 import storeNavBar from "@/components/store-nav-bar";
+import storeShare from "@/components/store-share";
 import Big from "big.js";
 
 export default {
@@ -144,7 +146,8 @@ export default {
     [ImagePreview.name]: ImagePreview,
     [Tab.name]:Tab,
     [Tabs.name]:Tabs,
-    storeNavBar
+    storeNavBar,
+    storeShare
   },
 
   data() {
@@ -154,6 +157,9 @@ export default {
       activeTab:"product",
       swipe:{
         current:0,
+      },
+      share:{
+        show:false
       },
       goods: {
         name: 'HLA海澜之家简约动物印花短袖T恤',
