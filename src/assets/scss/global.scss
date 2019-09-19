@@ -53,6 +53,7 @@ textarea {
 
 .full-page {
   height: 100vh;
+  width: 100vw;
 }
 
 .scroll-wrap {
@@ -72,7 +73,8 @@ textarea {
 .border-none.van-hairline--top-bottom::after {
   border-width: 0;
 }
-.van-nav-bar{
+.van-nav-bar:not(.store-nav-bar){
+  transition: background-color .2s linear;
   box-sizing: content-box;
   padding-top: 20px;
   height: 46px;
@@ -81,4 +83,10 @@ textarea {
       color: $red;
     }
   }
+}
+
+.text-ellipsis{
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
 }

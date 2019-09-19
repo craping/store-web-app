@@ -21,6 +21,9 @@ const routes = [{
         name: 'home',
         component: () => import('@/view/home')
     }, {
+        name: 'search',
+        component: () => import('@/view/search')
+    }, {
         name: 'cart',
         component: () => import('@/view/cart'),
         meta: {

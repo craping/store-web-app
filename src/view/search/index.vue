@@ -1,40 +1,14 @@
 <template>
-  <div class="home">
-    <!-- <store-nav-bar background="#ff4444">
+  <div class="search">
+    <van-nav-bar left-arrow @click-left="left" :fixed="true">
       <template slot="title">
-        <router-link to="/main/search">
-          <van-search placeholder="请输入搜索关键词" disabled background="$red">
-            <template v-slot:left-icon>
-              <van-icon name="search" color="#969799" size="15" />
-            </template>
-          </van-search>
-        </router-link>
+        <form action="/">
+          <van-search v-model="keyword" placeholder="请输入搜索关键词" @search="onSearch" @focus="onFocus"/>
+        </form>
       </template>
-      <template slot="right">
-        <van-icon name="chat-o" color="#fff" size="30" />
-      </template>
-    </store-nav-bar> -->
-
-    <van-nav-bar style="backgroundColor: #ff4444">
-      <template slot="title">
-        <router-link to="/main/search">
-          <van-search placeholder="请输入搜索关键词" disabled background="$red"/>
-        </router-link>
-      </template>
-      <van-icon name="chat-o" slot="right" color="#fff" size="28"/>
     </van-nav-bar>
-    
     <div class="content">
-      <div class="curtain" ref="curtain">
-        <div class="cav"></div>
-      </div>
-
       <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad" @onScroll="onScroll">
-        <van-swipe :autoplay="3000" :height="130" class="round">
-          <van-swipe-item v-for="(ad, index) in content.advertiseList" :key="index">
-            <img v-lazy="ad.pic" height="130" width="100%" />
-          </van-swipe-item>
-        </van-swipe>
         <br />
         <router-link
           v-for="(item) in content.hotProductList"
@@ -57,6 +31,14 @@
         </router-link>
       </store-scroller>
     </div>
+    <div class="history full-page" style="background-color:#fff" v-show="showHistory">
+      <van-cell title="搜索历史" :border="false">
+        <van-icon slot="right-icon" name="delete" style="line-height: inherit;" size="16" />
+      </van-cell>
+      <div class="keywords">
+        <van-tag round class="text-ellipsis keyword" size="large" v-for="(e, i) in keywords" :key="i" @click="setKeyword(e)">{{e}}</van-tag>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -65,18 +47,16 @@ import { mapState } from "vuex";
 import {
   Icon,
   Search,
-  Swipe,
-  SwipeItem,
   PullRefresh,
   List,
   Cell,
+  CellGroup,
   Toast,
   Card,
   Button,
-  NavBar
+  NavBar,
+  Tag
 } from "vant";
-import Arrow from "@/components/vue-scroller/components/Arrow.vue";
-import storeNavBar from "@/components/store-nav-bar";
 import storeScroller from "@/components/store-scroller";
 import { isIOS } from "mobile-device-detect";
 
@@ -84,17 +64,15 @@ export default {
   components: {
     [Icon.name]: Icon,
     [Search.name]: Search,
-    [Swipe.name]: Swipe,
-    [SwipeItem.name]: SwipeItem,
     [PullRefresh.name]: PullRefresh,
     [List.name]: List,
     [Cell.name]: Cell,
+    [CellGroup.name]: CellGroup,
     [Card.name]: Card,
     [Button.name]: Button,
     [NavBar.name]: NavBar,
+    [Tag.name]: Tag,
     Toast,
-    Arrow,
-    storeNavBar,
     storeScroller
   },
   computed: {
@@ -102,7 +80,7 @@ export default {
       content: state => state.home.content
     })
   },
-  
+
   data() {
     return {
       isIOS: isIOS,
@@ -110,79 +88,88 @@ export default {
       images: ["", "", "", ""],
       list: [],
       loading: false,
-      finished: false
+      finished: false,
+      keyword: "",
+      keywords:["关键词","123", "士大夫"],
+      showHistory: true
     };
   },
   created() {
     this.$store.dispatch("home/content");
   },
-  mounted (){
-    this.onPlusReady(() =>{
-      Toast.success('plus加载成功');
-    })
+  mounted() {
+    this.onPlusReady(() => {
+      Toast.success("plus加载成功");
+    });
   },
   methods: {
+    left() {
+      this.$router.go(-1);
+    },
+    setKeyword(k){
+      this.keyword = k;
+      this.onSearch(k);
+    },
+    onFocus(){
+      this.showHistory = true;
+    },
+    onSearch(value){
+      this.showHistory = false;
+    },
     onRefresh(done) {
       this.$store.dispatch("home/content").finally(() => {
         this.isLoading = false;
-        if (done) 
-          done();
+        if (done) done();
       });
     },
     onScroll(top) {
       if (top > 0)
-        this.$refs.curtain.style.transform = "translate(0px," + -(top / 3) + "px) scale(1)";
+        this.$refs.curtain.style.transform =
+          "translate(0px," + -(top / 3) + "px) scale(1)";
     },
     onLoad(done) {
       if (done) done(true);
-        this.loading = false;
+      this.loading = false;
       this.finished = true;
     }
   }
 };
 </script>
 
-<style lang="scss" scope>
-.home {
-
+<style lang="scss">
+.search {
+  padding-top: 66px;
   .van-hairline--bottom::after {
     border-bottom-width: 0;
   }
-  .van-nav-bar{
+  .van-nav-bar {
     line-height: 56px;
-    .van-icon{
-      color:#969799;
+    .van-icon {
+      color: #969799;
     }
-    .van-nav-bar__title{
-      max-width:none;
-      padding-right: 35px;
+    .van-nav-bar__title {
+      max-width: none;
+      padding-left: 35px;
       .van-search {
         padding: 5px 16px;
-        .van-cell{
+        .van-cell {
           padding: 3px 10px 3px 0;
         }
       }
     }
   }
-
-  .content {
-
-    .curtain {
-      display: flex;
-      justify-content: center;
-      position: absolute;
-      overflow-x: hidden;
-      width: 100vw;
-      .cav {
-        // height: 85px;
-        height: 191px;
-        border-bottom-right-radius: 50%;
-        border-bottom-left-radius: 50%;
-        background-color: $red;
-        flex: none;
-        width: 150vw;
+  .history {
+    position: absolute;
+    .keywords {
+      padding-left: 15px;
+      padding-right: 15px;
+      .keyword {
+        max-width: 45%;
+        margin-right: 10px;
       }
     }
+  }
+  .content {
     .store-scroller {
       .van-pull-refresh {
         padding-top: 66px;
@@ -194,13 +181,6 @@ export default {
           padding-bottom: 50px;
         }
       }
-    }
-    .van-swipe-item {
-      color: #fff;
-      font-size: 20px;
-      line-height: 130px;
-      text-align: center;
-      background-color: #66c6f2;
     }
 
     .van-card {
