@@ -12,17 +12,15 @@ Vue.use(Router);
 const routes = [{
     path: '/',
     redirect: '/main/home'
-},
-
-{
+}, {
+    name: 'search',
+    component: () => import('@/view/search')
+}, {
     name: 'main',
     component: () => import('@/view/main'),
     children: [{
         name: 'home',
         component: () => import('@/view/home')
-    }, {
-        name: 'search',
-        component: () => import('@/view/search')
     }, {
         name: 'cart',
         component: () => import('@/view/cart'),

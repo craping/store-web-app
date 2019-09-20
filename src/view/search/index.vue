@@ -8,10 +8,10 @@
       </template>
     </van-nav-bar>
     <div class="content">
-      <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad" @onScroll="onScroll">
+      <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad">
         <br />
         <router-link
-          v-for="(item) in content.hotProductList"
+          v-for="(item) in search.info"
           :key="item.id"
           :to="'/goods/'+item.id"
         >
@@ -33,7 +33,7 @@
     </div>
     <div class="history full-page" style="background-color:#fff" v-show="showHistory">
       <van-cell title="搜索历史" :border="false">
-        <van-icon slot="right-icon" name="delete" style="line-height: inherit;" size="16" />
+        <van-icon slot="right-icon" name="delete" style="line-height: inherit;" size="16" @click="onClear"/>
       </van-cell>
       <div class="keywords">
         <van-tag round class="text-ellipsis keyword" size="large" v-for="(e, i) in keywords" :key="i" @click="setKeyword(e)">{{e}}</van-tag>
@@ -60,6 +60,7 @@ import {
 import storeScroller from "@/components/store-scroller";
 import { isIOS } from "mobile-device-detect";
 
+const keywordsKey = "keywords";
 export default {
   components: {
     [Icon.name]: Icon,
@@ -90,12 +91,20 @@ export default {
       loading: false,
       finished: false,
       keyword: "",
-      keywords:["关键词","123", "士大夫"],
-      showHistory: true
+      keywords:[],
+      showHistory: this.$route.query.clear
     };
   },
+  computed: {
+    ...mapState({
+      search: state => state.home.search
+    })
+  },
   created() {
-    this.$store.dispatch("home/content");
+    let keywords = localStorage.getItem(keywordsKey);
+    this.keywords = keywords == null?[]:keywords.split(",");
+    if(this.$route.query.clear)
+      this.$store.commit("home/SET_SEARCH", { info: [] });
   },
   mounted() {
     this.onPlusReady(() => {
@@ -114,18 +123,26 @@ export default {
       this.showHistory = true;
     },
     onSearch(value){
+      if(!value || value == "")
+        return;
       this.showHistory = false;
+      const index = this.keywords.indexOf(value);
+      if(index != -1)
+        this.keywords.splice(index, 1);
+      this.keywords.unshift(value);
+      this.keywords = this.keywords.slice(0, 10);
+      localStorage.setItem(keywordsKey, this.keywords.join(","));
+      this.$store.dispatch("home/search", {keyword:value});
+    },
+    onClear(){
+      this.keywords = [];
+      localStorage.removeItem(keywordsKey);
     },
     onRefresh(done) {
-      this.$store.dispatch("home/content").finally(() => {
+      this.$store.dispatch("home/search", {keyword:this.keyword}).finally(() => {
         this.isLoading = false;
         if (done) done();
       });
-    },
-    onScroll(top) {
-      if (top > 0)
-        this.$refs.curtain.style.transform =
-          "translate(0px," + -(top / 3) + "px) scale(1)";
     },
     onLoad(done) {
       if (done) done(true);

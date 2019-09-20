@@ -7,18 +7,34 @@ export default {
     content:{
       advertiseList:[],
       hotProductList:[]
+    },
+    search:{
+      info:[]
     }
   },
   mutations: {
     SET_CONTENT(state, content){
       state.content = content;
+    },
+    SET_SEARCH(state, search){
+      state.search = search;
     }
   },
   actions: {
     content({commit}){
       return new Promise((resolve, reject) => {
-        request.get("/home/content", {}).then(data => {
+        request.get("home/content", {}).then(data => {
           commit('SET_CONTENT', data.info)
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    search({commit}, params){
+      return new Promise((resolve, reject) => {
+        request.post("product/list", params).then(data => {
+          commit('SET_SEARCH', data)
           resolve()
         }).catch(error => {
           reject(error)

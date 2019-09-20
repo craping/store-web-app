@@ -13,17 +13,15 @@
       <template slot="right">
         <van-icon name="chat-o" color="#fff" size="30" />
       </template>
-    </store-nav-bar> -->
+    </store-nav-bar>-->
 
     <van-nav-bar style="backgroundColor: #ff4444">
       <template slot="title">
-        <router-link to="/main/search">
-          <van-search placeholder="请输入搜索关键词" disabled background="$red"/>
-        </router-link>
+        <van-search placeholder="请输入搜索关键词" disabled background="$red" @click="toSearch" />
       </template>
-      <van-icon name="chat-o" slot="right" color="#fff" size="28"/>
+      <van-icon name="chat-o" slot="right" color="#fff" size="28" />
     </van-nav-bar>
-    
+
     <div class="content">
       <div class="curtain" ref="curtain">
         <div class="cav"></div>
@@ -102,7 +100,7 @@ export default {
       content: state => state.home.content
     })
   },
-  
+
   data() {
     return {
       isIOS: isIOS,
@@ -116,27 +114,30 @@ export default {
   created() {
     this.$store.dispatch("home/content");
   },
-  mounted (){
-    this.onPlusReady(() =>{
-      Toast.success('plus加载成功');
-    })
+  mounted() {
+    this.onPlusReady(() => {
+      Toast.success("plus加载成功");
+    });
   },
   methods: {
     onRefresh(done) {
       this.$store.dispatch("home/content").finally(() => {
         this.isLoading = false;
-        if (done) 
-          done();
+        if (done) done();
       });
     },
     onScroll(top) {
       if (top > 0)
-        this.$refs.curtain.style.transform = "translate(0px," + -(top / 3) + "px) scale(1)";
+        this.$refs.curtain.style.transform =
+          "translate(0px," + -(top / 3) + "px) scale(1)";
     },
     onLoad(done) {
       if (done) done(true);
-        this.loading = false;
+      this.loading = false;
       this.finished = true;
+    },
+    toSearch() {
+      this.$router.push({ name: "search", query: { clear: true } });
     }
   }
 };
@@ -144,21 +145,20 @@ export default {
 
 <style lang="scss" scope>
 .home {
-
   .van-hairline--bottom::after {
     border-bottom-width: 0;
   }
-  .van-nav-bar{
+  .van-nav-bar {
     line-height: 56px;
-    .van-icon{
-      color:#969799;
+    .van-icon {
+      color: #969799;
     }
-    .van-nav-bar__title{
-      max-width:none;
+    .van-nav-bar__title {
+      max-width: none;
       padding-right: 35px;
       .van-search {
         padding: 5px 16px;
-        .van-cell{
+        .van-cell {
           padding: 3px 10px 3px 0;
         }
       }
@@ -166,7 +166,6 @@ export default {
   }
 
   .content {
-
     .curtain {
       display: flex;
       justify-content: center;
