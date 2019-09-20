@@ -104,11 +104,8 @@ export default {
   data() {
     return {
       isIOS: isIOS,
-      isLoading: false,
       images: ["", "", "", ""],
-      list: [],
-      loading: false,
-      finished: false
+      list: []
     };
   },
   created() {
@@ -122,7 +119,6 @@ export default {
   methods: {
     onRefresh(done) {
       this.$store.dispatch("home/content").finally(() => {
-        this.isLoading = false;
         if (done) done();
       });
     },
@@ -133,11 +129,9 @@ export default {
     },
     onLoad(done) {
       if (done) done(true);
-      this.loading = false;
-      this.finished = true;
     },
     toSearch() {
-      this.$router.push({ name: "search", query: { clear: true } });
+      this.$router.push("/search");
     }
   }
 };
@@ -184,7 +178,6 @@ export default {
     }
     .store-scroller {
       .van-pull-refresh {
-        padding-top: 66px;
         padding-bottom: 50px;
       }
       .scroll {

@@ -276,7 +276,7 @@ export default {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
         this.opacityIn = scrollTop/(this.$refs.product.offsetTop- 66);
       } else {
-        this.$router.replace("/main/home");
+        this.$router.go(-1);
       }
     },
     onSwipeChange(index) {

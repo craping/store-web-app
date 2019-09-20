@@ -4,7 +4,7 @@
       <slot name="curtain"></slot>
 
       <scroller
-        ref="scroller"
+        ref="iosScroller"
         :on-refresh="_onRefresh"
         :on-infinite="_onInfinite"
         :onScroll="_onScroll"
@@ -17,7 +17,7 @@
     </div>
 
     <div v-else>
-      <van-pull-refresh v-model="refresh" :head-height="60" @refresh="_onRefresh">
+      <van-pull-refresh ref="refresh" v-model="refresh" :head-height="60" @refresh="_onRefresh">
        <template v-slot:pulling>
          <arrow fillColor="#fff" style="width: 15px; height: 15px;"></arrow>
          <div class="text" style="color:#fff;font-size: 12px;margin: 0 auto;line-height: 20px;text-align: center;width: 100%;">下拉刷新</div>
@@ -83,7 +83,7 @@
 
 <script>
 import { PullRefresh, List } from "vant";
-import Arrow from ".//vue-scroller/components/Arrow";
+import Arrow from "./vue-scroller/components/Arrow";
 import { isIOS } from "mobile-device-detect";
 import inobounce from "inobounce";
 
@@ -124,12 +124,19 @@ export default {
       window.removeEventListener('scroll', this.handleScroll, true);
   },
   methods: {
+    pullToRefresh(){
+      if (isIOS)
+        this.$refs.iosScroller.triggerPullToRefresh();
+      else
+        this.$emit('onRefresh', this.finishRefresh)
+    },
     handleScroll(e){
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
       this._onScroll({top:scrollTop})
     },
-    finishRefresh(){
+    finishRefresh(finished){
       this.refresh = false;
+      this.finished = finished;
     },
     finishInfinite(finished) {
       this.loading = false;
@@ -140,7 +147,8 @@ export default {
       this.$emit('onRefresh', done?done:this.finishRefresh)
     },
     _onInfinite(done) {
-      this.$emit('onInfinite', done?done:this.finishInfinite)
+      if(!this.finished)
+        this.$emit('onInfinite', done?done:this.finishInfinite)
     },
     _onScroll({ top }) {
       this.$emit('onScroll', top)

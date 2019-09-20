@@ -3,16 +3,16 @@
     <van-nav-bar left-arrow @click-left="left" :fixed="true">
       <template slot="title">
         <form action="/">
-          <van-search v-model="keyword" placeholder="请输入搜索关键词" @search="onSearch" @focus="onFocus"/>
+          <van-search v-model.trim="keyword" placeholder="请输入搜索关键词" @search="onSearch" @focus="onFocus"/>
         </form>
       </template>
     </van-nav-bar>
     <div class="content">
-      <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad">
+      <store-scroller ref="scroller" @onRefresh="onRefresh" @onInfinite="onLoad">
         <br />
         <router-link
-          v-for="(item) in search.info"
-          :key="item.id"
+          v-for="(item, index) in search.data.info"
+          :key="index"
           :to="'/goods/'+item.id"
         >
           <van-card
@@ -58,7 +58,6 @@ import {
   Tag
 } from "vant";
 import storeScroller from "@/components/store-scroller";
-import { isIOS } from "mobile-device-detect";
 
 const keywordsKey = "keywords";
 export default {
@@ -84,15 +83,9 @@ export default {
 
   data() {
     return {
-      isIOS: isIOS,
-      isLoading: false,
-      images: ["", "", "", ""],
-      list: [],
-      loading: false,
-      finished: false,
       keyword: "",
       keywords:[],
-      showHistory: this.$route.query.clear
+      showHistory: true
     };
   },
   computed: {
@@ -100,19 +93,25 @@ export default {
       search: state => state.home.search
     })
   },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      if(from.name == "goods"){
+        vm.showHistory = false;
+        vm.keyword = vm.search.params.keyword;
+      }
+    });
+  },
   created() {
     let keywords = localStorage.getItem(keywordsKey);
     this.keywords = keywords == null?[]:keywords.split(",");
-    if(this.$route.query.clear)
-      this.$store.commit("home/SET_SEARCH", { info: [] });
   },
   mounted() {
-    this.onPlusReady(() => {
-      Toast.success("plus加载成功");
-    });
   },
   methods: {
     left() {
+      this.$store.commit("home/SET_SEARCH", { info: [] });
+      this.$store.commit("home/SET_SEARCH_KEYWORD", "");
+      this.keywords = "";
       this.$router.go(-1);
     },
     setKeyword(k){
@@ -132,22 +131,26 @@ export default {
       this.keywords.unshift(value);
       this.keywords = this.keywords.slice(0, 10);
       localStorage.setItem(keywordsKey, this.keywords.join(","));
-      this.$store.dispatch("home/search", {keyword:value});
+      this.$refs.scroller.pullToRefresh();
     },
     onClear(){
       this.keywords = [];
       localStorage.removeItem(keywordsKey);
     },
     onRefresh(done) {
-      this.$store.dispatch("home/search", {keyword:this.keyword}).finally(() => {
-        this.isLoading = false;
-        if (done) done();
+      this.$store.commit("home/SET_SEARCH_KEYWORD", this.keyword);
+      this.$store.dispatch("home/search").then((data) => {
+          if (done) done(data.page >= data.totalpage);
       });
     },
     onLoad(done) {
-      if (done) done(true);
-      this.loading = false;
-      this.finished = true;
+      if(!this.search.data.page || this.search.data.page >= this.search.data.totalpage){
+        if (done) done(true);
+        return;
+      }
+      this.$store.dispatch("home/search").then((data) => {
+        if (done) done(data.page >= data.totalpage);
+      });
     }
   }
 };
@@ -177,6 +180,7 @@ export default {
   }
   .history {
     position: absolute;
+    top: 66px;
     .keywords {
       padding-left: 15px;
       padding-right: 15px;
@@ -189,7 +193,6 @@ export default {
   .content {
     .store-scroller {
       .van-pull-refresh {
-        padding-top: 66px;
         padding-bottom: 50px;
       }
       .scroll {

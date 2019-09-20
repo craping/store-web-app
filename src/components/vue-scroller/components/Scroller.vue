@@ -473,6 +473,21 @@ export default {
         let data = { left, top, zoom }
         this.leftTopZoom = data
         this.onScroll(this.leftTopZoom)
+
+        // enable infinite loading
+        if (this.onInfinite) {
+          // 在 keep alive 中 deactivated 的组件长宽变为 0
+          // console.log(this.loadingState)
+          if (
+            this.content.offsetHeight > 0 &&
+            top + 60 > this.content.offsetHeight - this.container.clientHeight
+          ) {
+            if (this.loadingState || this.state!=0) return
+            this.loadingState = 1
+            this.showLoading = true
+            this.onInfinite(this.finishInfinite)
+          }
+        }
       }
     })
 
@@ -509,24 +524,6 @@ export default {
           this.state = 2
         }
       )
-    }
-
-    // enable infinite loading
-    if (this.onInfinite) {
-      this.infiniteTimer = setInterval(() => {
-        let { left, top, zoom } = this.scroller.getValues()
-
-        // 在 keep alive 中 deactivated 的组件长宽变为 0
-        if (
-          this.content.offsetHeight > 0 &&
-          top + 60 > this.content.offsetHeight - this.container.clientHeight
-        ) {
-          if (this.loadingState) return
-          this.loadingState = 1
-          this.showLoading = true
-          this.onInfinite(this.finishInfinite)
-        }
-      }, 10)
     }
 
     // setup scroller
@@ -579,18 +576,19 @@ export default {
       )
     },
 
-    finishPullToRefresh() {
+    finishPullToRefresh(finished) {
       this.state = 0
-      this.scroller.finishPullToRefresh()
+      this.scroller.finishPullToRefresh();
+      this.loadingState = finished ? 2 : 0;
     },
 
-    finishInfinite(hideSpinner) {
-      this.loadingState = hideSpinner ? 2 : 0
+    finishInfinite(finished) {
+      this.loadingState = finished ? 2 : 0
       this.showLoading = false
 
-      if (this.loadingState == 2) {
-        this.resetLoadingState()
-      }
+      // if (this.loadingState == 2) {
+      //   this.resetLoadingState()
+      // }
     },
 
     triggerPullToRefresh() {

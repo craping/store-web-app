@@ -14,13 +14,19 @@ const routes = [{
     redirect: '/main/home'
 }, {
     name: 'search',
-    component: () => import('@/view/search')
+    component: () => import('@/view/search'),
+    meta: {
+        keepAlive:true
+    }
 }, {
     name: 'main',
     component: () => import('@/view/main'),
     children: [{
         name: 'home',
-        component: () => import('@/view/home')
+        component: () => import('@/view/home'),
+        meta: {
+            keepAlive:true
+        }
     }, {
         name: 'cart',
         component: () => import('@/view/cart'),

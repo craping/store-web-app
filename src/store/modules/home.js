@@ -9,15 +9,30 @@ export default {
       hotProductList:[]
     },
     search:{
-      info:[]
+      data:{
+        info:[]
+      },
+      params:{
+        keyword:"",
+        pageNum:1,
+        pageSize:5
+      }
     }
   },
   mutations: {
     SET_CONTENT(state, content){
       state.content = content;
     },
-    SET_SEARCH(state, search){
-      state.search = search;
+    SET_SEARCH(state, data){
+      state.search.data = data;
+    },
+    SET_SEARCH_KEYWORD(state, keyword){
+      state.search.params.keyword = keyword;
+      state.search.params.pageNum = 1;
+      state.search.data = {info:[]};
+    },
+    SET_SEARCH_NEXT(state){
+      state.search.params.pageNum++;
     }
   },
   actions: {
@@ -25,17 +40,24 @@ export default {
       return new Promise((resolve, reject) => {
         request.get("home/content", {}).then(data => {
           commit('SET_CONTENT', data.info)
-          resolve()
+          resolve(data)
         }).catch(error => {
           reject(error)
         })
       })
     },
-    search({commit}, params){
+    search({state, commit}){
       return new Promise((resolve, reject) => {
-        request.post("product/list", params).then(data => {
-          commit('SET_SEARCH', data)
-          resolve()
+        request.post("product/list", {
+          keyword:state.search.params.keyword,
+          pageNum:state.search.params.pageNum,
+          pageSize:state.search.params.pageSize
+        }).then(data => {
+          data.info = state.search.data.info.concat(data.info);
+          commit('SET_SEARCH', data);
+          if(data.totalpage > state.search.params.pageNum)
+            commit('SET_SEARCH_NEXT');
+          resolve(data)
         }).catch(error => {
           reject(error)
         })
