@@ -15,7 +15,7 @@
       </template>
     </store-nav-bar>-->
 
-    <van-nav-bar style="backgroundColor: #ff4444">
+    <van-nav-bar :fixed="true" style="backgroundColor: #ff4444">
       <template slot="title">
         <van-search placeholder="请输入搜索关键词" disabled background="$red" @click="toSearch" />
       </template>
@@ -37,7 +37,7 @@
         <router-link
           v-for="(item) in content.hotProductList"
           :key="item.id"
-          :to="'/goods/'+item.id"
+          :to="'/goods/'+item.id+'/'+item.productAttributeCategoryId"
         >
           <van-card
             class="round"
@@ -139,6 +139,7 @@ export default {
 
 <style lang="scss" scope>
 .home {
+  padding-top: 66px;
   .van-hairline--bottom::after {
     border-bottom-width: 0;
   }

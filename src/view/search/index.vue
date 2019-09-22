@@ -13,7 +13,7 @@
         <router-link
           v-for="(item, index) in search.data.info"
           :key="index"
-          :to="'/goods/'+item.id"
+          :to="'/goods/'+item.id+'/'+item.productAttributeCategoryId"
         >
           <van-card
             class="round"
@@ -180,7 +180,8 @@ export default {
   }
   .history {
     position: absolute;
-    top: 66px;
+    top:0;
+    padding-top: 66px;
     .keywords {
       padding-left: 15px;
       padding-right: 15px;

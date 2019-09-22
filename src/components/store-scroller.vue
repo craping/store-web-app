@@ -82,17 +82,22 @@
 
 
 <script>
+import Vue from 'vue';
 import { PullRefresh, List } from "vant";
 import Arrow from "./vue-scroller/components/Arrow";
 import { isIOS } from "mobile-device-detect";
 import inobounce from "inobounce";
+import VueScroller from '@/components/vue-scroller'
 
+if(isIOS)
+  Vue.use(VueScroller);
 export default {
   name: "store-scroller",
   components: {
     [PullRefresh.name]: PullRefresh,
     [List.name]: List,
-    Arrow
+    Arrow,
+    inobounce
   },
 
   props: {
@@ -105,13 +110,14 @@ export default {
       refresh:false,
       loading:false,
       finished:false,
-
     };
   },
 
   created() {
-     if (isIOS)
+    if (isIOS)
       inobounce.enable();
+    else
+      inobounce.disable();
   },
   mounted() {
     if(!isIOS)
