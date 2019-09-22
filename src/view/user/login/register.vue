@@ -4,12 +4,12 @@
     <div class="login-body">
       <p class="title">马上注册</p>
       <van-cell-group>
-        <van-field v-model="phone" type="tel" placeholder="请输入手机号码" />
-        <van-field v-model="code" placeholder="请输入验证码" />
+        <van-field v-model="mobile" type="tel" placeholder="请输入手机号码" />
+        <van-field v-model="verCode" placeholder="请输入验证码" />
+        <van-field v-model="agentNo" placeholder="请输入邀请码" />
         <div class="code-operate" @click="getCode">
           <span :class="{gray:countDownSecond >= 0}">{{codeText}}</span>
         </div>
-        <van-field v-model="inviteCode" placeholder="请输入邀请码" />
       </van-cell-group>
       <div class="login-btn" @click="register">注册</div>
     </div>
@@ -25,9 +25,9 @@ Vue.use(Field)
 export default {
   data() {
     return {
-      phone: "",
-      code: "",
-      inviteCode: "",
+      mobile: "",
+      verCode: "",
+      agentNo: "",
       codeText: "获取验证码",
       countDownSecond: -1,
       codeTimer: null
@@ -44,7 +44,7 @@ export default {
       if (this.countDownSecond > 0) {
         return;
       }
-      if (this.phone == "") {
+      if (this.mobile == "") {
         Toast("请输入手机号码");
         return;
       }
@@ -86,19 +86,45 @@ export default {
     /**
      * 获取验证码接口
      */
-    getCodeReq() {},
+    getCodeReq() {
+      const params = { mobile: this.mobile };
+      if (this.isValidate()) {
+        //手机号输入正确，才能获取验证码
+        this.$http
+          .post("/login/getVerCode", params)
+          .then(res => {})
+          .catch(error => {
+            Toast("获取验证码失败");
+          });
+      }
+    },
     /**
      * 判断输入手机号
      */
     isValidate() {
       let flag = true;
-      if (!new RegExp("^1[0-9]{10}$").test(this.phone)) {
+      if (!new RegExp("^1[0-9]{10}$").test(this.mobile)) {
         flag = false;
         Toast("请填写正确的手机号码");
       }
       return flag;
     },
-    register() {}
+    register() {
+      const params = {
+        mobile: this.mobile,
+        verCode: this.verCode,
+        agentNo: this.agentNo
+      };
+      if (this.isValidate()) {
+        //手机号输入正确，才能获取验证码
+        this.$http
+          .post("/login/register", params)
+          .then(res => {})
+          .catch(error => {
+            Toast("获取验证码失败");
+          });
+      }
+    }
   }
 };
 </script>
@@ -127,7 +153,7 @@ export default {
     .code-operate {
       position: absolute;
       right: 15px;
-      bottom: 14px;
+      bottom: 56px;
       color: $red;
       .gray {
         color: #ccc;

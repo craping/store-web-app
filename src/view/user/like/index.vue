@@ -6,7 +6,7 @@
       <div class="content">
         <van-card
           class="round"
-          v-for="(item) in content.hotProductList"
+          v-for="(item) in likeList"
           :key="item.id"
           :price="item.price"
           :origin-price="item.originalPrice"
@@ -32,21 +32,17 @@ Vue.use(Card)
   .use(Button)
   .use(Icon);
 import storeScroller from "@/components/store-scroller";
-import { mapState } from "vuex";
 
 export default {
   components: {
-    storeScroller,
+    storeScroller
   },
   data() {
-    return {};
+    return {
+      likeList: []
+    };
   },
-  computed: {
 
-  ...mapState({
-    content: state => state.home.content
-  }),
-  },
   created() {
     this.$store.dispatch("home/content");
   },
@@ -54,7 +50,14 @@ export default {
     onClickLeft() {
       this.$router.go(-1);
     },
-
+    getLikeList() {
+      this.$http
+        .get("/collec/getProductList", {})
+        .then(res => {
+          this.likeList = res.data || {};
+        })
+        .catch(error => {});
+    },
     jumpLink(path) {
       this.$router.push(path);
     },
@@ -66,12 +69,17 @@ export default {
     onLoad(done) {
       if (done) done(true);
     },
-    toDetail(item){
-        console.log('todetail')
+    toDetail(item) {
+      console.log("todetail");
     },
-    cancelLike(item){
-        console.log('cancel')
-    },
+    cancelLike(item) {
+      this.$http
+        .post("/collec/deleteProduct", {id:item.itemId})
+        .then(res => {
+
+        })
+        .catch(error => {});
+    }
   }
 };
 </script>
@@ -79,8 +87,8 @@ export default {
 .like-page {
   .content {
     padding-top: 66px;
-    >>>.van-card__content{
-        justify-content: space-around;
+    >>> .van-card__content {
+      justify-content: space-around;
     }
   }
 }

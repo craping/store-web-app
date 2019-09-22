@@ -42,7 +42,7 @@
         </div>
       </div>
     </div>
-    <div class="main">
+    <div class="main-content">
       <div class="my-order grid-panel">
         <div class="grid-top">
           <span>订单中心</span>
@@ -165,6 +165,7 @@ export default {
 
 <style lang="scss" scoped>
 .user-page {
+  padding-bottom: 50px;
   .curtain {
     display: flex;
     justify-content: center;
@@ -285,7 +286,7 @@ export default {
       }
     }
   }
-  .main {
+  .main-content {
     .grid-panel {
       background: #fff;
       padding: 0 15px;

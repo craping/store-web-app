@@ -58,10 +58,10 @@
     </van-cell-group>
 
     <van-cell-group class="goods-cell-group">
-       <van-cell title-class="title" title="7天退换.免费包邮" value="" @click="showServiceSheet = true" :is-link="true">
+       <van-cell title-class="title" title="7天退换.免费包邮" value="" :is-link="true" @click="showServiceSheet = true" >
         <template v-slot:icon class="title">服务：</template>
       </van-cell>
-      <van-cell  title-class="title" title="7天退换.免费包邮" value="" :is-link="true">
+      <van-cell  title-class="title" title="型号、品牌" value="" :is-link="true" @click="showParamSheet = true">
         <template v-slot:icon class="title">参数：</template>
       </van-cell>
       <van-cell  title-class="title" title="7天退换.免费包邮" value="" :is-link="true">
@@ -87,7 +87,7 @@
     <van-cell-group class="goods-cell-group" ref="detail">
       <van-cell title="图文详细" @click="sorry" />
       <div class="goods-detail" >
-        <img v-for="j in 4" src="https://img.yzcdn.cn/vant/apple-1.jpg" @click="showPre">
+        <img v-for="j in 4" src="https://img.yzcdn.cn/vant/apple-1.jpg" >
       </div>
       
     </van-cell-group>
@@ -117,11 +117,11 @@
       <judge-sheet @showPre="showPre"></judge-sheet>
     </van-popup>
     <van-popup
-      class="service-popup"
+      class="bottom-popup"
       v-model="showServiceSheet"
       position="bottom"
     >
-      <div class="service-content">
+      <div class="service-content popup-content">
         <div class="title">服务说明</div>
         <div class="item-wrapper">
           <div class="item" v-for='i in 5'>
@@ -135,7 +135,22 @@
         <div class="btn" @click="showServiceSheet=false">完成</div>
       </div>
     </van-popup>
-
+    <van-popup
+      class="bottom-popup"
+      v-model="showParamSheet"
+      position="bottom"
+    >
+      <div class="params-content popup-content">
+        <div class="title">产品参数</div>
+        <div class="item-wrapper">
+          <div class="item van-hairline--bottom" v-for='i in 5'>
+            <div class="left">型号</div>
+            <div class="right">Eu22923</div>
+          </div>
+        </div>
+        <div class="btn" @click="showServiceSheet=false">完成</div>
+      </div>
+    </van-popup>
     <van-image-preview
       v-model="prePicShow"
       :images="preImage"
@@ -217,7 +232,8 @@ export default {
       showJudgeSheet: false,
       prePicShow: false,
       preImage: [],
-      showServiceSheet: false,      
+      showServiceSheet: false,  
+      showParamSheet: false    
     };
   },
   created(){
@@ -484,7 +500,7 @@ export default {
     padding-top: 76px;
     background: #f2f2f2;
   }
-  .service-popup{
+  .bottom-popup{
     height: 50%;
     border-top-left-radius: 14px;
     border-top-right-radius: 14px;
@@ -494,7 +510,7 @@ export default {
       width: 100%;
     }
   }
-  .service-content{
+  .popup-content{
     padding: 0 15px;
     height: 100%;
     display: flex;
@@ -509,23 +525,49 @@ export default {
     .item-wrapper{
       flex: 1;
       overflow: auto;
+      &::-webkit-scrollbar { 
+        width: 0 ; 
+        display: none;
+      }
     }
-    .item{
-      display: flex;
-      align-items: flex-start;
-      margin-bottom: 15px;
-      .left{
-        margin: 3px 5px 0 0;
+    &.service-content{
+      .item{
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        .left{
+          margin: 3px 5px 0 0;
+        }
+        .itme-title{
+          font-size: 14px;
+        }
+        .itme-info{
+          margin-top: 4px;
+          color: #999;
+        }
       }
-      .itme-title{
-        font-size: 14px;
-      }
-      .itme-info{
-        margin-top: 4px;
-        color: #999;
-      }
-      
     }
+    &.params-content{
+      .item{
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        height: 40px;
+        .left{
+          margin-right: 20px;
+          width: 15%;
+          color: #999;
+        }
+        .right{
+          flex: 1;
+          color: #666;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+    
     .btn{
       width: 95%;
       background: $red;
