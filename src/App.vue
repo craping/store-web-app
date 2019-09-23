@@ -12,9 +12,11 @@ export default {
     };
   },
   created() {
-    this.$http.post("user/getUserInfo", {}).then(data => {
+    this.$store.dispatch("user/getUserInfo").catch(() => {
+    })
+  },
+  mounted() {
 
-    });
   }
 }
 </script>
