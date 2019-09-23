@@ -2,6 +2,7 @@
   <div class="setting-page">
     <van-nav-bar title="设置" left-arrow @click-left="onClickLeft" />
     <van-cell title="个人资料" is-link @click="jumpLink('userInfo')" />
+    <van-cell title="账户安全" is-link @click="jumpLink('account')" />
     <van-cell title="银行卡" is-link @click="jumpLink('bankCard')" />
     <van-cell title="关于我们" is-link @click="jumpLink('about')" />
     <van-cell title="当前版本" value="1.0" />

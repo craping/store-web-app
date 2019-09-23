@@ -12,11 +12,15 @@ export default [{
 },
 {
   path: '/userInfo',
-  component: () => import('@/view/user/setting/userInfo.vue')
+  component: () => import('@/view/user/setting/userInfo/index.vue')
+},
+{
+  path: '/account',
+  component: () => import('@/view/user/setting/account/index.vue')
 },
 {
   path: '/nameSet',
-  component: () => import('@/view/user/setting/nameSet.vue')
+  component: () => import('@/view/user/setting/userInfo/nameSet.vue')
 },
 {
   path: '/about',
@@ -30,6 +34,23 @@ export default [{
   path: '/login',
   component: () => import('@/view/user/login/index.vue')
 },
+{
+  path: '/mobileLogin',
+  component: () => import('@/view/user/login/mobileLogin/index.vue')
+},
+{
+  path: '/forgetPass',
+  component: () => import('@/view/user/login/mobileLogin/forgetPass.vue')
+},
+{
+  path: '/inputMobile',
+  component: () => import('@/view/user/login/mobileLogin/inputMobile.vue')
+},
+{
+  path: '/inputsms',
+  component: () => import('@/view/user/login/mobileLogin/inputsms.vue')
+},
+
 {
   path: '/register',
   component: () => import('@/view/user/login/register.vue')
