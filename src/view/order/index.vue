@@ -50,7 +50,7 @@
               <p>可能有你喜欢的</p>
               <div class="roghtLine"></div>
             </div>
-            <storeCard :proData="productList"></storeCard>
+            <store-card :proData="productList"></store-card>
           </div>
         </van-tab>
       </store-scroller>
@@ -60,6 +60,7 @@
 </template>
 <script>
 import Vue from 'vue'
+import { mapState } from 'vuex'
 import storeScroller from '@/components/store-scroller'
 import storeCard from '@/components/store-card'
 import storePayDialog from '@/components/store-pay-dialog'
@@ -179,6 +180,12 @@ export default {
   created() {
     this.showProductList = this.productList
     this.active = this.$route.query.tabId
+    this.$store.dispatch('order/getOrderList')
+  },
+  computed: {
+    ...mapState({
+      orderList: state => state.order.orderList
+    })
   },
   methods: {
     /*************返回点击事件***************/
@@ -333,9 +340,6 @@ export default {
 <style lang="scss" scoped>
 .order {
   padding-top: 46px;
-  .van-nav-bar {
-    padding-top: 0;
-  }
   .status {
     text-align: right;
     padding-right: 10px;
