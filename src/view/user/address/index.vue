@@ -63,8 +63,8 @@ export default {
   methods: {
     ...mapActions(['setAddressInfo']),
     getAddressList() {
-      this.$http.get("api", {}).then(res => {
-
+      this.$http.get("/address/getUserInfoAddress", {}).then(res => {
+        this.list = res.data || []
       }).catch(error => {
         
       })

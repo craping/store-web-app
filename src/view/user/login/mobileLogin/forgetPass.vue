@@ -1,13 +1,11 @@
 <template>
-  <div class="register-login">
-    <van-nav-bar left-arrow @click-left="onClickLeft" />
+  <div class="foget-page">
+    <van-nav-bar title="忘记密码" left-arrow @click-left="onClickLeft" />
     <div class="login-body">
-      <p class="title">马上注册</p>
       <van-cell-group>
         <van-field
           v-model="mobile"
           clearable
-          type="tel"
           label="手机号"
           placeholder="请输入手机号码"
           left-icon="phone"
@@ -27,25 +25,21 @@
           :right-icon="isEyeClose ? 'closed-eye' : 'eye-o'"
           @click-right-icon="changeShow"
         />
-        <van-field
-          v-model="agentNo"
-          clearable
-          label="邀请码"
-          placeholder="请输入邀请码"
-          left-icon="friends-o"
-        />
+        <div class="main-btn" @click="sureHandle">完成</div>
       </van-cell-group>
-      <div class="main-btn" @click="register">注册</div>
     </div>
   </div>
 </template>
 <script>
 import Vue from "vue";
-import { NavBar, CellGroup, Field, Toast } from "vant";
-Vue.use(Field)
-  .use(CellGroup)
-  .use(Toast)
+import { NavBar, Icon } from "vant";
+import { setToken } from "@/utils/auth";
+import { CellGroup, Field, Toast } from "vant";
+Vue.use(CellGroup)
+  .use(Field)
+  .use(Icon)
   .use(NavBar);
+const aweixin = null;
 export default {
   data() {
     return {
@@ -60,14 +54,32 @@ export default {
     };
   },
   destroyed() {
-    this.clearTimeCount(this.codeTimer);
+    clearInterval(this.codeTimer);
   },
   methods: {
     onClickLeft() {
       this.$router.go(-1);
     },
+    jumpLink(path) {
+      this.$router.push(path);
+    },
     changeShow() {
       this.isEyeClose = !this.isEyeClose;
+    },
+    sureHandle() {
+      const params = {
+        mobile: this.mobile,
+        verCode: this.verCode,
+        type: ""
+      };
+      this.$http
+        .post("/login/verCodeOrPasswrodLogin", params)
+        .then(res => {
+          setToken("token");
+        })
+        .catch(error => {
+          Toast("登录失败");
+        });
     },
     getCode() {
       if (this.countDownSecond > 0) {
@@ -78,7 +90,6 @@ export default {
         return;
       }
       this.timeCountDown();
-
       if (this.isValidate()) {
         //手机号输入正确，才能获取验证码
         this.timeCountDown();
@@ -105,14 +116,6 @@ export default {
       }, 1000);
     },
     /**
-     * 清除倒计时相关数据
-     */
-    clearTimeCount() {
-      clearInterval(this.codeTimer);
-      this.codeText = "重新获取";
-      this.countDownSecond = -1;
-    },
-    /**
      * 获取验证码接口
      */
     getCodeReq() {
@@ -137,50 +140,34 @@ export default {
         Toast("请填写正确的手机号码");
       }
       return flag;
-    },
-    register() {
-      const params = {
-        mobile: this.mobile,
-        verCode: this.verCode,
-        agentNo: this.agentNo,
-        password: this.password
-      };
-      if (this.isValidate()) {
-        //手机号输入正确，才能获取验证码
-        this.$http
-          .post("/login/register", params)
-          .then(res => {
-            setToken("token");
-          })
-          .catch(error => {
-            Toast("z注册失败");
-          });
-      }
     }
   }
 };
 </script>
 <style lang="scss" scoped>
-.register-login {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #fff;
+.foget-page {
+  .right-tips {
+    color: #ccc;
+  }
   .login-body {
-    margin-top: 40px;
-    padding: 0 15px;
-    .title {
-      font-size: 20px;
-      margin-bottom: 40px;
+    margin-top: 10px;
+    .van-cell-group {
+      overflow: hidden;
     }
-    /deep/ .van-hairline--top-bottom::after {
-      border-top: 0;
+    .welcome-word {
+      font-size: 30px;
+      margin-top: 80px;
     }
-    /deep/ .field-group {
-      position: relative;
-      margin-top: 40px;
+    .main-btn {
+      margin: 30px auto;
+      width: 86%;
+      height: 40px;
+      color: #fff;
+      background: $red;
+      border-radius: 20px;
+      text-align: center;
+      line-height: 40px;
+      font-size: 14px;
     }
     .code-operate {
       color: $red;
@@ -188,17 +175,6 @@ export default {
         color: #ccc;
       }
     }
-  }
-  .main-btn {
-    margin: 40px auto 0;
-    width: 86%;
-    height: 40px;
-    color: #fff;
-    background: $red;
-    border-radius: 20px;
-    text-align: center;
-    line-height: 40px;
-    font-size: 14px;
   }
 }
 </style>
