@@ -144,11 +144,11 @@
     </van-popup>
 
     <van-popup
-      class="service-popup"
+      class="bottom-popup"
       v-model="showServiceSheet"
       position="bottom"
     >
-      <div class="service-content">
+      <div class="service-content popup-content">
         <div class="title">服务说明</div>
         <div class="item-wrapper">
           <div class="item" v-for='i in 5'>
@@ -162,27 +162,22 @@
         <div class="btn" @click="showServiceSheet=false">完成</div>
       </div>
     </van-popup>
-
     <van-popup
-      class="params-popup"
-      v-model="params.show"
+      class="bottom-popup"
+      v-model="showParamSheet"
       position="bottom"
     >
-      <div class="service-content">
+      <div class="params-content popup-content">
         <div class="title">产品参数</div>
         <div class="item-wrapper">
-          <div class="item" v-for='i in 5'>
-          <div class="left"><van-icon name="certificate" color="#f44" /></div>
-          <div class="right">
-            <div class="itme-title">正品保证</div>
-            <div class="itme-info">本商品是滴是滴时间来得及啊第四季度是本商品是滴是滴时间来得及啊第四季度是</div>
+          <div class="item van-hairline--bottom" v-for='i in 5'>
+            <div class="left">型号</div>
+            <div class="right">Eu22923</div>
           </div>
-        </div>
         </div>
         <div class="btn" @click="showServiceSheet=false">完成</div>
       </div>
     </van-popup>
-
     <van-image-preview
       v-model="prePicShow"
       :images="preImage"
@@ -286,7 +281,8 @@ export default {
       showJudgeSheet: false,
       prePicShow: false,
       preImage: [],
-      showServiceSheet: false,      
+      showServiceSheet: false,  
+      showParamSheet: false    
     };
   },
   created(){
@@ -668,7 +664,7 @@ export default {
     padding-top: 76px;
     background: #f2f2f2;
   }
-  .service-popup{
+  .bottom-popup{
     height: 50%;
     border-top-left-radius: 14px;
     border-top-right-radius: 14px;
@@ -678,7 +674,7 @@ export default {
       width: 100%;
     }
   }
-  .service-content{
+  .popup-content{
     padding: 0 15px;
     height: 100%;
     display: flex;
@@ -693,23 +689,49 @@ export default {
     .item-wrapper{
       flex: 1;
       overflow: auto;
+      &::-webkit-scrollbar { 
+        width: 0 ; 
+        display: none;
+      }
     }
-    .item{
-      display: flex;
-      align-items: flex-start;
-      margin-bottom: 15px;
-      .left{
-        margin: 3px 5px 0 0;
+    &.service-content{
+      .item{
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        .left{
+          margin: 3px 5px 0 0;
+        }
+        .itme-title{
+          font-size: 14px;
+        }
+        .itme-info{
+          margin-top: 4px;
+          color: #999;
+        }
       }
-      .itme-title{
-        font-size: 14px;
-      }
-      .itme-info{
-        margin-top: 4px;
-        color: #999;
-      }
-      
     }
+    &.params-content{
+      .item{
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        height: 40px;
+        .left{
+          margin-right: 20px;
+          width: 15%;
+          color: #999;
+        }
+        .right{
+          flex: 1;
+          color: #666;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+    
     .btn{
       width: 95%;
       background: $red;

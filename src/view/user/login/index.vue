@@ -1,234 +1,263 @@
 <template>
-    <div class="login-page">
-        <van-nav-bar title="" :border="false" class="right-tips">
-            <template slot="right" >
-                <span @click="jumpLink('/main/home')">跳过，看好货</span>
-                <van-icon  name="arrow" color="#ccc" />  
-            </template>
-        </van-nav-bar>
-        <div class="login-body">
-            <div class="welcome-word">
-                欢迎来到5G云购 <br>
-                请您登录/注册
-            </div>
-            <div class="field-group">
-                 <van-cell-group >
-                    <van-field  v-model="phone" type="tel"  placeholder="请输入手机号码"/>
-                    <van-field v-model="code"  placeholder="请输入验证码" />
-                    <div class="code-operate" @click="getCode">
-                        <span :class="{gray:countDownSecond >= 0}">{{codeText}}</span>
-                    </div>
-                </van-cell-group>
-                <p class="goRegister" @click="jumpLink('register')">去注册></p>
-            </div>
-            <div class="login-btn" @click="login">
-                登录
-            </div>
-            <div class="else-way">
-                <p>其他登录方式</p>
-                <div class="way-group">
-                    <div class="way-item">
-                        <img src="./img/wechat.png" alt="">
-                        <p>微信</p>
-                    </div>
-                     <!-- <div class="way-item" @click="jumpLink('accountLogin')">
+  <div class="login-page">
+    <van-nav-bar title :border="false" class="right-tips">
+      <template slot="right">
+        <span @click="jumpLink('/main/home')">跳过，看好货</span>
+        <van-icon name="arrow" color="#ccc" />
+      </template>
+    </van-nav-bar>
+    <div class="login-body">
+      <div class="welcome-word">
+        欢迎来到5G云购
+        <br />请您登录/注册
+      </div>
+      <div class="field-group">
+        <van-cell-group>
+          <van-field v-model="mobile" type="tel" placeholder="请输入手机号码" />
+          <van-field v-model="verCode" placeholder="请输入验证码" />
+          <div class="code-operate" @click="getCode">
+            <span :class="{gray:countDownSecond >= 0}">{{codeText}}</span>
+          </div>
+        </van-cell-group>
+        <p class="goRegister" @click="jumpLink('register')">去注册></p>
+      </div>
+      <div class="login-btn" @click="login">登录</div>
+      <div class="else-way">
+        <p>其他登录方式</p>
+        <div class="way-group">
+          <div class="way-item" @click="wechatLogin()">
+            <img src="./img/wechat.png" alt />
+            <p>微信</p>
+          </div>
+          <!-- <div class="way-item" @click="jumpLink('accountLogin')">
                         <img src="./img/usericon.png" alt="">
                         <p>账号</p>
-                    </div> -->
-                </div>
-            </div>
+          </div>-->
         </div>
+      </div>
     </div>
+  </div>
 </template>
 <script>
-import Vue from 'vue';
-import { NavBar, Icon } from 'vant';
-import { CellGroup, Field , Toast} from 'vant';
-Vue.use(CellGroup).use(Field).use(Icon).use(NavBar);
+import Vue from "vue";
+import { NavBar, Icon } from "vant";
+import { setToken } from "@/utils/auth";
+import { CellGroup, Field, Toast } from "vant";
+Vue.use(CellGroup)
+  .use(Field)
+  .use(Icon)
+  .use(NavBar);
+const aweixin = null;
 export default {
-    data(){
-        return {
-            phone: '',
-            code: '',
-            codeText: '获取验证码',
-            countDownSecond: -1,
-            codeTimer: null,
-            aweixin:null, // 微信授权登录对象
-        }
+  data() {
+    return {
+      mobile: "",
+      verCode: "",
+      codeText: "获取验证码",
+      countDownSecond: -1,
+      codeTimer: null
+    };
+  },
+  destroyed() {
+    this.clearTimeCount(this.codeTimer);
+  },
+  mounted() {
+    this.onPlusReady(() => {
+      this.initWeChatService();
+    });
+  },
+  methods: {
+    onClickLeft() {
+      this.$router.go(-1);
     },
-    destroyed() {
-        this.clearTimeCount(this.codeTimer);
+    jumpLink(path) {
+      this.$router.push(path);
     },
-    mounted (){
-        this.onPlusReady(() =>{
-            // this.initWexin()
-            Toast.success('plus加载成功');
+    toHome() {
+      this.$router.push("/main/home");
+    },
+    login() {
+      const params = {
+        mobile: this.mobile,
+        verCode: this.verCode,
+        type: ""
+      };
+      this.$http
+        .post("/login/verCodeOrPasswrodLogin", params)
+        .then(res => {
+          setToken("token");
         })
+        .catch(error => {
+          Toast("登录失败");
+        });
     },
-    methods:{
-        onClickLeft() {
-            this.$router.go(-1)
-        },   
-        jumpLink(path) {
-            this.$router.push(path)
-        },
-        toHome() {
-            this.$router.push('/main/home')
-        },
-        login() {
+    getCode() {
+      if (this.countDownSecond > 0) {
+        return;
+      }
+      if (this.mobile == "") {
+        Toast("请输入手机号码");
+        return;
+      }
+      this.timeCountDown();
 
-        },  
-        getCode() {
-            if(this.countDownSecond > 0){ 
-                return;
-            }
-            if(this.phone == ""){
-                Toast("请输入手机号码");
-                return;
-            }
-            this.timeCountDown()
-
-            if(this.isValidate()) { //手机号输入正确，才能获取验证码
-                this.timeCountDown()
-            }
-        },  
-        /**
-         * 验证码倒计时方法
-         */
-        timeCountDown(){
-            this.codeText = "重新获取(60s)";
-            var timer = 60000;
-            this.countDownSecond = timer / 1000;
-            this.getCodeReq(); //获取验证码
-            this.codeTimer = setInterval(()=> {
-                timer -= 1000;
-                if (timer <= 0) {
-                clearInterval(this.codeTimer);
-                this.codeText = "重新获取";
-                this.countDownSecond = -1;
-                } else {
-                this.countDownSecond = timer / 1000;
-                this.codeText = "重新获取(" + this.countDownSecond + "s)";
-                }
-            }, 1000);
+      if (this.isValidate()) {
+        //手机号输入正确，才能获取验证码
+        this.timeCountDown();
+      }
+    },
+    /**
+     * 验证码倒计时方法
+     */
+    timeCountDown() {
+      this.codeText = "重新获取(60s)";
+      var timer = 60000;
+      this.countDownSecond = timer / 1000;
+      this.getCodeReq(); //获取验证码
+      this.codeTimer = setInterval(() => {
+        timer -= 1000;
+        if (timer <= 0) {
+          clearInterval(this.codeTimer);
+          this.codeText = "重新获取";
+          this.countDownSecond = -1;
+        } else {
+          this.countDownSecond = timer / 1000;
+          this.codeText = "重新获取(" + this.countDownSecond + "s)";
+        }
+      }, 1000);
+    },
+    /**
+     * 清除倒计时相关数据
+     */
+    clearTimeCount() {
+      clearInterval(this.codeTimer);
+      this.codeText = "重新获取";
+      this.countDownSecond = -1;
+    },
+    /**
+     * 获取验证码接口
+     */
+    getCodeReq() {
+      const params = { mobile: this.mobile };
+      if (this.isValidate()) {
+        //手机号输入正确，才能获取验证码
+        this.$http
+          .post("/login/getVerCode", params)
+          .then(res => {})
+          .catch(error => {
+            Toast("获取验证码失败");
+          });
+      }
+    },
+    /**
+     * 判断输入手机号
+     */
+    isValidate() {
+      let flag = true;
+      if (!new RegExp("^1[0-9]{10}$").test(this.mobile)) {
+        flag = false;
+        Toast("请填写正确的手机号码");
+      }
+      return flag;
+    },
+    initWeChatService() {
+      if (window.aweixin) return;
+      // 微信授权登录对象
+      // 获取登录授权认证服务列表，单独保存微信登录授权对象
+      // 5+APP在plusready事件中调用，uni-app在vue页面的onLoad中调用
+      plus.oauth.getServices(
+        function(services) {
+          // alert('list+:'+JSON.stringify(services));
+          window.aweixin = services[0];
+          // alert('weService+:'+JSON.stringify(window.aweixin));
         },
-        /**
-         * 清除倒计时相关数据
-         */
-        clearTimeCount(){
-            clearInterval(this.codeTimer);
-            this.codeText = "重新获取";
-            this.countDownSecond = -1;
-        },
-        /**
-         * 获取验证码接口
-         */
-        getCodeReq() {
-
-        },
-        /**
-         * 判断输入手机号
-         */
-        isValidate(){
-            let flag = true;
-            if(!new RegExp("^1[0-9]{10}$").test(this.phone)){
-                flag = false;
-                Toast("请填写正确的手机号码");
-            }
-            return flag;
-        },
-        initWeChatService(){
-            // 微信授权登录对象
-            // 获取登录授权认证服务列表，单独保存微信登录授权对象
-            // 5+APP在plusready事件中调用，uni-app在vue页面的onLoad中调用
-            plus.oauth.getServices(function(services){
-                this.prototype.weService = services['weixin'];
-            }, function(e){
-                alert("获取登录授权服务列表失败："+JSON.stringify(e));
-            } );
-        },
-        wechatLogin() {  
-            if (!aweixin.authResult) {  
-                aweixin.authorize((e)=> {  
-                    console.log(e.code);//app端获取到的code  
-                
-                }, function(e) {  
-                    alert('微信授权失败'+JSON.stringify(e))  
-                });  
-            }
-        },  
+        function(e) {
+          alert("获取登录授权服务列表失败：" + JSON.stringify(e));
+        }
+      );
+    },
+    wechatLogin() {
+      if (!window.aweixin.authResult) {
+        window.aweixin.authorize(
+          e => {
+            alert("e.code+:" + e.code); //app端获取到的code
+          },
+          function(e) {
+            alert("微信授权失败" + JSON.stringify(e));
+          }
+        );
+      }
     }
-}
+  }
+};
 </script>
 <style lang="scss" scoped>
-    .login-page{
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: #FFF;
-        .right-tips{
-            color: #ccc;
-        }
-        .login-body{
-            padding: 0 20px;
-            .welcome-word{
-                font-size: 30px;
-                margin-top: 80px;
-            }
-            /deep/ .field-group{
-                position: relative;
-                margin-top: 40px;
-            }
-            .code-operate{
-                position: absolute;
-                right: 15px;
-                bottom: 14px;
-                color: $red;
-                .gray{
-                    color: #CCC;
-                }
-            }
-            .goRegister{
-                text-align: right;
-                color: $red;
-                margin-top: 20px;
-                text-decoration: underline;
-            }
-            .login-btn{
-                background: $red;
-                height: 40px;
-                line-height: 40px;
-                width: 80%;
-                border-radius: 6px;
-                margin: 20px auto 0;
-                color: #FFF;
-                font-size: 16px;
-                text-align: center;
-            }
-            .else-way{
-                position: absolute;
-                bottom: 80px;
-                >p{
-                    color: #ccc;
-                }
-                .way-group{
-                    display: flex;
-                    .way-item{
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                        margin: 10px;
-                        img{
-                            width: 32px;
-                            height: 32px;
-                        }
-                    }
-                }
-
-            }
-        }
+.login-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  .right-tips {
+    color: #ccc;
+  }
+  .login-body {
+    padding: 0 20px;
+    .welcome-word {
+      font-size: 30px;
+      margin-top: 80px;
     }
+    /deep/ .field-group {
+      position: relative;
+      margin-top: 40px;
+    }
+    .code-operate {
+      position: absolute;
+      right: 15px;
+      bottom: 14px;
+      color: $red;
+      .gray {
+        color: #ccc;
+      }
+    }
+    .goRegister {
+      text-align: right;
+      color: $red;
+      margin-top: 20px;
+      text-decoration: underline;
+    }
+    .login-btn {
+      background: $red;
+      height: 40px;
+      line-height: 40px;
+      width: 80%;
+      border-radius: 6px;
+      margin: 20px auto 0;
+      color: #fff;
+      font-size: 16px;
+      text-align: center;
+    }
+    .else-way {
+      margin-top: 30px;
+      > p {
+        color: #ccc;
+      }
+      .way-group {
+        display: flex;
+        .way-item {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          margin: 10px;
+          img {
+            width: 32px;
+            height: 32px;
+          }
+        }
+      }
+    }
+  }
+}
 </style>
