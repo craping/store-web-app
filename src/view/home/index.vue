@@ -1,32 +1,26 @@
 <template>
   <div class="home">
-    <store-nav-bar background="#ff4444">
+    <!-- <store-nav-bar background="#ff4444">
       <template slot="title">
-        <van-search placeholder="请输入搜索关键词" background="$red" >
-          <template v-slot:left-icon>
-            <van-icon name="search" color="#969799" size="15" />
-          </template>
-        </van-search>
+        <router-link to="/main/search">
+          <van-search placeholder="请输入搜索关键词" disabled background="$red">
+            <template v-slot:left-icon>
+              <van-icon name="search" color="#969799" size="15" />
+            </template>
+          </van-search>
+        </router-link>
       </template>
       <template slot="right">
         <van-icon name="chat-o" color="#fff" size="30" />
       </template>
-    </store-nav-bar>
-    <!-- <van-nav-bar class="van-home-nav-bar" fixed>
-      <template slot="left">
-        <van-icon name="chat-o" color="#fff" size="30" />
-      </template>
+    </store-nav-bar>-->
+
+    <van-nav-bar :fixed="true" style="backgroundColor: #ff4444">
       <template slot="title">
-        <van-search placeholder="请输入搜索关键词" background="$red" >
-          <template v-slot:left-icon>
-            <van-icon name="search" color="#969799" size="15" />
-          </template>
-        </van-search>
+        <van-search placeholder="请输入搜索关键词" disabled background="$red" @click="toSearch" />
       </template>
-      <template slot="right">
-        <van-icon name="chat-o" color="#fff" size="30" />
-      </template>
-    </van-nav-bar> -->
+      <van-icon name="chat-o" slot="right" color="#fff" size="28" />
+    </van-nav-bar>
 
     <div class="content">
       <div class="curtain" ref="curtain">
@@ -43,7 +37,7 @@
         <router-link
           v-for="(item) in content.hotProductList"
           :key="item.id"
-          :to="'/goods/'+item.id"
+          :to="'/goods/'+item.id+'/'+item.productAttributeCategoryId"
         >
           <van-card
             class="round"
@@ -76,7 +70,8 @@ import {
   Cell,
   Toast,
   Card,
-  Button
+  Button,
+  NavBar
 } from "vant";
 import Arrow from "@/components/vue-scroller/components/Arrow.vue";
 import storeNavBar from "@/components/store-nav-bar";
@@ -94,6 +89,7 @@ export default {
     [Cell.name]: Cell,
     [Card.name]: Card,
     [Button.name]: Button,
+    [NavBar.name]: NavBar,
     Toast,
     Arrow,
     storeNavBar,
@@ -104,54 +100,67 @@ export default {
       content: state => state.home.content
     })
   },
-  
+
   data() {
     return {
       isIOS: isIOS,
-      isLoading: false,
       images: ["", "", "", ""],
-      list: [],
-      loading: false,
-      finished: false
+      list: []
     };
   },
   created() {
     this.$store.dispatch("home/content");
   },
-  mounted (){
-    this.onPlusReady(() =>{
-      Toast.success('plus加载成功');
-    })
+  mounted() {
+    this.onPlusReady(() => {
+      Toast.success("plus加载成功");
+    });
   },
   methods: {
     onRefresh(done) {
       this.$store.dispatch("home/content").finally(() => {
-        this.isLoading = false;
-        if (done) 
-          done();
+        if (done) done();
       });
     },
     onScroll(top) {
       if (top > 0)
-        this.$refs.curtain.style.transform = "translate(0px," + -(top / 3) + "px) scale(1)";
+        this.$refs.curtain.style.transform =
+          "translate(0px," + -(top / 3) + "px) scale(1)";
     },
     onLoad(done) {
       if (done) done(true);
-        this.loading = false;
-      this.finished = true;
+    },
+    toSearch() {
+      this.$router.push("/search");
     }
   }
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scope>
 .home {
-
-  .store-nav-bar.van-hairline--bottom::after {
+  padding-top: 66px;
+  .van-hairline--bottom::after {
     border-bottom-width: 0;
   }
-  .content {
+  .van-nav-bar {
+    line-height: 56px;
+    .van-icon {
+      color: #969799;
+    }
+    .van-nav-bar__title {
+      max-width: none;
+      padding-right: 35px;
+      .van-search {
+        padding: 5px 16px;
+        .van-cell {
+          padding: 3px 10px 3px 0;
+        }
+      }
+    }
+  }
 
+  .content {
     .curtain {
       display: flex;
       justify-content: center;
@@ -170,7 +179,6 @@ export default {
     }
     .store-scroller {
       .van-pull-refresh {
-        padding-top: 66px;
         padding-bottom: 50px;
       }
       .scroll {

@@ -35,3 +35,7 @@ export function UUID() {
     });
     return uuid;
 }
+
+export function PrefixInteger(num, n) {
+    return (Array(n).join(0) + num).slice(-n);
+}

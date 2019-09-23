@@ -174,13 +174,19 @@ export default {
         event4: ['评价商品', '退货退款', '删除订单']
       },
       showPayDialog: false, //支付弹框默认隐藏
-      patyType: '' //获取支付方式
+      patyType: '', //获取支付方式
+
+      /***********联调用的的数据************* */
+      pageNums: 1 //请求数据的页数
     }
   },
   created() {
     this.showProductList = this.productList
     this.active = this.$route.query.tabId
-    this.$store.dispatch('order/getOrderList')
+    this.$store.dispatch('order/getOrderList', {
+      pageNum: 1,
+      pageSize: 10
+    })
   },
   computed: {
     ...mapState({
@@ -319,10 +325,16 @@ export default {
 
     /***********下拉刷新事件*********/
     onRefresh(done) {
-      this.$store.dispatch('home/content').finally(() => {
-        this.isLoading = false
-        if (done) done()
-      })
+      this.pageNums += 1
+      this.$store
+        .dispatch('order/getOrderList', {
+          pageNum: this.pageNums,
+          pageSize: 10
+        })
+        .finally(() => {
+          this.isLoading = false
+          if (done) done()
+        })
     },
     onLoad(done) {
       if (done) done(true)
@@ -339,7 +351,8 @@ export default {
 </Script>
 <style lang="scss" scoped>
 .order {
-  padding-top: 46px;
+  // padding-top: 46px;
+  height: 100%;
   .status {
     text-align: right;
     padding-right: 10px;
@@ -352,13 +365,12 @@ export default {
     position: fixed;
     left: 0;
     right: 0;
-    top: 46px;
+    top: 66px;
     z-index: 10;
   }
   /deep/.van-tabs__content {
-    margin-top: 52px;
+    margin-top: 115px;
     height: 100vh;
-    position: fixed;
     width: 100%;
     .van-button {
       margin: 0 5px;

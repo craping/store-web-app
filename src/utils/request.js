@@ -12,9 +12,16 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(
   config => {
-    if (!config.params || !config.params.format)
-      config.params = { ...config.params, format: 'json' }
-    config.data.token = getToken()
+    if (!config.params) config.params = { format: 'json', token: getToken() }
+    else
+      config.params = {
+        ...config.params,
+        ...{ format: 'json', token: getToken() }
+      }
+
+    if (!config.data) config.data = { format: 'json', token: getToken() }
+    else
+      config.data = { ...config.data, ...{ format: 'json', token: getToken() } }
     return config
   },
   error => {
