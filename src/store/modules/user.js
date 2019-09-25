@@ -1,10 +1,11 @@
 import request from '../../utils/request'
 import { getToken } from '@/utils/auth'
+import { getClient } from '@/utils/util'
 
 export default {
   namespaced: true,
   state: {
-    platform: navigator.userAgent.includes('Html5Plus') ? 1 : 0,
+    client: getClient(),
     userInfo: {},
     // 用户是否登录
     isLogin: false,
@@ -17,6 +18,7 @@ export default {
     SET_USERINFO(state, userInfo) {
       state.userInfo = userInfo
       state.isLogin = true
+      state.isVip = userInfo.amsAccount.orders > 0;
     }
   },
   actions: {

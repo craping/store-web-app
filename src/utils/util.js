@@ -39,3 +39,13 @@ export function UUID() {
 export function PrefixInteger(num, n) {
     return (Array(n).join(0) + num).slice(-n);
 }
+
+export function getClient() {
+    const agent = navigator.userAgent;
+    if(agent.includes('Html5Plus'))
+        return 1;
+    else if(agent.toLowerCase().match(/MicroMessenger/i) == 'micromessenger')
+        return 3;
+    else
+        return 2;
+}
