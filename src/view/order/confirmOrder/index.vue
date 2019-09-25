@@ -167,7 +167,7 @@ export default {
   computed: {
     ...mapState({
       // confirmOrderList: state => state.order.confirmOrderList,
-      platform: state => state.user.platform
+      platform: state => state.user.client
     }),
     totalPrice() {
       return this.confirmOrderList.reduce((pre, cur) => {

@@ -158,7 +158,7 @@ export default {
   },
   computed: {
     ...mapState({
-      afterSaleList: state => state.user.platform
+      afterSaleList: state => state.afterSale.afterSaleList
     })
   },
   methods: {
