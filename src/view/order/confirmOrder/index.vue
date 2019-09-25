@@ -51,7 +51,7 @@
       </div>
     </div>
     <van-tabbar>
-      <van-button type="danger" plain size="mini" @click="toShowPay">去支付</van-button>
+      <van-button type="danger" plain size="mini" @click="toSumbitOrder">去支付</van-button>
     </van-tabbar>
     <store-pay-dialog @closeDialog="closeDialog" @toPay="toPay" :show="showPayDialog"></store-pay-dialog>
     <van-action-sheet v-model="showAddress" :actions="addressList" @select="onSelect"/>
@@ -59,6 +59,7 @@
 </template>
 <script>
 import Vue from 'vue'
+import { mapState } from 'vuex'
 import storePayDialog from '@/components/store-pay-dialog'
 import {
   NavBar,
@@ -116,7 +117,7 @@ export default {
           productAttr: [
             {
               key: '颜色',
-              value: '颜色'
+              value: '金色'
             },
             {
               key: '容量',
@@ -136,7 +137,7 @@ export default {
           productAttr: [
             {
               key: '颜色',
-              value: '颜色'
+              value: '白色'
             },
             {
               key: '容量',
@@ -164,9 +165,10 @@ export default {
     }
   },
   computed: {
-    // ...mapState({
-    //   confirmOrderList: state => state.order.confirmOrderList
-    // })
+    ...mapState({
+      // confirmOrderList: state => state.order.confirmOrderList,
+      platform: state => state.user.platform
+    }),
     totalPrice() {
       return this.confirmOrderList.reduce((pre, cur) => {
         return pre + cur.price
@@ -174,7 +176,7 @@ export default {
     }
   },
   created() {
-    this.confirmedAddress = this.addressList[0] //默认地址
+    this.getAddress()
   },
   methods: {
     /*************返回点击事件***************/
@@ -183,8 +185,45 @@ export default {
     },
 
     /*************点击打开支付弹框事件*********/
+
     toShowPay() {
       this.showPayDialog = true
+    },
+
+    /*********获取用户的收货地址*********** */
+    getAddress() {
+      this.$http
+        .get('/address/getUserInfoAddress')
+        .then(data => {
+          this.addressList = data.alert
+          this.confirmedAddress = this.addressList[0] //默认地址
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+
+    //点击支付触发提交订单接口
+    toSumbitOrder() {
+      const params = {
+        skuIds: ['134', '135'],
+        addressId: '1',
+        type: this.$route.query.type,
+        sourceType: this.platform,
+        quantity: 1,
+        productAttr: { color: 'gold' },
+        note: '备注',
+        recommenderId: '123'
+      }
+      this.$http
+        .post('/order/create', params)
+        .then(data => {
+          console.log(data)
+          this.toShowPay()
+        })
+        .catch(error => {
+          console.log(error)
+        })
     },
 
     /*************支付弹框事件群start******/

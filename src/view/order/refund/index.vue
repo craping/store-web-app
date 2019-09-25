@@ -90,18 +90,18 @@ export default {
       this.$router.go(-1)
     },
     noproduct() {
-      this.toRefund('noPro')
+      this.toRefund('0')
     },
     hasproduct() {
-      this.toRefund('hasPro')
+      this.toRefund('1')
     },
     /************跳转到申请退款页面事件*********/
     toRefund(status) {
       this.$router.push({
         name: 'applyrefund',
-        params: {
-          pid: '000000000',
-          refund: status
+        query: {
+          pid: this.$route.params.pid,
+          receiveStatus: status
         }
       })
     }

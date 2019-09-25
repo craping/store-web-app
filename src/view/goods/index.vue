@@ -479,7 +479,12 @@ export default {
     },
     /********点击立即购买去到确认订单中心******/
     onBuyClicked() {
-      this.$router.push('/confirmOrder')
+      this.$router.push({
+        name: 'confirmOrder',
+        query: {
+          type: 'dir'
+        }
+      })
     }
   }
 }
