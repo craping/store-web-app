@@ -69,7 +69,7 @@
           价格
           <span class="line-through">{{ formatPrice(goods.originalPrice) }}</span>
         </div>
-        <div class="originalPrice">
+        <div v-if="isSafe" class="originalPrice">
           赚
           <span>{{ formatPrice(goods.commission, goods.maxCommission) }}</span>
         </div>
@@ -213,6 +213,9 @@ import judgeSheet from './judgeSheet'
 import { PrefixInteger } from '@/utils/util'
 import Big from 'big.js'
 import Vue from 'vue'
+import { mapState } from 'vuex'
+import sync from "@/utils/sync";
+
 Vue.use(ImagePreview)
 const service = ['', '7天退换', '正品保障', '免费包邮']
 export default {
@@ -236,7 +239,11 @@ export default {
     storeShare,
     judgeSheet
   },
-
+  computed: {
+    ...mapState({
+      isSafe: state => state.user.isSafe
+    })
+  },
   data() {
     return {
       opacityIn: 0,
@@ -287,6 +294,7 @@ export default {
     }
   },
   created() {
+    console.log("isSafe:"+this.isSafe)
     this.$http
       .post('product/detail', {
         pId: this.$route.params.pId,
@@ -461,6 +469,7 @@ export default {
     },
 
     sorry() {
+      sync.connect();
       Toast('暂无后续逻辑~')
     },
     showJudge() {

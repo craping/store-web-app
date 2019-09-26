@@ -28,6 +28,12 @@ const routes = [{
             keepAlive:true
         }
     }, {
+        name: 'bargain',
+        component: () => import('@/view/bargain'),
+        meta: {
+            single: false
+        }
+    }, {
         name: 'cart',
         component: () => import('@/view/cart'),
         meta: {

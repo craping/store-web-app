@@ -1,4 +1,5 @@
 import axios from 'axios'
+import sync from "@/utils/sync";
 import { Toast, Dialog } from 'vant'
 import { getToken } from '@/utils/auth'
 
@@ -12,16 +13,17 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(
   config => {
-    if (!config.params) config.params = { format: 'json', token: getToken() }
-    else
-      config.params = {
-        ...config.params,
-        ...{ format: 'json', token: getToken() }
-      }
+    if (!config.params) {
+      config.params = { format: 'json', token: getToken() }
+    } else {
+      config.params = { ...{ format: 'json', token: getToken() }, ...config.params }
+    }
 
-    if (!config.data) config.data = { format: 'json', token: getToken() }
-    else
-      config.data = { ...config.data, ...{ format: 'json', token: getToken() } }
+    if (!config.data) {
+      config.data = { format: 'json', token: getToken() }
+    } else {
+      config.data = { ...{ format: 'json', token: getToken() }, ...config.data }
+    }
     return config
   },
   error => {
@@ -38,31 +40,27 @@ service.interceptors.response.use(
      * code为非200是抛错 可结合自己业务进行修改
      */
     const res = response.data
-    if (res.errcode) {
-      Toast.fail(res.msg)
+    if (res.result) {
+      /* Toast.fail(res.msg) */
 
-      // 401:未登录;
-      if (res.errcode === 401 || res.errcode === 403) {
-        Dialog.confirm({
-          title: '确定登出',
-          message: '你已被登出，可以取消继续留在该页面，或者重新登录',
-          confirmButtonText: '重新登录'
-        })
-          .then(() => {
-            // on confirm
-          })
-          .catch(() => {
-            // on cancel
-          })
+      // result:1 token错误集;
+      if (res.result == 1) {
+        sync.disconnect();
       }
-      return Promise.reject(new Error(res.msg || 'Error'))
+      let error = new Error(res.msg || 'Error');
+      error.errcode = res.errcode;
+      return Promise.reject(error)
     } else {
-      return res.data
+      if(res.hasOwnProperty('result'))
+        return res.data
+      else
+        return res;
     }
   },
   error => {
     console.log('err' + error) // for debug
-    Toast.fail(error.message)
+    if(error.errcode)
+      Toast.fail(error.message)
     return Promise.reject(error)
   }
 )
