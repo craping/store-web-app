@@ -2,9 +2,9 @@
   <div class="user-page">
     <div class="curtain" ref="curtain">
       <div class="cav">
-        <!-- <div class="no-vip-card">
+        <div class="no-vip-card" @click="ss()">
           升级<span class="vip-grade-bar">会员等级</span>享受更多权益
-        </div>-->
+        </div>
       </div>
     </div>
     <div class="top-info">
@@ -18,7 +18,7 @@
           <span class="vip-grade-bar">会员等级</span>
         </div>
       </div>
-      <div class="vip-card" @click="jumpLink('/vip')">
+      <div class="vip-card" v-if="0" @click="jumpLink('/vip')">
         <div class="vip-row-1">
           <span class="word-text">
             <span>可提现余额(元)</span>
@@ -148,6 +148,9 @@ export default {
     }
   },
   methods: {
+    ss(){
+      debugger
+    },
     jumpLink(path, params) {
       this.$router.push({
         path,
@@ -184,7 +187,7 @@ export default {
       overflow: hidden;
       .no-vip-card {
         height: 40px;
-        width: 80vw;
+        width: 90vw;
         background: #50545f;
         align-self: flex-end;
         border-radius: 5px;

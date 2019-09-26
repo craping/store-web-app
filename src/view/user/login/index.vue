@@ -14,11 +14,11 @@
       <div class="main-btn" @click="jumpLink('register')">去注册</div>
       <div class="login-way">
         <div class="way-item" @click="jumpLink('mobileLogin')">
-          <img src="./img/mobile.png" alt="">
+          <img src="./img/mobile.png" alt />
           <span>手机登录</span>
         </div>
         <div class="way-item" @click="wechatLogin">
-          <img src="./img/wechat.png" alt="">
+          <img src="./img/wechat.png" alt />
           <span>微信登录</span>
         </div>
       </div>
@@ -37,8 +37,7 @@ Vue.use(CellGroup)
 const aweixin = null;
 export default {
   data() {
-    return {
-    };
+    return {};
   },
 
   mounted() {
@@ -55,21 +54,6 @@ export default {
     },
     toHome() {
       this.$router.push("/main/home");
-    },
-    login() {
-      const params = {
-        mobile: this.mobile,
-        verCode: this.verCode,
-        type: ""
-      };
-      this.$http
-        .post("/login/verCodeOrPasswrodLogin", params)
-        .then(res => {
-          setToken("token");
-        })
-        .catch(error => {
-          Toast("登录失败");
-        });
     },
     initWeChatService() {
       if (window.aweixin) return;
@@ -88,16 +72,28 @@ export default {
       );
     },
     wechatLogin() {
-      if (!window.aweixin.authResult) {
-        window.aweixin.authorize(
-          e => {
-            alert("e.code+:" + e.code); //app端获取到的code
-            
-          },
-          function(e) {
-            alert("微信授权失败" + JSON.stringify(e));
-          }
-        );
+      if (window.aweixin) {
+        if (!window.aweixin.authResult) {
+          window.aweixin.authorize(
+            e => {
+              alert("e.code+:" + e.code); //app端获取到的code
+              this.$http
+                .post("/wxLogin/Login", {code:e.code})
+                .then(res => {
+                  // userName 不存在就是未注册
+                  if(!res.info.umsMember.userName){
+                    this.jumpLink('register')
+                  }
+                })
+                .catch(error => {
+                  Toast("登录失败");
+                });
+            },
+            function(e) {
+              alert("微信授权失败" + JSON.stringify(e));
+            }
+          );
+        }
       }
     }
   }
@@ -120,29 +116,29 @@ export default {
       font-size: 30px;
       margin-top: 80px;
     }
-    .main-btn{
+    .main-btn {
       margin: 100px auto 60px;
       width: 86%;
       height: 40px;
-      color: #FFF;
+      color: #fff;
       background: $red;
       border-radius: 20px;
       text-align: center;
       line-height: 40px;
       font-size: 14px;
     }
-    .login-way{
+    .login-way {
       display: flex;
       justify-content: space-between;
-      .way-item{
+      .way-item {
         display: flex;
         align-items: center;
         width: 40%;
         background: #eee;
         height: 30px;
         border-radius: 15px;
-        padding: 0 20px; 
-        img{
+        padding: 0 20px;
+        img {
           width: 24px;
           height: 24px;
           margin-right: 10px;

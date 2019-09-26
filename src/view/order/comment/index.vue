@@ -40,7 +40,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import {UUID} from '@/utils/util'
+import { UUID } from '@/utils/util'
 import { NavBar, Rate, Button, Card, Row, Field, Uploader } from 'vant'
 Vue.use(NavBar)
   .use(Rate)
@@ -55,15 +55,12 @@ export default {
   data() {
     return {
       starts: { name: '商品评分', initStar: 0 },
-      describeStar: 0, //获取三个星的数量
-      serviceStar: 0,
-      logisticsStar: 0,
       commentDefault:
         '亲，您对这个商品满意吗？您的评价会帮助我们选择更好的商品哦~',
       commentWord: '', //获取评论内容
       maxWord: 50, //最大评论字数
       commentStyle: { maxHeight: 150, minHeight: 100 },
-      fileList: [],
+      fileList: []
     }
   },
   created() {
@@ -86,69 +83,57 @@ export default {
     },
 
     /***********上传图片之前事件*********/
-    beforeRead(file){
-      console.log("beforeRead");
-      console.log(file);
-      this.$http.post("aliyun/oss/policy",{}).then(data => {
-        console.log(data.info)
-        let form = new FormData();
-        const filename = UUID()+"."+file.name.split(".")[1];
-        form.append("policy", data.info.policy);
-        form.append("signature", data.info.signature);
-        form.append("key", data.info.dir + "/"+filename);
-        form.append("ossaccessKeyId", data.info.accessKeyId);
-        form.append("dir", data.info.dir);
-        form.append("host", data.info.host);
-        form.append("file", file);
-
-        this.$http.post(data.info.host, form, {
-          headers: {
-          	'Content-Type': 'multipart/form-data'
-        }}).then(()=>{
-          this.fileList.push({url:data.info.host + '/' + data.info.dir + '/' + filename})
-        })
-      })
-      return false;
-    },
-
-    /***********上传图片事件*********/
-    afterRead(file) {
-      // 此时可以自行将文件上传至服务器
+    beforeRead(file) {
+      console.log('beforeRead')
       console.log(file)
+      this.$http.post('aliyun/oss/policy', {}).then(data => {
+        console.log(data.info)
+        let form = new FormData()
+        const filename = UUID() + '.' + file.name.split('.')[1]
+        form.append('policy', data.info.policy)
+        form.append('signature', data.info.signature)
+        form.append('key', data.info.dir + '/' + filename)
+        form.append('ossaccessKeyId', data.info.accessKeyId)
+        form.append('dir', data.info.dir)
+        form.append('host', data.info.host)
+        form.append('file', file)
 
-      let files = this.dataURLtoFile(file)
-      let formData = new FormData()
-      formData.append('file', files)
-      console.log('xxxfiles', files)
-      console.log('xxx', formData)
-    },
-
-    /***********将base64转换为文件*********/
-    dataURLtoFile(file) {
-      var arr = file.content.split(','),
-        bstr = atob(arr[1]),
-        n = bstr.length,
-        u8arr = new Uint8Array(n)
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n)
-      }
-      return new File([u8arr], file.file.name, {
-        type: file.file.type
+        this.$http
+          .post(data.info.host, form, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+          .then(() => {
+            this.fileList.push({
+              url: data.info.host + '/' + data.info.dir + '/' + filename
+            })
+          })
       })
+      return false
     },
 
     /***********将base64转换为文件*********/
     doSubmit() {
-      const { commentWord, describeStar, serviceStar, logisticsStar } = this
+      const { commentWord, starts, fileList } = this
       const pid = this.$route.params.pid
       const params = {
-        pid,
-        commentWord,
-        describeStar,
-        serviceStar,
-        logisticsStar
+        productId: pid,
+        productName: 'xx',
+        star: starts.initStar,
+        productAttribute: 'cccc',
+        content: commentWord,
+        pics: fileList
       }
-      console.log('提交', params)
+
+      this.$http
+        .post('/orderItem/releaseComment', params)
+        .then(data => {
+          console.log(data)
+        })
+        .catch(error => {
+          console.log(error)
+        })
     }
   }
 }

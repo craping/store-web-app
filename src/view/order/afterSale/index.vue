@@ -28,11 +28,17 @@
             </div>
             <div slot="footer">
               <van-button
-                size="mini"
+                size="small"
                 plain
-                type="danger"
+                type="info"
                 @click.stop="toRefundInfo(product.pid)"
               >查看详情</van-button>
+              <van-button
+                size="small"
+                plain
+                type="danger"
+                @click.stop="cancelRefund(product.pid)"
+              >取消售后</van-button>
             </div>
           </van-card>
         </div>
@@ -42,6 +48,7 @@
 </template>
 <script>
 import Vue from 'vue'
+import { mapState } from 'vuex'
 import storeScroller from '@/components/store-scroller'
 import storeCard from '@/components/store-card'
 import {
@@ -139,10 +146,21 @@ export default {
         }
       ],
       asStatus: ['仅退款', '仅退款退货'],
-      asStatusCon: ['退款成功', '退款失败']
+      asStatusCon: ['退款成功', '退款失败'],
+
+      /***联调后的数据***/
+      listContainer: [], //用来放获取的数据列表数据
+      pageNums: 1 //下拉刷新增加的页码数
     }
   },
-  created() {},
+  created() {
+    this.getAfterSale()
+  },
+  computed: {
+    ...mapState({
+      afterSaleList: state => state.afterSale.afterSaleList
+    })
+  },
   methods: {
     /*************返回点击事件***************/
     onClickLeft() {
@@ -162,27 +180,70 @@ export default {
 
     /***********下拉刷新事件*********/
     onRefresh(done) {
-      this.$store.dispatch('home/content').finally(() => {
-        this.isLoading = false
-        if (done) done()
-      })
+      this.pageNums += 1
+      this.$store
+        .dispatch('afterSale/getAfterSaleList', {
+          pageNum: this.pageNums,
+          pageSize: 10
+        })
+        .then(() => {
+          this.listContainer = [...this.listContainer, ...this.afterSaleList]
+        })
+        .finally(() => {
+          this.isLoading = false
+          if (done) done()
+        })
     },
     onLoad(done) {
       if (done) done(true)
       this.loading = false
       // this.finished = true
+    },
+    /*********获取售后列表方法**********/
+    getAfterSale() {
+      this.$store
+        .dispatch('afterSale/getAfterSaleList', {
+          pageNum: 1,
+          pageSize: 10
+        })
+        .then(() => {
+          this.listContainer = [...this.afterSaleList]
+        })
+    },
+
+    /********取消售后******** */
+    cancelRefund(id) {
+      const params = {
+        returnId: id,
+        orderItemId: id
+      }
+      Dialog.confirm({
+        title: '取消售后',
+        message: '确定取消此产品的售后？'
+      })
+        .then(() => {
+          // on confirm
+          this.$http
+            .post('/orderReturnApply/cancel', params)
+            .then(data => {
+              console.log(data)
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        })
+        .catch(() => {
+          // on cancel
+        })
     }
   }
 }
 </Script>
 <style lang="scss" scoped>
 .aftersale {
-  .van-nav-bar {
-    padding-top: 0;
-  }
   .content {
     position: relative;
-    top: 46px;
+    top: 66px;
     height: 100vh;
   }
   .pro-container {

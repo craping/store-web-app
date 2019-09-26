@@ -211,7 +211,10 @@ export default {
       ],
       expressNo: '', //物流单号
       expressCom: '', //物流公司,
-      isShowSumbit: false //是否显示提交物流信息
+      isShowSumbit: false, //是否显示提交物流信息
+
+      /*******联调的新数据*******/
+      refundSpecObj: {}
     }
   },
   created() {
@@ -219,6 +222,8 @@ export default {
       this.refundSpec.expressInfo == '' &&
       this.refundSpec.applyStatus == 1 &&
       this.refundSpec.productStatus == 1
+
+    this.getRefund()
   },
   methods: {
     /*************返回点击事件***************/
@@ -235,9 +240,9 @@ export default {
     },
     /***********提交物流信息事件*********/
     postExpressInfo() {
-      const expressNo = this.expressNo
+      const deliverySn = this.expressNo
       const expressCom = this.expressCom
-      if (!expressNo) {
+      if (!deliverySn) {
         Toast.fail('请填写物流单号')
         return
       }
@@ -246,20 +251,25 @@ export default {
         return
       }
       const params = {
-        expressNo,
+        returnId: this.$route.params.id,
+        deliverySn,
         expressCom
       }
-      console.log('获取的数据', params)
+      this.$http.post('/orderReturnApply/insertDeliveryInfo', params)
+    },
+
+    /****** 获取售后详情 *****/
+    getRefund() {
+      this.$http.post('/orderReturnApply/detail').then(data => {
+        this.refundSpecObj = data.info
+      })
     }
   }
 }
 </Script>
 <style lang="scss" scoped>
 .refundInfo {
-  padding-top: 46px;
-  .van-nav-bar {
-    padding-top: 0;
-  }
+  padding-top: 66px;
   .ordercontent {
     padding: 46px 0px;
     height: 100vh;

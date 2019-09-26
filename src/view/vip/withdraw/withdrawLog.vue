@@ -69,10 +69,10 @@ export default {
 </script>
 <style lang="scss" scoped>
     .withdraw-log-page{
-        >>>.scroll{
+        /deep/.scroll{
             padding-top: 46px;
         }
-        >>>.store-scroller .scroll ._v-content{
+        /deep/.store-scroller .scroll ._v-content{
             padding: 0;
         }
         .log-list{

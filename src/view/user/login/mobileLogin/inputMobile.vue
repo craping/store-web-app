@@ -19,8 +19,9 @@
 <script>
 import Vue from "vue";
 import { NavBar, Icon } from "vant";
-import { setToken } from "@/utils/auth";
 import { CellGroup, Field, Toast } from "vant";
+import md5 from "js-md5";
+
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
@@ -45,9 +46,18 @@ export default {
     },
     checkMobile() {
       if (this.isValidate()) {
-        this.jumpLink("inputsms", { mobile: this.mobile });
+        const params = { mobile: this.mobile };
+        this.$http
+          .post("/authCode/getLoginCode", params)
+          .then(res => {
+            this.jumpLink("inputsms", { mobile: this.mobile });
+          })
+          .catch(error => {
+            Toast(error.message);
+          });
       }
     },
+
     /**
      * 判断输入手机号
      */

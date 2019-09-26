@@ -41,6 +41,7 @@
 </template>
 <script>
 import Vue from "vue";
+import md5 from 'js-md5';
 import { NavBar, CellGroup, Field, Toast } from "vant";
 Vue.use(Field)
   .use(CellGroup)
@@ -77,8 +78,6 @@ export default {
         Toast("请输入手机号码");
         return;
       }
-      this.timeCountDown();
-
       if (this.isValidate()) {
         //手机号输入正确，才能获取验证码
         this.timeCountDown();
@@ -117,15 +116,15 @@ export default {
      */
     getCodeReq() {
       const params = { mobile: this.mobile };
-      if (this.isValidate()) {
-        //手机号输入正确，才能获取验证码
-        this.$http
-          .post("/login/getVerCode", params)
-          .then(res => {})
-          .catch(error => {
-            Toast("获取验证码失败");
-          });
-      }
+      //手机号输入正确，才能获取验证码
+      this.$http
+        .post("/authCode/getRegisterCode", params)
+        .then(res => {
+          Toast("已发送验证码");
+        })
+        .catch((error) => {
+          Toast(error.message);
+        });
     },
     /**
      * 判断输入手机号
@@ -143,17 +142,29 @@ export default {
         mobile: this.mobile,
         verCode: this.verCode,
         agentNo: this.agentNo,
-        password: this.password
+        password: md5(this.password)
       };
+      if(!this.verCode){
+        Toast("请填写验证码")
+        return
+      }
+      if(!this.agentNo){
+        Toast("请填写邀请码")
+        return
+      }
+      if(!this.password){
+        Toast("请设置密码")
+        return
+      }
       if (this.isValidate()) {
         //手机号输入正确，才能获取验证码
         this.$http
           .post("/login/register", params)
           .then(res => {
-            setToken("token");
+            this.$router.go(-1)
           })
-          .catch(error => {
-            Toast("z注册失败");
+          .catch((error) => {
+            Toast(error.message);
           });
       }
     }

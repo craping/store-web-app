@@ -68,7 +68,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .unliquidated-page {
-  >>> .nav {
+  /deep/ .nav {
     z-index: 1000 !important;
   }
   .content {

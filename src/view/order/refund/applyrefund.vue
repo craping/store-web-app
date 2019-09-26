@@ -35,6 +35,7 @@
             v-model="fileList"
             :max-count="3"
             multiple
+            :before-read="beforeRead"
             :preview-image="true"
             :after-read="afterRead"
           />
@@ -43,7 +44,7 @@
     </div>
     <van-action-sheet v-model="showReason" :actions="actions" @select="onSelectReason"/>
     <div class="confirm">
-      <van-button type="danger" size="large">提交</van-button>
+      <van-button type="danger" size="large" @click="doSumbit">提交</van-button>
     </div>
   </van-row>
 </template>
@@ -51,6 +52,7 @@
 import Vue from 'vue'
 import storeScroller from '@/components/store-scroller'
 import storeCard from '@/components/store-card'
+import { UUID } from '@/utils/util'
 import {
   AddressList,
   Tab,
@@ -104,7 +106,7 @@ export default {
       selectedReason: '原因详情',
       proMoney: 100,
       refundSpec: '',
-      fileList: [{ url: 'https://img.yzcdn.cn/vant/cat.jpeg' }]
+      fileList: []
     }
   },
   created() {
@@ -128,29 +130,56 @@ export default {
     },
 
     /***********上传图片事件*********/
-    afterRead(file) {
-      // 此时可以自行将文件上传至服务器
-      console.log(file)
 
-      let files = this.dataURLtoFile(file)
-      let formData = new FormData()
-      formData.append('file', files)
-      console.log('xxxfiles', files)
-      console.log('xxx', formData)
+    /***********上传图片之前事件*********/
+    beforeRead(file) {
+      console.log('beforeRead')
+      console.log(file)
+      this.$http.post('aliyun/oss/policy', {}).then(data => {
+        console.log(data.info)
+        let form = new FormData()
+        const filename = UUID() + '.' + file.name.split('.')[1]
+        form.append('policy', data.info.policy)
+        form.append('signature', data.info.signature)
+        form.append('key', data.info.dir + '/' + filename)
+        form.append('ossaccessKeyId', data.info.accessKeyId)
+        form.append('dir', data.info.dir)
+        form.append('host', data.info.host)
+        form.append('file', file)
+
+        this.$http
+          .post(data.info.host, form, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+          .then(() => {
+            this.fileList.push({
+              url: data.info.host + '/' + data.info.dir + '/' + filename
+            })
+          })
+      })
+      return false
     },
 
-    /***********将base64转换为文件*********/
-    dataURLtoFile(file) {
-      var arr = file.content.split(','),
-        bstr = atob(arr[1]),
-        n = bstr.length,
-        u8arr = new Uint8Array(n)
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n)
+    /******提交事件****** */
+    doSumbit() {
+      const params = {
+        orderId: this.$route.query.pid,
+        orderSn: '0',
+        orderItemId: '0',
+        quantity: '1',
+        receiveStatus: this.$route.query.receiveStatus,
+        reason: this.selectedReason,
+        description: this.refundSpec,
+        proofPics: this.fileList
       }
-      return new File([u8arr], file.file.name, {
-        type: file.file.type
-      })
+      this.$http
+        .post('/orderReturnApply/create', params)
+        .then(data => {})
+        .catch(error => {
+          console.log(error)
+        })
     }
   }
 }

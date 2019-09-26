@@ -32,6 +32,8 @@
 </template>
 <script>
 import Vue from "vue";
+import { setToken } from "@/utils/auth";
+import md5 from "js-md5";
 import { NavBar, CellGroup, Field, Toast } from "vant";
 Vue.use(Field)
   .use(CellGroup)
@@ -52,16 +54,18 @@ export default {
     login() {
       const params = {
         mobile: this.mobile,
-        password: this.password,
-        type: 1
+        password: md5(this.password),
+        clientId: "wap"
       };
       this.$http
-        .post("/login/verCodeOrPasswrodLogin", params)
+        .post("/login/passwrodLogin", params)
         .then(res => {
-          setToken("token");
+          setToken(res.info.token);
+          this.$store.commit('user/SET_USERINFO',res.info)
+          this.$router.push("/main/home");
         })
         .catch(error => {
-          Toast("登录失败");
+          Toast(error.message);
         });
     },
     jumpLink(path) {

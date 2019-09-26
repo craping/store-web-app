@@ -87,7 +87,7 @@ export default {
 .like-page {
   .content {
     padding-top: 66px;
-    >>> .van-card__content {
+    /deep/ .van-card__content {
       justify-content: space-around;
     }
   }

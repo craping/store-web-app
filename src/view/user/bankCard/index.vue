@@ -4,7 +4,7 @@
 <template>
   <div class="bankcard-page">
     <van-nav-bar :title="title" left-arrow @click-left="onClickLeft" fixed>
-      <van-icon name="plus" slot="right" color="#f44" @click="jumpLink('/addBankCard')" />
+      <van-icon name="plus" slot="right" color="#f44" @click="jumpLink('/editBankCard')" />
     </van-nav-bar>
     <div class="banl-list">
       <div
@@ -23,8 +23,8 @@
         <div v-if="from">
           <van-icon name="success" size="14px" color="#f44" />
         </div>
-        <div v-else @click="removeHandle(item)">
-          <van-icon name="delete" size="14px" color="#f44" />
+        <div v-else @click.stop="removeHandle(item)">
+          <van-icon name="delete" size="20px" color="#f44" />
         </div>
       </div>
     </div>
@@ -43,7 +43,19 @@ export default {
     return {
       title: "银行卡",
       from: this.$route.query.from || "",
-      cardList: [{}, {}]
+      cardList: [{
+        id:1,
+        bankCardNumber:'111',
+        bankName:'招商',
+        userName: 'zlw',
+        openingBank: '招商支行'
+      }, {
+        id:2,
+        bankCardNumber:'222',
+        bankName:'招商2',
+        userName: 'zlw',
+        openingBank: '招商支行2'
+      }]
     };
   },
   methods: {
@@ -68,22 +80,20 @@ export default {
         this.$router.go(-1);
       } else {
         const param = {
-          // bankCardNumber: item.bankCardNumber,
-          // bankName: item.bankName,
-          // userName: item.userName,
-          // openingBank: item.openingBank
-          bankCardNumber: '3',
-          bankName: 'item.bankName',
-          userName: 'item.userName',
-          openingBank: 'item.openingBank'
+          id: item.id,
+          bankCardNumber: item.bankCardNumber,
+          bankName: item.bankName,
+          userName: item.userName,
+          openingBank: item.openingBank
         };
         this.setCurrentCard(param);
-        this.jumpLink("addBankCard");
+        this.jumpLink("editBankCard");
       }
     },
+    // 删除银行卡
     removeHandle(item) {
       this.$http
-        .get("/bankCard/removeBankCardInfo", {
+        .post("/bankCard/removeBankCardInfo", {
           id: item.id
         })
         .then(data => {

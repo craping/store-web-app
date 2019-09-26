@@ -183,10 +183,7 @@ export default {
   created() {
     this.showProductList = this.productList
     this.active = this.$route.query.tabId
-    this.$store.dispatch('order/getOrderList', {
-      pageNum: 1,
-      pageSize: 10
-    })
+    this.initData()
   },
   computed: {
     ...mapState({
@@ -197,6 +194,14 @@ export default {
     /*************返回点击事件***************/
     onClickLeft() {
       this.$router.go(-1)
+    },
+
+    /*************初始化数据************ */
+    initData() {
+      this.$store.dispatch('order/getOrderList', {
+        pageNum: 1,
+        pageSize: 10
+      })
     },
 
     /*************点击查看详情事件***************/
@@ -263,15 +268,9 @@ export default {
           break
         case '立即付款':
           this.showPayDialog = true
-          console.log('sadfkjskdfj', this.showPayDialog)
           break
         case '确认收货':
-          this.$router.push({
-            name: 'successfulOrder',
-            params: {
-              pid
-            }
-          })
+          this.confirmOrder(pid)
           break
       }
     },
@@ -302,12 +301,52 @@ export default {
 
     /***********取消订单事件*********/
     cancelOrder(pid) {
-      console.log('取消订单')
+      const params = {
+        orderId: pid
+      }
+      this.$http
+        .post('/order/cancelOrder', params)
+        .then(data => {
+          this.initData()
+        })
+        .catch(error => {
+          console.log(error)
+        })
     },
 
     /***********删除订单事件*********/
     deleteOrder(pid) {
-      console.log('删除订单')
+      const params = {
+        orderId: pid
+      }
+      this.$http
+        .post('/order/deleteOrder', params)
+        .then(data => {
+          this.initData()
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+
+    /*********确认收货事件******** */
+    confirmOrder(pid) {
+      const params = {
+        orderId: pid
+      }
+      this.$http
+        .post('/order/confirmOrder', params)
+        .then(data => {
+          this.$router.push({
+            name: 'successfulOrder',
+            params: {
+              pid
+            }
+          })
+        })
+        .catch(error => {
+          console.log(error)
+        })
     },
 
     /*************支付弹框事件群start******/

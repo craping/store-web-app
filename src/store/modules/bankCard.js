@@ -7,7 +7,8 @@ export default {
             bankCardNumber: "",
             bankName: "",
             userName: "",
-            openingBank: ""
+            openingBank: "",
+            id: null
         }
     },
     mutations: {
@@ -19,7 +20,8 @@ export default {
                     bankCardNumber: "",
                     bankName: "",
                     userName: "",
-                    openingBank: ""
+                    openingBank: "",
+                    id: null
                 }
             }
         },

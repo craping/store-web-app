@@ -19,6 +19,18 @@ export default [{
   component: () => import('@/view/user/setting/account/index.vue')
 },
 {
+  path: '/editCheck',
+  component: () => import('@/view/user/setting/account/editCheck.vue')
+},
+{
+  path: '/editMobile',
+  component: () => import('@/view/user/setting/account/editMobile.vue')
+},
+{
+  path: '/editPassword',
+  component: () => import('@/view/user/setting/account/editPassword.vue')
+},
+{
   path: '/nameSet',
   component: () => import('@/view/user/setting/userInfo/nameSet.vue')
 },
@@ -54,18 +66,14 @@ export default [{
 {
   path: '/register',
   component: () => import('@/view/user/login/register.vue')
-},
-{
-  path: '/accountLogin',
-  component: () => import('@/view/user/login/accountLogin.vue')
 }
 ,{
   path: '/bankCard',
   component: () => import('@/view/user/bankCard/index.vue')
 }
 ,{
-  path: '/addBankCard',
-  component: () => import('@/view/user/bankCard/addBankCard.vue')
+  path: '/editBankCard',
+  component: () => import('@/view/user/bankCard/aditBankCard.vue')
 },
 {
   path: '/bill',
