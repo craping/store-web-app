@@ -257,7 +257,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .bill-page {
-  >>> .nav {
+  /deep/ .nav {
     z-index: 1000 !important;
   }
   .content {

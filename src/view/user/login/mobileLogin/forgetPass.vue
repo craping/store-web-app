@@ -33,7 +33,6 @@
 <script>
 import Vue from "vue";
 import { NavBar, Icon } from "vant";
-import { setToken } from "@/utils/auth";
 import { CellGroup, Field, Toast } from "vant";
 Vue.use(CellGroup)
   .use(Field)
@@ -75,10 +74,8 @@ export default {
       this.$http
         .post("/login/verCodeOrPasswrodLogin", params)
         .then(res => {
-          setToken("token");
         })
         .catch(error => {
-          Toast("登录失败");
         });
     },
     getCode() {

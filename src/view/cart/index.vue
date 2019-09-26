@@ -263,11 +263,11 @@ export default {
       background-color: #fff;
       border-radius: 5px;
       overflow: hidden;
-      >>> .van-card {
+      /deep/ .van-card {
         background: transparent;
         width: 100%;
       }
-      >>> .van-checkbox__label {
+      /deep/ .van-checkbox__label {
         width: 100%;
         flex: 1;
       }

@@ -57,7 +57,7 @@ export default {
 .message-list-page {
   .page-content {
     padding-top: 66px;
-    >>> .scoll-s {
+    /deep/ .scoll-s {
       ._v-container {
         padding-top: 66px;
       }

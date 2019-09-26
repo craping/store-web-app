@@ -2,8 +2,8 @@
     <div class="account-page">
         <van-nav-bar title="账户安全" left-arrow @click-left="onClickLeft" />
         <van-cell title="微信绑定" is-link value="未绑定" />
-        <van-cell title="修改手机号" is-link value="修改" />
-        <van-cell title="修改密码" is-link value="修改" />
+        <van-cell title="修改手机号" is-link value="修改" @click="jumpLink('editCheck',{mode:'mobile'})"/>
+        <van-cell title="修改密码" is-link value="修改" @click="jumpLink('editCheck',{mode:'password'})"/>
     </div>
 </template>
 <script>
@@ -32,9 +32,9 @@ export default {
         onClickLeft() {
             this.$router.go(-1)
         },   
-        jumpLink(path) {
-            this.$router.push(path)
-        },
+            jumpLink(path, query) {
+      this.$router.push({ path, query });
+    },
         selectSex(item) {
              this.sexSelectshow = false;
         },
