@@ -16,8 +16,8 @@
         <div class="col-left">
           <img class="bank-icon" src />
           <div class="col-mid">
-            <div class="title">招商银行</div>
-            <div class="info">尾号1223 快捷</div>
+            <div class="title">{{item.bankName}}</div>
+            <div class="info">尾号{{item.bankCardNumber.slice(-4)}}</div>
           </div>
         </div>
         <div v-if="from">
@@ -34,7 +34,7 @@
 import Vue from "vue";
 import { createNamespacedHelpers } from "vuex";
 const { mapState, mapActions } = createNamespacedHelpers("bankCard");
-import { NavBar, Field, Icon } from "vant";
+import { NavBar, Field, Icon, Toast } from "vant";
 Vue.use(Field)
   .use(Icon)
   .use(NavBar);
@@ -43,20 +43,11 @@ export default {
     return {
       title: "银行卡",
       from: this.$route.query.from || "",
-      cardList: [{
-        id:1,
-        bankCardNumber:'111',
-        bankName:'招商',
-        userName: 'zlw',
-        openingBank: '招商支行'
-      }, {
-        id:2,
-        bankCardNumber:'222',
-        bankName:'招商2',
-        userName: 'zlw',
-        openingBank: '招商支行2'
-      }]
+      cardList: []
     };
+  },
+  mounted() {
+    this.getCardList();
   },
   methods: {
     ...mapActions(["setCurrentCard"]),
@@ -70,10 +61,12 @@ export default {
     getCardList() {
       this.$http
         .get("/bankCard/getBankCardInfo", {})
-        .then(data => {
-          this.cardList = data || [];
+        .then(res => {
+          this.cardList = res.info || [];
         })
-        .catch(error => {});
+        .catch(error => {
+          Toast(error.message);
+        });
     },
     clickHandle(item) {
       if (this.from == "choose") {
@@ -98,9 +91,11 @@ export default {
         })
         .then(data => {
           Toast("删除成功");
-          this.$router.go(-1);
+          this.getCardList()
         })
-        .catch(error => {});
+        .catch(error => {
+          Toast(error.message)
+        });
     }
   }
 };

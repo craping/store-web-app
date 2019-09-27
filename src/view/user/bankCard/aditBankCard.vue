@@ -74,7 +74,7 @@ export default {
       this.$http
         .post("/bankCard/addBankCardInfo", {
           bankCardNumber: this.bankCardNumber,
-          bankName: this.bankCardNumber,
+          bankName: this.bankName,
           userName: this.userName,
           openingBank: this.openingBank
         })
@@ -83,7 +83,7 @@ export default {
           this.$router.go(-1);
         })
         .catch(error => {
-          Toast("添加失败");
+          Toast(error.message)
         });
     },
     // 修改银行卡
@@ -101,7 +101,7 @@ export default {
           this.$router.go(-1);
         })
         .catch(error => {
-          Toast("添加失败");
+          Toast(error.message)
         });
     }
   }

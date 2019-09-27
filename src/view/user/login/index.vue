@@ -39,7 +39,6 @@ export default {
   data() {
     return {};
   },
-
   mounted() {
     this.onPlusReady(() => {
       this.initWeChatService();
@@ -67,7 +66,7 @@ export default {
           // alert('weService+:'+JSON.stringify(window.aweixin));
         },
         function(e) {
-          alert("获取登录授权服务列表失败：" + JSON.stringify(e));
+          Toast("获取登录授权服务列表失败：" + JSON.stringify(e));
         }
       );
     },
@@ -76,17 +75,17 @@ export default {
         if (!window.aweixin.authResult) {
           window.aweixin.authorize(
             e => {
-              alert("e.code+:" + e.code); //app端获取到的code
+              // Toast("e.code+:" + e.code); //app端获取到的code
               this.$http
-                .post("/wxLogin/Login", {code:e.code})
+                .post("/wxLogin/Login", { code: e.code })
                 .then(res => {
                   // userName 不存在就是未注册
-                  if(!res.info.umsMember.userName){
-                    this.jumpLink('register')
+                  if (!res.info.umsMember.userName) {
+                    this.jumpLink("register");
                   }
                 })
                 .catch(error => {
-                  Toast("登录失败");
+                  Toast(error.message);
                 });
             },
             function(e) {
