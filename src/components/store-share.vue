@@ -17,7 +17,7 @@
             <icon :name="e.icon" scale="5"></icon>
           </template>
         </van-grid-item>
-        <van-grid-item text="商品链接" class="store-share-link" :data-clipboard-text="msg.href" @click="shareLink">
+        <van-grid-item text="商品链接" class="store-share-link" :data-clipboard-text="value.href" @click="shareLink">
           <template v-slot:icon>
             <icon name="share_link" scale="5"></icon>
           </template>
@@ -56,12 +56,7 @@ export default {
   data() {
     return {
       showDialog: this.show,
-      msg: {
-        title:"",
-          content:"",
-          thumbs:[],
-          href:"http://www.baidu.com"
-      },
+      msg: {},
       channels: [
         {
           title: "微信",
@@ -85,7 +80,6 @@ export default {
      * 分享消息实体
      * @param {plus.share.ShareMessage} s
      *
-     * type:"web",
      * title:"HLA海澜之家简约动物印花短袖T恤",
      * content: "2018夏季新品微弹舒适新款短T男生 6月6日-6月20日，满300减30，参与互动赢百元礼券，立即分享赢大奖",
      * thumbs:["http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20180615/5ad83a4fN6ff67ecd.jpg!cc_350x449.jpg"],
@@ -94,7 +88,12 @@ export default {
     value: {
       type: Object,
       default:() =>{
-        return {}
+        return {
+          title:"",
+          content:"",
+          thumbs:[],
+          href:"http://www.baidu.com"
+        }
       }
     },
     show: {
@@ -104,6 +103,7 @@ export default {
   },
   mounted() {
     let me = this;
+    this.shorten(this.value);
     this.onPlusReady(() => {
       plus.share.getServices(
         function(s) {
@@ -125,8 +125,6 @@ export default {
         }
       );
     });
-    // const {amsAccount:{memberId, agentNo}} = this.userInfo;
-    // this.msg.href += "?recommenderId="+memberId+"&recommenderNo="+agentNo;
   },
   methods: {
     cancel() {
@@ -141,10 +139,10 @@ export default {
       if (!channel.share) {
         return;
       }
-      this.msg = {
+      this.value = {
         ...{ extra: { scene: channel.scene } }, 
         type:channel.type, 
-        ...this.msg 
+        ...this.value 
       };
       if (channel.share.authenticated) {
         this.shareMessage(channel.share);
@@ -162,7 +160,7 @@ export default {
     shareMessage(share) {
       let me = this;
       share.send(
-        this.msg,
+        this.value,
         function() {
           Toast.success("分享成功！");
           me.cancel();
@@ -189,6 +187,17 @@ export default {
         clipboard.destroy();
         me.cancel();
       });
+    },
+    shorten(msg){
+      if(!msg || !msg.href)
+        return;
+      const {amsAccount:{memberId, agentNo}} = this.userInfo;
+      let url =  msg.href + (msg.href.includes("?")?"&":"?") + "recommenderId="+memberId+"&recommenderNo="+agentNo;
+      this.$http.post("api/shorturl", {
+        url:url
+      }).then(data =>{
+        this.value.href = data.info;
+      })
     }
   },
   watch: {
@@ -196,10 +205,7 @@ export default {
       this.showDialog = newValue;
     },
     value(newValue, oldValue){
-      this.msg = this.newValue;
-      const {amsAccount:{memberId, agentNo}} = this.userInfo;
-      let url =  this.msg.href + "?recommenderId="+memberId+"&recommenderNo="+agentNo;
-      this.msg.href = url;
+      this.shorten(newValue)
     }
   }
 };

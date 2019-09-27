@@ -10,7 +10,7 @@ export default {
     // 用户是否登录
     isLogin: false,
     // 用户是否是会员
-    isVip: true,
+    isVip: false,
     // 是否开启会员模块
     vipEnable: true,
     // 绑定的手机号

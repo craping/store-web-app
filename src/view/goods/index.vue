@@ -6,7 +6,7 @@
           <van-icon name="arrow-left" color="#fff" size="20" @click="left('out')"/>
         </div>
       </template>
-      <template v-slot:right v-if="isLogin && client == 1">
+      <template v-slot:right v-if="shareEnable">
         <div class="back share" @click="share.show = true">
           <van-icon name="share" color="#fff" size="20"/>
         </div>
@@ -30,7 +30,7 @@
           <van-tab ref="tab-detail" title="详情" name="detail"></van-tab>
         </van-tabs>
       </template>
-      <template v-slot:right v-if="isLogin && client == 1">
+      <template v-slot:right v-if="shareEnable">
         <van-icon name="share" color="#999" size="20" @click="share.show = true"/>
       </template>
     </store-nav-bar>
@@ -131,13 +131,13 @@
       <div class="goods-detail" v-html="goods.detailHtml" @click="showHTMLPre($event)"></div>
     </van-cell-group>
 
-    <store-share v-if="isLogin && client == 1" :show="share.show" @cancel="share.show=false"></store-share>
+    <store-share v-if="shareEnable" v-model="share.msg" :show="share.show" @cancel="share.show=false"></store-share>
 
     <van-sku
       ref="sku"
       v-model="sku.show"
       :sku="sku"
-      :goods-id="$route.params.id"
+      :goods-id="goods.id"
       :goods="goods"
       :quota="0"
       :hide-stock="sku.hide_stock"
@@ -290,11 +290,12 @@ export default {
   },
   computed: {
     ...mapState({
-      client: state => state.user.client,
       userInfo: state => state.user.userInfo,
-      isLogin: state => state.user.isLogin,
+      shareEnable(state){
+        return /* state.user.client == 1 &&  */state.user.isLogin;
+      },
       vipEnable(state){
-        return state.user.client == 1 && state.user.isVip && state.user.vipEnable;
+        return /* state.user.client == 1 &&  */state.user.isVip && state.user.vipEnable;
       }
     }),
     commission: function(){
@@ -303,7 +304,9 @@ export default {
     skuCommission: function(){
       return this.formatPrice(this.sku.commission, this.sku.maxCommission);
     },
-    
+    recommenderId: function(){
+      return this.goods.id == this.$route.query.shopId?this.$route.query.recommenderId:null;
+    }
   },
   data() {
     return {
@@ -319,7 +322,13 @@ export default {
         current: 0
       },
       share: {
-        show: false
+        show: false,
+        msg: {
+          title:null,
+          content:null,
+          thumbs:[],
+          href:null
+        }
       },
       goods: {
         title: '',
@@ -363,12 +372,9 @@ export default {
       })
       .then(data => {
         //goods初始化
-        let {product, skus, specifications} = data.info;
-        // let product = data.info.product
-        // let skus = data.info.skus
+        let { product, skus, specifications, comments } = data.info;
         product.title = product.name
-        product.thumb =
-          product.albumPics == '' ? [] : product.albumPics.split(',')
+        product.thumb = product.albumPics == '' ? [] : product.albumPics.split(',')
         product.thumb.unshift(product.pic)
         const index = product.thumb.findIndex(e => {
           if (e.includes('.mp4')) {
@@ -438,7 +444,14 @@ export default {
         this.sku.list = skus
         this.sku.commission = product.commission;
         this.sku.maxCommission = product.maxCommission;
-        this.comments = data.info.comments
+        //分享组件初始化
+        this.share.msg = {
+          title:product.title,
+          content:product.subTitle,
+          thumbs:[product.pic],
+          href:"http://localhost:9090/#/goods/"+product.id+"?shopId="+product.id
+        }
+        this.comments = comments
       })
   },
   mounted() {
@@ -567,7 +580,11 @@ export default {
     },
     /********点击立即购买去到确认订单中心******/
     buy(skuData) {
-      const sku = {...skuData.selectedSkuComb, num:skuData.selectedNum};
+      const sku = {
+        ...skuData.selectedSkuComb, 
+        num:skuData.selectedNum,
+        recommenderId:this.recommenderId
+      };
       this.$store.commit("order/SET_CONFIRM_ORDER_LIST", [sku]);
       this.$router.push({
         name: 'confirmOrder',
@@ -577,7 +594,20 @@ export default {
       })
     },
     addCart(skuData){
-      const sku = {...skuData.selectedSkuComb, num:skuData.selectedNum};
+      const sku = {
+        ...skuData.selectedSkuComb, 
+        num:skuData.selectedNum,
+        recommenderId:this.recommenderId
+      };
+      this.$http.post("cartItem/addCart", {
+        productSkuId:sku.id,
+        quantity:sku.num,
+        productAttr:JSON.stringify(sku.productAttr),
+        recommenderId:this.recommenderId
+      }).then(data => {
+        Toast.success('添加成功');
+        this.sku.show = false;
+      })
       console.log(sku)
     },
     skuSelected({skuValue, selectedSku, selectedSkuComb}){
