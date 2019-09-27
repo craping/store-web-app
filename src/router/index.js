@@ -16,7 +16,7 @@ const routes = [{
     name: 'search',
     component: () => import('@/view/search'),
     meta: {
-        keepAlive:true
+        keepAlive: true
     }
 }, {
     name: 'main',
@@ -25,7 +25,7 @@ const routes = [{
         name: 'home',
         component: () => import('@/view/home'),
         meta: {
-            keepAlive:true
+            keepAlive: true
         }
     }, {
         name: 'bargain',
@@ -62,7 +62,23 @@ router.beforeEach((to, from, next) => {
     if (title) {
         document.title = title;
     }
-    next();
+    if (to.query.shopId) {
+        next();
+        return;
+    }
+    if (from.query.shopId) {
+        next({
+            path: to.path,
+            query: {
+                ...to.query, 
+                shopId:from.query.shopId,
+                recommenderId:from.query.recommenderId,
+                recommenderNo:from.query.recommenderNo
+            }
+        })
+    } else {
+        next()
+    }
 });
 
 export default router

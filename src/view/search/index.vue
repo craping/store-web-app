@@ -13,7 +13,7 @@
         <router-link
           v-for="(item, index) in search.data.info"
           :key="index"
-          :to="'/goods/'+item.id+'/'+item.productAttributeCategoryId"
+          :to="'/goods/'+item.id"
         >
           <van-card
             class="round"

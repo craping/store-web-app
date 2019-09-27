@@ -10,9 +10,9 @@ export default {
     // 用户是否登录
     isLogin: false,
     // 用户是否是会员
-    isVip: false,
-    // 系统是否开启安全模式
-    isSafe: false
+    isVip: true,
+    // 是否开启会员模块
+    vipEnable: true
   },
   mutations: {
     SET_USERINFO(state, userInfo) {

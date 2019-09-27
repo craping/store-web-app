@@ -11,13 +11,13 @@
           v-for="(e, index) in channels"
           :key="index"
           :text="e.title"
-          @click="shareAction(e.share, e.scene)"
+          @click="shareAction(e)"
         >
           <template v-slot:icon>
             <icon :name="e.icon" scale="5"></icon>
           </template>
         </van-grid-item>
-        <van-grid-item text="商品链接" class="store-share-link" :data-clipboard-text="value.href" @click="shareLink">
+        <van-grid-item text="商品链接" class="store-share-link" :data-clipboard-text="msg.href" @click="shareLink">
           <template v-slot:icon>
             <icon name="share_link" scale="5"></icon>
           </template>
@@ -35,7 +35,9 @@
 
 <script>
 import { ActionSheet, Icon, Grid, GridItem, Toast } from "vant";
+import { mapState } from 'vuex'
 import Clipboard from "clipboard";
+
 export default {
   components: {
     [ActionSheet.name]: ActionSheet,
@@ -45,20 +47,33 @@ export default {
     [Toast.name]: Toast
   },
   name: "store-share",
+  computed:{
+    ...mapState({
+      userInfo: state => state.user.userInfo,
+      isLogin: state => state.user.isLogin
+    })
+  },
   data() {
     return {
       showDialog: this.show,
-      msg: {},
+      msg: {
+        title:"",
+          content:"",
+          thumbs:[],
+          href:"http://www.baidu.com"
+      },
       channels: [
         {
           title: "微信",
           icon: "share_wx",
+          type:"web",
           scene: "WXSceneSession",
           share: null
         },
         {
           title: "朋友圈",
           icon: "share_pyq",
+          type:"web",
           scene: "WXSceneTimeline",
           share: null
         }
@@ -79,13 +94,7 @@ export default {
     value: {
       type: Object,
       default:() =>{
-        return {
-          type:"web",
-          title:"",
-          content:"",
-          thumbs:[],
-          href:"http://www.baidu.com"
-        }
+        return {}
       }
     },
     show: {
@@ -116,6 +125,8 @@ export default {
         }
       );
     });
+    // const {amsAccount:{memberId, agentNo}} = this.userInfo;
+    // this.msg.href += "?recommenderId="+memberId+"&recommenderNo="+agentNo;
   },
   methods: {
     cancel() {
@@ -123,17 +134,22 @@ export default {
     },
     /**
      * 分享操作
-     * @param {plus.share.ShareService} s
+     * @param {plus.share.ShareService} channel.share
      */
-    shareAction(s, scene) {
+    shareAction(channel) {
       let me = this;
-      if (!s) {
+      if (!channel.share) {
         return;
       }
-      if (s.authenticated) {
-        this.shareMessage(s, scene);
+      this.msg = {
+        ...{ extra: { scene: channel.scene } }, 
+        type:channel.type, 
+        ...this.msg 
+      };
+      if (channel.share.authenticated) {
+        this.shareMessage(channel.share);
       } else {
-        s.authorize(shareMessage, function(e) {
+        channel.share.authorize(this.shareMessage, function(e) {
           Toast.fail("未进行认证");
           me.cancel();
         });
@@ -141,12 +157,12 @@ export default {
     },
     /**
      * 发送分享消息
-     * @param {plus.share.ShareService} s
+     * @param {plus.share.ShareService} share
      */
-    shareMessage(s, scene) {
+    shareMessage(share) {
       let me = this;
-      s.send(
-        { ...{ extra: { scene: scene } }, ...this.value },
+      share.send(
+        this.msg,
         function() {
           Toast.success("分享成功！");
           me.cancel();
@@ -178,6 +194,12 @@ export default {
   watch: {
     show(newValue, oldValue) {
       this.showDialog = newValue;
+    },
+    value(newValue, oldValue){
+      this.msg = this.newValue;
+      const {amsAccount:{memberId, agentNo}} = this.userInfo;
+      let url =  this.msg.href + "?recommenderId="+memberId+"&recommenderNo="+agentNo;
+      this.msg.href = url;
     }
   }
 };

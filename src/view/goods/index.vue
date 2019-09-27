@@ -6,7 +6,7 @@
           <van-icon name="arrow-left" color="#fff" size="20" @click="left('out')"/>
         </div>
       </template>
-      <template v-slot:right>
+      <template v-slot:right v-if="isLogin && client == 1">
         <div class="back share" @click="share.show = true">
           <van-icon name="share" color="#fff" size="20"/>
         </div>
@@ -30,7 +30,7 @@
           <van-tab ref="tab-detail" title="详情" name="detail"></van-tab>
         </van-tabs>
       </template>
-      <template v-slot:right>
+      <template v-slot:right v-if="isLogin && client == 1">
         <van-icon name="share" color="#999" size="20" @click="share.show = true"/>
       </template>
     </store-nav-bar>
@@ -65,13 +65,11 @@
     <van-cell-group ref="product" :border="false">
       <van-cell class="goods-price" :border="false" :center="true">
         <div class="price">{{ formatPrice(goods.price, goods.maxPrice) }}</div>
-        <div class="originalPrice">
-          价格
-          <span class="line-through">{{ formatPrice(goods.originalPrice) }}</span>
+        <div v-if="vipEnable" class="commission">
+          赚 <span>{{ commission }}</span>
         </div>
-        <div v-if="isSafe" class="originalPrice">
-          赚
-          <span>{{ formatPrice(goods.commission, goods.maxCommission) }}</span>
+        <div v-else class="originalPrice">
+          价格 <span class="line-through">{{ formatPrice(goods.originalPrice) }}</span>
         </div>
       </van-cell>
       <van-cell :title="goods.title" title-style="font-size:1rem;" :label="goods.subTitle"/>
@@ -133,22 +131,71 @@
       <div class="goods-detail" v-html="goods.detailHtml" @click="showHTMLPre($event)"></div>
     </van-cell-group>
 
-    <store-share :show="share.show" @cancel="share.show=false"></store-share>
+    <store-share v-if="isLogin && client == 1" :show="share.show" @cancel="share.show=false"></store-share>
 
     <van-sku
+      ref="sku"
       v-model="sku.show"
       :sku="sku"
+      :goods-id="$route.params.id"
       :goods="goods"
       :quota="0"
       :hide-stock="sku.hide_stock"
-      @buy-clicked="onBuyClicked"
-    />
+      @buy-clicked="buy"
+      @add-cart="addCart"
+      @sku-selected="skuSelected"
+      @stepper-change="stepperChange"
+    >
+      <template slot="sku-actions" slot-scope="props">
+        <div class="van-sku-actions">
+          <van-button
+            square
+            size="large"
+            type="warning"
+            @click="props.skuEventBus.$emit('sku:addCart')"
+          >
+            <div style="line-height:normal">
+              <div>加入购物车</div>
+              <div v-if="vipEnable" class="commission">省 {{ skuCommission }}</div>
+            </div>
+          </van-button>
+          <!-- 直接触发 sku 内部事件，通过内部事件执行 buy 回调 -->
+          <van-button
+            square
+            size="large"
+            type="danger"
+            @click="props.skuEventBus.$emit('sku:buy')"
+          >
+            <div style="line-height:normal">
+              <div>立即购买</div>
+              <div v-if="vipEnable" class="commission">省 {{ skuCommission }}</div>
+            </div>
+          </van-button>
+        </div>
+      </template>
+    </van-sku>
 
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" @click="sorry">客服</van-goods-action-icon>
       <van-goods-action-icon icon="cart-o" @click="onClickCart">购物车</van-goods-action-icon>
-      <van-goods-action-button type="warning" @click="sku.show=true">加入购物车</van-goods-action-button>
-      <van-goods-action-button type="danger" @click="sku.show=true">立即购买</van-goods-action-button>
+      <template v-if="vipEnable">
+        <van-goods-action-button type="warning" @click="sku.show=true">
+          <div style="line-height:normal">
+            <div>购买</div>
+            <div class="commission">省 {{ commission }}</div>
+          </div>
+        </van-goods-action-button>
+        <van-goods-action-button type="danger" @click="share.show=true">
+          <div style="line-height:normal">
+            <div>分享</div>
+            <div class="commission">赚 {{ commission }}</div>
+          </div>
+        </van-goods-action-button>
+      </template>
+      <template v-else>
+        <van-goods-action-button type="warning" @click="sku.show=true">加入购物车</van-goods-action-button>
+        <van-goods-action-button type="danger" @click="sku.show=true">立即购买</van-goods-action-button>
+      </template>
     </van-goods-action>
 
     <van-popup class="judge-popup" v-model="showJudgeSheet" position="right">
@@ -205,7 +252,8 @@ import {
   Tab,
   Tabs,
   Popup,
-  Sku
+  Sku,
+  Button
 } from 'vant'
 import storeNavBar from '@/components/store-nav-bar'
 import storeShare from '@/components/store-share'
@@ -235,14 +283,27 @@ export default {
     [Tabs.name]: Tabs,
     [Popup.name]: Popup,
     [Sku.name]: Sku,
+    [Button.name]: Button,
     storeNavBar,
     storeShare,
     judgeSheet
   },
   computed: {
     ...mapState({
-      isSafe: state => state.user.isSafe
-    })
+      client: state => state.user.client,
+      userInfo: state => state.user.userInfo,
+      isLogin: state => state.user.isLogin,
+      vipEnable(state){
+        return state.user.client == 1 && state.user.isVip && state.user.vipEnable;
+      }
+    }),
+    commission: function(){
+      return this.formatPrice(this.goods.commission, this.goods.maxCommission);
+    },
+    skuCommission: function(){
+      return this.formatPrice(this.sku.commission, this.sku.maxCommission);
+    },
+    
   },
   data() {
     return {
@@ -279,7 +340,9 @@ export default {
         collection_id: 2261, // 默认skuID
         none_sku: false, // 是否无规格商品
         messages: [],
-        hide_stock: true // 是否隐藏剩余库存
+        hide_stock: true, // 是否隐藏剩余库存
+        commission:0,
+        maxCommission:0
       },
       params: {
         list: [],
@@ -294,16 +357,15 @@ export default {
     }
   },
   created() {
-    console.log("isSafe:"+this.isSafe)
     this.$http
       .post('product/detail', {
-        pId: this.$route.params.pId,
-        pacId: this.$route.params.pacId
+        id: this.$route.params.id
       })
       .then(data => {
         //goods初始化
-        let product = data.info.product
-        let skus = data.info.skus
+        let {product, skus, specifications} = data.info;
+        // let product = data.info.product
+        // let skus = data.info.skus
         product.title = product.name
         product.thumb =
           product.albumPics == '' ? [] : product.albumPics.split(',')
@@ -340,8 +402,8 @@ export default {
 
         //sku初始化
         this.sku.price = new Big(product.price).toFixed(2)
-        for (let i = 0; i < data.info.specifications.length; i++) {
-          const e = data.info.specifications[i]
+        for (let i = 0; i < specifications.length; i++) {
+          const e = specifications[i]
           this.goods.sku += e.name + ' '
           const sp = {
             k: e.name,
@@ -357,10 +419,25 @@ export default {
           this.sku.tree.push(sp)
         }
         skus.forEach(e => {
-          e.stock_num = 9999
-          e.price *= 100
+          e.stock_num = 9999;
+          e.price *= 100;
+          e.title = product.title;
+          e.subTitle = product.subTitle;
+          e.supId = product.supId;
+          e.pic = product.pic;
+          e.productAttr = [];
+          for (let i = 1; i <= 3; i++) {
+            const value = e["sp"+i];
+            if(value)
+              e.productAttr.push({
+                key:specifications[i-1].name,
+                value:value
+              });
+          }
         })
         this.sku.list = skus
+        this.sku.commission = product.commission;
+        this.sku.maxCommission = product.maxCommission;
         this.comments = data.info.comments
       })
   },
@@ -424,7 +501,10 @@ export default {
           document.body.scrollTop
         this.opacityIn = scrollTop / (this.$refs.product.offsetTop - 66)
       } else {
-        this.$router.go(-1)
+        if(window.history.length <= 1)
+          this.$router.push("/main/home")
+        else
+          this.$router.go(-1)
       }
     },
     displayVideo() {
@@ -465,11 +545,10 @@ export default {
     },
 
     onClickCart() {
-      this.$router.push('cart')
+      this.$router.push('/cart')
     },
 
     sorry() {
-      sync.connect();
       Toast('暂无后续逻辑~')
     },
     showJudge() {
@@ -487,13 +566,41 @@ export default {
       this.prePicShow = true
     },
     /********点击立即购买去到确认订单中心******/
-    onBuyClicked() {
+    buy(skuData) {
+      const sku = {...skuData.selectedSkuComb, num:skuData.selectedNum};
+      this.$store.commit("order/SET_CONFIRM_ORDER_LIST", [sku]);
       this.$router.push({
         name: 'confirmOrder',
         query: {
           type: 'dir'
         }
       })
+    },
+    addCart(skuData){
+      const sku = {...skuData.selectedSkuComb, num:skuData.selectedNum};
+      console.log(sku)
+    },
+    skuSelected({skuValue, selectedSku, selectedSkuComb}){
+      // console.log(skuValue)
+      // console.log(selectedSku)
+      const { selectedNum } = this.$refs.sku.getSkuData();
+      this.commissionChange(selectedSkuComb, selectedNum)
+    },
+    stepperChange(num){
+      const { selectedSkuComb } = this.$refs.sku.getSkuData();
+      this.commissionChange(selectedSkuComb, num);
+    },
+    commissionChange(selectedSkuComb, num){
+      if(selectedSkuComb){
+        this.sku.commission = new Big(selectedSkuComb.commission).mul(num).toFixed(2);
+        this.sku.maxCommission = null;
+      } else{
+        this.sku.commission = new Big(this.goods.commission).mul(num).toFixed(2);
+        if(this.goods.maxCommission)
+          this.sku.maxCommission = new Big(this.goods.maxCommission).mul(num).toFixed(2);
+        else
+          this.sku.maxCommission = null;
+      }
     }
   }
 }
@@ -597,6 +704,11 @@ export default {
       font-size: 12px;
     }
   }
+
+  .commission {
+      color: #fff;
+      font-size: 12px;
+    }
 
   .title {
     font-size: 0.8rem;
