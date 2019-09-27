@@ -12,7 +12,7 @@
         <van-checkbox-group class="card-goods" v-model="checkedGoods">
           <van-checkbox
             class="card-goods-item"
-            v-for="item in goods"
+            v-for="item in itemList"
             :key="item.id"
             :name="item.id"
             icon-size="16px"
@@ -83,7 +83,7 @@ export default {
     return {
       isOperate: false,
       checkedGoods: ["1", "2", "3"],
-      goods: [
+      itemList: [
         {
           id: "1",
           title: "进口香蕉",
@@ -154,7 +154,7 @@ export default {
   computed: {
     selectCount() {
       const count = this.checkedGoods.length;
-      if (count == this.goods.length && count != 0) {
+      if (count == this.itemList.length && count != 0) {
         this.isSelectAll = true;
       } else {
         this.isSelectAll = false;
@@ -162,7 +162,7 @@ export default {
       return count ? `(${count})` : "";
     },
     totalPrice() {
-      return this.goods.reduce(
+      return this.itemList.reduce(
         (total, item) =>
           total +
           (this.checkedGoods.indexOf(item.id) !== -1
@@ -174,14 +174,24 @@ export default {
   },
 
   methods: {
+    getCartList() {
+      this.$http
+        .get("/cartItem/getCartItemList", {})
+        .then(res => {
+          this.itemList = res.info || []
+        })
+        .catch((error) => {
+          Toast(error.message);
+        });
+    },
     changeOperate() {
       this.isOperate = !this.isOperate;
     },
     changeAll(val) {
       if (this.isSelectAll) {
-        this.checkedGoods = this.goods.map(item => item.id);
+        this.checkedGoods = this.itemList.map(item => item.id);
       } else {
-        if (this.checkedGoods.length == this.goods.length) {
+        if (this.checkedGoods.length == this.itemList.length) {
           this.checkedGoods = [];
         }
       }
@@ -213,7 +223,7 @@ export default {
       if (done) done(true);
       this.loading = false;
       this.finished = true;
-    }
+    },
   }
 };
 </script>

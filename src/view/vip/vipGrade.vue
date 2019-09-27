@@ -3,7 +3,7 @@
  -->
 <template>
   <div class="vip-grade-page">
-    <van-nav-bar title="会员等级" left-arrow @click-left="onClickLeft" fixed/>
+    <van-nav-bar title="会员等级" left-arrow @click-left="onClickLeft" fixed />
     <div class="title">钻石会员等级</div>
     <div class="subtitle">规则大解析</div>
     <div class="rule-table">
@@ -21,13 +21,13 @@
     </div>
     <div class="tip">*会员等级根据上一日24:00为止的的订单数结算得出</div>
     <div class="rule-item">
-        <i>1</i> 购买礼包注册成功即为新人，V1-V6会员按照最近90天内购物产生的订单数升降级。
+      <i>1</i> 购买礼包注册成功即为新人，V1-V6会员按照最近90天内购物产生的订单数升降级。
     </div>
     <div class="rule-item">
-        <i>2</i> 购买礼包注册成功即为新人，V1-V6会员按照最近90天内购物产生的订单数升降级。
+      <i>2</i> 购买礼包注册成功即为新人，V1-V6会员按照最近90天内购物产生的订单数升降级。
     </div>
     <div class="rule-item">
-        <i>3</i> 购买礼包注册成功即为新人，V1-V6会员按照最近90天内购物产生的订单数升降级。
+      <i>3</i> 购买礼包注册成功即为新人，V1-V6会员按照最近90天内购物产生的订单数升降级。
     </div>
   </div>
 </template>
@@ -50,7 +50,11 @@ export default {
   components: {
     storeScroller
   },
-  methods: {}
+  methods: {
+    onClickLeft() {
+      this.$router.go(-1);
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -105,24 +109,24 @@ export default {
       }
     }
   }
-  .tip{
-      padding: 0 25px;
-      margin: 6px 0 15px;
+  .tip {
+    padding: 0 25px;
+    margin: 6px 0 15px;
   }
-  .rule-item{
-      font-size: 14px;
-      padding: 5px 25px;
-      i{
-          display: inline-block;
-          background: #a24b04;
-          color: #fddc8f;
-          border-radius: 50%;
-          width: 14px;
-          height: 14px;
-          font-size: 12px;
-          line-height: 14px;
-          text-align: center;
-      }
+  .rule-item {
+    font-size: 14px;
+    padding: 5px 25px;
+    i {
+      display: inline-block;
+      background: #a24b04;
+      color: #fddc8f;
+      border-radius: 50%;
+      width: 14px;
+      height: 14px;
+      font-size: 12px;
+      line-height: 14px;
+      text-align: center;
+    }
   }
 }
 </style>

@@ -3,7 +3,7 @@
     <van-nav-bar title="验证" left-arrow @click-left="onClickLeft" />
     <div class="login-body">
       <van-cell-group>
-        <van-field value="153232322" clearable label="手机号" disabled />
+        <van-field :value="bindPhoneStr" clearable label="原手机号" disabled />
         <van-field v-model="verCode" clearable label="短信验证码" placeholder="请输入短信验证码">
           <div class="code-operate" slot="button" @click="getCode">
             <span :class="{gray:countDownSecond >= 0}">{{codeText}}</span>
@@ -18,6 +18,7 @@
 import Vue from "vue";
 import { NavBar, Icon } from "vant";
 import { CellGroup, Field, Toast } from "vant";
+import { mapState, mapGetters } from "vuex";
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
@@ -26,17 +27,22 @@ const aweixin = null;
 export default {
   data() {
     return {
-      mobile: "",
       verCode: "",
       codeText: "获取验证码",
       countDownSecond: -1,
       codeTimer: null,
       isEyeClose: true,
-      mode: this.$route.mode
+      mode: this.$route.query.mode
     };
   },
   destroyed() {
     clearInterval(this.codeTimer);
+  },
+  computed: {
+    ...mapState("user", {
+      bindPhone: state => state.bindPhone
+    }),
+    ...mapGetters("user", ["bindPhoneStr"])
   },
   methods: {
     onClickLeft() {
@@ -49,30 +55,32 @@ export default {
       this.isEyeClose = !this.isEyeClose;
     },
     sureHandle() {
+      if (!this.verCode) {
+        Toast("请输入验证码");
+        return
+      }
       const params = {
-        mobile: this.mobile,
-        verCode: this.verCode
+        mobile: this.bindPhone,
+        verCode: this.verCode,
+        type: 3
       };
       this.$http
-        .post("/login/checkingCode", params)
+        .post("/authCode/checkingCode", params)
         .then(res => {
-          if ((this.mode = "mobile")) {
+          if (this.mode == "mobile") {
             this.jumpLink("editMobile");
-          } else if ((this.mode = "password")) {
+          } else if (this.mode == "password") {
             this.jumpLink("editPassword");
           }
         })
-        .catch(error => {});
+        .catch(error => {
+          Toast(error.message);
+        });
     },
     getCode() {
       if (this.countDownSecond > 0) {
         return;
       }
-      if (this.mobile == "") {
-        Toast("请输入手机号码");
-        return;
-      }
-      this.timeCountDown();
       this.timeCountDown();
     },
     /**
@@ -99,12 +107,14 @@ export default {
      * 获取验证码接口
      */
     getCodeReq() {
-      const params = { mobile: this.mobile };
+      const params = { mobile: this.bindPhone };
       this.$http
-        .post("/login/getVerCode", params)
-        .then(res => {})
+        .post("/authCode/getUpdateCode", params)
+        .then(res => {
+          Toast("已发送");
+        })
         .catch(error => {
-          Toast("获取验证码失败");
+          Toast(error.message);
         });
     }
   }

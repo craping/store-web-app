@@ -10,7 +10,7 @@
           placeholder="请输入新密码"
         />
         <van-field
-          v-model="passwrods"
+          v-model="passwords"
           clearable
           label="确认新密码"
           placeholder="请再次输入新密码"
@@ -24,6 +24,8 @@
 import Vue from "vue";
 import { NavBar, Icon } from "vant";
 import { CellGroup, Field, Toast } from "vant";
+import md5 from 'js-md5';
+
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
@@ -45,20 +47,25 @@ export default {
       this.$router.push(path);
     },
     sureHandle() {
-      if (this.passwrod !== this.passwrods) {
+      console.log(this.password)
+      console.log(this.passwords)
+
+      if (this.password !== this.passwords) {
         Toast("两次输入的密码不相同");
         return;
       }
       const params = {
-        passwrod: this.passwrod,
-        passwrods: this.passwrods
+        password: md5(this.password),
+        passwords: md5(this.passwords)
       };
       this.$http
-        .post("/user/updataPassword ", params)
+        .post("/user/updataPassword", params)
         .then(res => {
           Toast("修改成功");
         })
-        .catch(error => {});
+        .catch(error => {
+          Toast(error.message);
+        });
     }
   }
 };

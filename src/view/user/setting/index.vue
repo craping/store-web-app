@@ -33,12 +33,14 @@ export default {
       this.$http
         .post("/login/loginOut", {})
         .then(res => {
-					removeToken() 
-					window.aweixin.authResult = null // 清空微信登录的认证
+          removeToken() 
+          if(window.aweixin){
+					  window.aweixin.authResult = null // 清空微信登录的认证
+          }
       		this.$router.push("/login");
         })
         .catch(error => {
-          Toast("退出登录失败");
+          Toast(error.message);
         });
     }
   }

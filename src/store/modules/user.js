@@ -12,11 +12,19 @@ export default {
     // 用户是否是会员
     isVip: true,
     // 是否开启会员模块
-    vipEnable: true
+    vipEnable: true,
+    // 绑定的手机号
+    bindPhone: '',
+  },
+  getters: {
+    bindPhoneStr: state => {
+      return state.bindPhone.replace(/^(\d{3})\d{4}(\d+)/,"$1****$2")
+    }
   },
   mutations: {
     SET_USERINFO(state, userInfo) {
       state.userInfo = userInfo
+      state.bindPhone = userInfo.umsMember.phone
       state.isLogin = true
       state.isVip = userInfo.amsAccount.orders > 0;
     },

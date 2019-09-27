@@ -1,24 +1,20 @@
 <template>
   <div class="user-page">
     <div class="curtain" ref="curtain">
-      <div class="cav">
-        <div class="no-vip-card" @click="ss()">
-          升级<span class="vip-grade-bar">会员等级</span>享受更多权益
-        </div>
-      </div>
+      <div class="cav"></div>
     </div>
     <div class="top-info">
       <div class="row-1">
-        <van-icon name="chat-o" @click="jumpLink('/message')" color="#fff" size="30"/>
+        <van-icon name="chat-o" @click="jumpLink('/message')" color="#fff" size="30" />
       </div>
       <div class="row-2">
         <div class="head-img" src></div>
         <div class="base-info">
-          <div class="phone-num">15323232323</div>
+          <!-- <div class="phone-num">{{userInfo.umsMember.phone}}</div> -->
           <span class="vip-grade-bar">会员等级</span>
         </div>
       </div>
-      <div class="vip-card" v-if="0" @click="jumpLink('/vip')">
+      <div v-if="isVip" class="vip-card"  @click="jumpLink('/vip')">
         <div class="vip-row-1">
           <span class="word-text">
             <span>可提现余额(元)</span>
@@ -40,6 +36,10 @@
             <span>我的团队</span>
           </div>
         </div>
+      </div>
+      <div v-else class="no-vip-card" @click="jumpLink('/vipGrade')">
+        升级
+        <span class="vip-grade-bar">会员等级</span>享受更多权益
       </div>
     </div>
     <div class="main-content">
@@ -79,10 +79,12 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import storeNavBar from '@/components/store-nav-bar'
-import { Grid, GridItem, Icon } from 'vant'
-Vue.use(Grid).use(GridItem)
+import Vue from "vue";
+import { mapState } from "vuex";
+import storeNavBar from "@/components/store-nav-bar";
+import { Grid, GridItem, Icon } from "vant";
+Vue.use(Grid).use(GridItem);
+
 
 export default {
   components: {
@@ -94,76 +96,79 @@ export default {
     return {
       orderTabs: [
         {
-          name: '待付款',
-          link: '/order',
-          icon: 'paid',
+          name: "待付款",
+          link: "/order",
+          icon: "paid",
           prams: 1
         },
         {
-          name: '待发货',
-          link: '/order',
-          icon: 'send-gift-o',
+          name: "待发货",
+          link: "/order",
+          icon: "send-gift-o",
           prams: 2
         },
         {
-          name: '待收货',
-          link: '/order',
-          icon: 'logistics',
+          name: "待收货",
+          link: "/order",
+          icon: "logistics",
           prams: 3
         },
         {
-          name: '待评论',
-          link: '/order',
-          icon: 'label-o',
+          name: "待评论",
+          link: "/order",
+          icon: "label-o",
           prams: 4
         },
         {
-          name: '退款/售后',
-          link: '/aftersale',
-          icon: 'refund-o'
+          name: "退款/售后",
+          link: "/aftersale",
+          icon: "refund-o"
         }
       ],
       serviceTabs: [
         {
-          name: '收货地址',
-          link: '/address',
-          icon: 'location-o'
+          name: "收货地址",
+          link: "/address",
+          icon: "location-o"
         },
         {
-          name: '我的收藏',
-          link: '/like',
-          icon: 'like-o'
+          name: "我的收藏",
+          link: "/like",
+          icon: "like-o"
         },
         {
-          name: '设置',
-          link: '/setting',
-          icon: 'setting-o'
+          name: "设置",
+          link: "/setting",
+          icon: "setting-o"
         },
         {
-          name: '客服',
-          link: '',
-          icon: 'service-o'
+          name: "客服",
+          link: "",
+          icon: "service-o"
         }
       ]
-    }
+    };
+  },
+  computed:{
+    ...mapState({
+      isVip: state => state.user.isVip,
+      userInfo: state => state.user.userInfo,
+    })
   },
   methods: {
-    ss(){
-      debugger
-    },
     jumpLink(path, params) {
       this.$router.push({
         path,
         query: {
           tabId: params
         }
-      })
+      });
     },
     toOrderCenter() {
-      this.$router.push('/order')
+      this.$router.push("/order");
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -185,19 +190,6 @@ export default {
       display: flex;
       justify-content: center;
       overflow: hidden;
-      .no-vip-card {
-        height: 40px;
-        width: 90vw;
-        background: #50545f;
-        align-self: flex-end;
-        border-radius: 5px;
-        padding-top: 10px;
-        padding-left: 20px;
-        color: #fbe5ae;
-        .vip-grade-bar {
-          margin: 0 4px;
-        }
-      }
     }
   }
   .vip-grade-bar {
@@ -234,11 +226,23 @@ export default {
         }
       }
     }
+    .no-vip-card {
+      margin-top: 32px;
+      height: 40px;
+      background: #50545f;
+      align-self: flex-end;
+      border-radius: 5px;
+      padding-top: 10px;
+      padding-left: 20px;
+      color: #fbe5ae;
+      .vip-grade-bar {
+        margin: 0 4px;
+      }
+    }
     .vip-card {
-      margin-top: 30px;
+      margin: 30px 0 20px;
       border-radius: 5px;
       overflow: hidden;
-      margin-bottom: 20px;
       .vip-row-1 {
         height: 36px;
         background: #fbe5ae;

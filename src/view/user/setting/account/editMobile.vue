@@ -18,6 +18,7 @@
 import Vue from "vue";
 import { NavBar, Icon } from "vant";
 import { CellGroup, Field, Toast } from "vant";
+import { mapActions } from 'vuex';
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
@@ -38,6 +39,7 @@ export default {
     clearInterval(this.codeTimer);
   },
   methods: {
+    ...mapActions('user',['getUserInfo']),
     onClickLeft() {
       this.$router.go(-1);
     },
@@ -53,15 +55,19 @@ export default {
         .post("/user/updataMobile ", params)
         .then(res => {
             Toast("修改成功");
+            this.getUserInfo()
+            this.$router.go(-2);
         })
-        .catch(error => {});
+        .catch(error => {
+          Toast(error.message);
+        });
     },
     getCode() {
       if (this.countDownSecond > 0) {
         return;
       }
       if (this.mobile == "") {
-        Toast("请输入手机号码");
+        Toast("请输入新手机号码");
         return;
       }
       this.timeCountDown();
@@ -93,9 +99,10 @@ export default {
       const params = { mobile: this.mobile };
       this.$http
         .post("/login/getVerCode", params)
-        .then(res => {})
+        .then(res => {
+        })
         .catch(error => {
-          Toast("获取验证码失败");
+          Toast(error.message);
         });
     }
   }
