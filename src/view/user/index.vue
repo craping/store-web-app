@@ -8,31 +8,34 @@
         <van-icon name="chat-o" @click="jumpLink('/message')" color="#fff" size="30" />
       </div>
       <div class="row-2">
-        <div class="head-img" src></div>
+        <div class="head-img" @click="jumpLink('/userInfo')"> 
+          <img src="" alt="">
+        </div>
         <div class="base-info">
-          <!-- <div class="phone-num">{{userInfo.umsMember.phone}}</div> -->
-          <span class="vip-grade-bar">会员等级</span>
+          <div class="nick-phone" @click="jumpLink('/userInfo')">{{umsMember.nickname || bindPhoneStr}}</div>
+          <span class="vip-grade-bar" v-if="isVip" @click="jumpLink('/vipGrade')">V1会员</span>
+          <span class="vip-grade-bar" v-else @click="jumpLink('/vipGrade')">会员等级</span>
         </div>
       </div>
       <div v-if="isVip" class="vip-card"  @click="jumpLink('/vip')">
         <div class="vip-row-1">
           <span class="word-text">
             <span>可提现余额(元)</span>
-            <span class="money">142</span>
+            <span class="money">{{amsAccount.balance}}</span>
           </span>
           <span class="btn" @click.stop.prevent="jumpLink('/withdraw')">提现</span>
         </div>
         <div class="vip-row-2">
           <div class="gird-item">
-            <span class="num">1123</span>
+            <span class="num">{{amsAccount.income}}</span>
             <span>累计收益(元)</span>
           </div>
           <div class="gird-item">
-            <span class="num">1123</span>
+            <span class="num">{{amsAccount.unreceivedIncome}}</span>
             <span>未到账余额(元)</span>
           </div>
           <div class="gird-item">
-            <span class="num">13</span>
+            <span class="num">{{amsAccount.directTeams}}</span>
             <span>我的团队</span>
           </div>
         </div>
@@ -80,7 +83,7 @@
 
 <script>
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import storeNavBar from "@/components/store-nav-bar";
 import { Grid, GridItem, Icon } from "vant";
 Vue.use(Grid).use(GridItem);
@@ -150,10 +153,12 @@ export default {
     };
   },
   computed:{
-    ...mapState({
-      isVip: state => state.user.isVip,
-      userInfo: state => state.user.userInfo,
-    })
+    ...mapState('user',{
+      isVip: state => state.isVip,
+      amsAccount: state => state.userInfo.amsAccount || {},
+      umsMember: state => state.userInfo.umsMember || {},
+    }),
+    ...mapGetters('user',['bindPhoneStr'])
   },
   methods: {
     jumpLink(path, params) {
@@ -194,7 +199,8 @@ export default {
   }
   .vip-grade-bar {
     display: inline-block;
-    padding: 0 4px;
+    width: 56px;
+    text-align: center;
     border-radius: 8px;
     color: #895c29;
     background: #fbe5ae;
@@ -218,7 +224,7 @@ export default {
       }
       .base-info {
         margin-left: 20px;
-        .phone-num {
+        .nick-phone {
           font-size: 16px;
           margin: 5px 0;
           color: #fff;

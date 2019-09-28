@@ -33,7 +33,9 @@ export default {
         .then(res => {
           Toast("修改成功");
         })
-        .catch(error => {});
+        .catch(error => {
+          Toast(error.message)
+        });
     },
     jumpLink(path) {
       this.$router.push(path);

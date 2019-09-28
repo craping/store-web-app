@@ -3,18 +3,8 @@
     <van-nav-bar title="修改密码" left-arrow @click-left="onClickLeft" />
     <div class="login-body">
       <van-cell-group>
-        <van-field
-          v-model="password"
-          clearable
-          label="新密码"
-          placeholder="请输入新密码"
-        />
-        <van-field
-          v-model="passwords"
-          clearable
-          label="确认新密码"
-          placeholder="请再次输入新密码"
-        />
+        <van-field v-model="password" clearable label="新密码" placeholder="请输入新密码" />
+        <van-field v-model="passwords" clearable label="确认新密码" placeholder="请再次输入新密码" />
         <div class="main-btn" @click="sureHandle">修改</div>
       </van-cell-group>
     </div>
@@ -24,7 +14,7 @@
 import Vue from "vue";
 import { NavBar, Icon } from "vant";
 import { CellGroup, Field, Toast } from "vant";
-import md5 from 'js-md5';
+import md5 from "js-md5";
 
 Vue.use(CellGroup)
   .use(Field)
@@ -35,7 +25,7 @@ export default {
   data() {
     return {
       password: "",
-      passwords: "",
+      passwords: ""
     };
   },
 
@@ -47,11 +37,8 @@ export default {
       this.$router.push(path);
     },
     sureHandle() {
-      console.log(this.password)
-      console.log(this.passwords)
-
       if (this.password !== this.passwords) {
-        Toast("两次输入的密码不相同");
+        Toast("两次输入的密码不一致");
         return;
       }
       const params = {
@@ -62,6 +49,7 @@ export default {
         .post("/user/updataPassword", params)
         .then(res => {
           Toast("修改成功");
+          this.$router.go(-2);
         })
         .catch(error => {
           Toast(error.message);

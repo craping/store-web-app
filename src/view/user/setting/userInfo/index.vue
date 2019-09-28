@@ -4,14 +4,13 @@
     <van-uploader :before-read="beforeRead">
       <van-cell title="个人头像">
         <template slot="right-icon">
-          <img class="head-img" :src="userInfo.headImg" />
+          <img class="head-img" :src="userInfo.umsMember.headImg ||''" />
           <i data-v-a857212a class="van-icon van-icon-arrow van-cell__right-icon"></i>
         </template>
       </van-cell>
     </van-uploader>
-
-    <van-cell title="昵称" is-link :value="userInfo.name" @click="setName(userInfo.name)" />
-    <van-cell title="生日" is-link :value="userInfo.birth" @click="dateSelectshow = true" />
+    <van-cell title="昵称" is-link :value="userInfo.umsMember.nickname || ''" @click="setName(userInfo.umsMember.nickname|| '')" />
+    <!-- <van-cell title="生日" is-link :value="userInfo.birth" @click="dateSelectshow = true" />
     <van-cell title="性别" is-link :value="userInfo.sex" @click="sexSelectshow = true" />
     <van-action-sheet v-model="sexSelectshow" :actions="sexactions" @select="selectSex" />
     <van-popup v-model="dateSelectshow" position="bottom" :style="{ height: '30%' }">
@@ -21,7 +20,7 @@
         @confirm="selectDate"
         @cancel="dateSelectshow=false"
       />
-    </van-popup>
+    </van-popup> -->
   </div>
 </template>
 <script>
@@ -37,6 +36,7 @@ import {
   DatetimePicker,
   Uploader
 } from "vant";
+import { mapState } from 'vuex';
 Vue.use(Cell)
   .use(CellGroup)
   .use(ActionSheet)
@@ -47,17 +47,16 @@ Vue.use(Cell)
 export default {
   data() {
     return {
-      userInfo: {
-        headImg: "...",
-        name: "哈哈是",
-        birth: "2019-08-24",
-        sex: "男"
-      },
       dateSelectshow: false,
       sexSelectshow: false,
       sexactions: [{ name: "男" }, { name: "女" }],
       currentDate: new Date()
     };
+  },
+  computed:{
+    ...mapState({
+      userInfo: state => state.user.userInfo
+    })
   },
   methods: {
     onClickLeft() {

@@ -206,12 +206,18 @@ export default {
       Toast("点击结算");
     },
     deleteItem(){
-      this.goods = this.goods.filter((ele,index)=>{
-        if(!this.checkedGoods.includes(ele.id)){
-          return ele
-        }
-      })
-      this.checkedGoods = []
+      const ids = this.checkedGoods.map(ele => ele.id).join(',')
+      this.$http
+        .get("/cartItem/delete", {ids})
+        .then(res => {
+          Toast('删除成功')
+          this.checkedGoods = []
+          this.getCartList()
+        })
+        .catch((error) => {
+          Toast(error.message);
+        });   
+
     },
     onRefresh(done) {
       setTimeout(() => {
