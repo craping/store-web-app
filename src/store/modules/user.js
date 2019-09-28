@@ -1,4 +1,4 @@
-import request from '../../utils/request'
+import request from '@/utils/request'
 import { getToken } from '@/utils/auth'
 import { getClient } from '@/utils/util'
 
@@ -11,8 +11,8 @@ export default {
     isLogin: false,
     // 用户是否是会员
     isVip: false,
-    // 系统是否开启屏蔽
-    isShield: false,
+    // 是否开启会员模块
+    vipEnable: true,
     // 绑定的手机号
     bindPhone: '',
   },
@@ -27,6 +27,10 @@ export default {
       state.bindPhone = userInfo.umsMember.phone
       state.isLogin = true
       state.isVip = userInfo.amsAccount.orders > 0;
+    },
+    SET_SAFE(state, safe) {
+      console.log("invoke SET_SAFE:"+safe)
+      state.isSafe = safe;
     }
   },
   actions: {

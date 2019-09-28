@@ -37,7 +37,7 @@
         <router-link
           v-for="(item) in content.hotProductList"
           :key="item.id"
-          :to="'/goods/'+item.id+'/'+item.productAttributeCategoryId"
+          :to="'/goods/'+item.id"
         >
           <van-card
             class="round"

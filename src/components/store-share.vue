@@ -11,7 +11,7 @@
           v-for="(e, index) in channels"
           :key="index"
           :text="e.title"
-          @click="shareAction(e.share, e.scene)"
+          @click="shareAction(e)"
         >
           <template v-slot:icon>
             <icon :name="e.icon" scale="5"></icon>
@@ -35,7 +35,9 @@
 
 <script>
 import { ActionSheet, Icon, Grid, GridItem, Toast } from "vant";
+import { mapState } from 'vuex'
 import Clipboard from "clipboard";
+
 export default {
   components: {
     [ActionSheet.name]: ActionSheet,
@@ -45,6 +47,12 @@ export default {
     [Toast.name]: Toast
   },
   name: "store-share",
+  computed:{
+    ...mapState({
+      userInfo: state => state.user.userInfo,
+      isLogin: state => state.user.isLogin
+    })
+  },
   data() {
     return {
       showDialog: this.show,
@@ -53,12 +61,14 @@ export default {
         {
           title: "微信",
           icon: "share_wx",
+          type:"web",
           scene: "WXSceneSession",
           share: null
         },
         {
           title: "朋友圈",
           icon: "share_pyq",
+          type:"web",
           scene: "WXSceneTimeline",
           share: null
         }
@@ -70,7 +80,6 @@ export default {
      * 分享消息实体
      * @param {plus.share.ShareMessage} s
      *
-     * type:"web",
      * title:"HLA海澜之家简约动物印花短袖T恤",
      * content: "2018夏季新品微弹舒适新款短T男生 6月6日-6月20日，满300减30，参与互动赢百元礼券，立即分享赢大奖",
      * thumbs:["http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20180615/5ad83a4fN6ff67ecd.jpg!cc_350x449.jpg"],
@@ -80,7 +89,6 @@ export default {
       type: Object,
       default:() =>{
         return {
-          type:"web",
           title:"",
           content:"",
           thumbs:[],
@@ -95,6 +103,7 @@ export default {
   },
   mounted() {
     let me = this;
+    this.shorten(this.value);
     this.onPlusReady(() => {
       plus.share.getServices(
         function(s) {
@@ -123,17 +132,22 @@ export default {
     },
     /**
      * 分享操作
-     * @param {plus.share.ShareService} s
+     * @param {plus.share.ShareService} channel.share
      */
-    shareAction(s, scene) {
+    shareAction(channel) {
       let me = this;
-      if (!s) {
+      if (!channel.share) {
         return;
       }
-      if (s.authenticated) {
-        this.shareMessage(s, scene);
+      this.value = {
+        ...{ extra: { scene: channel.scene } }, 
+        type:channel.type, 
+        ...this.value 
+      };
+      if (channel.share.authenticated) {
+        this.shareMessage(channel.share);
       } else {
-        s.authorize(shareMessage, function(e) {
+        channel.share.authorize(this.shareMessage, function(e) {
           Toast.fail("未进行认证");
           me.cancel();
         });
@@ -141,12 +155,12 @@ export default {
     },
     /**
      * 发送分享消息
-     * @param {plus.share.ShareService} s
+     * @param {plus.share.ShareService} share
      */
-    shareMessage(s, scene) {
+    shareMessage(share) {
       let me = this;
-      s.send(
-        { ...{ extra: { scene: scene } }, ...this.value },
+      share.send(
+        this.value,
         function() {
           Toast.success("分享成功！");
           me.cancel();
@@ -173,11 +187,25 @@ export default {
         clipboard.destroy();
         me.cancel();
       });
+    },
+    shorten(msg){
+      if(!msg || !msg.href)
+        return;
+      const {amsAccount:{memberId, agentNo}} = this.userInfo;
+      let url =  msg.href + (msg.href.includes("?")?"&":"?") + "recommenderId="+memberId+"&recommenderNo="+agentNo;
+      this.$http.post("api/shorturl", {
+        url:url
+      }).then(data =>{
+        this.value.href = data.info;
+      })
     }
   },
   watch: {
     show(newValue, oldValue) {
       this.showDialog = newValue;
+    },
+    value(newValue, oldValue){
+      this.shorten(newValue)
     }
   }
 };

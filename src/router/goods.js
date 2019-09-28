@@ -1,6 +1,6 @@
 export default [{
     name: 'goods',
-    path: '/goods/:pId/:pacId',
+    path: '/goods/:id',
     component: () => import('@/view/goods'),
     meta: {
         title: '商品详情',
