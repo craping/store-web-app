@@ -11,7 +11,7 @@
       <div class="content">
         <van-checkbox-group class="card-goods" v-model="checkedGoods">
           <van-checkbox
-            class="card-goods-item"
+            class="card-goods-item van-hairline--bottom"
             v-for="item in itemList"
             :key="item.id"
             :name="item.id"
@@ -21,11 +21,10 @@
             <cardItem :item="item">
               <van-stepper
                 slot="num-step"
-                :value="item.num"
+                :value="item.quantity"
+                integer
                 input-width="26px"
                 button-size="20px"
-                integer
-                async-change
                 @change="(val)=>onChangeNum(val,item)"
               />
             </cardItem>
@@ -34,7 +33,7 @@
       </div>
     </store-scroller>
     <van-submit-bar
-      v-show='!isOperate'
+      v-show="!isOperate"
       :style="{bottom:this.$route.meta.single?'0':'50px'}"
       :safe-area-inset-bottom="true"
       :price="totalPrice"
@@ -49,7 +48,7 @@
         @change="changeAll"
       >全选</van-checkbox>
     </van-submit-bar>
-    <div class="operate-bar" v-show='isOperate'>
+    <div class="operate-bar" v-show="isOperate">
       <van-checkbox
         icon-size="16px"
         checked-color="#ff4444"
@@ -57,7 +56,12 @@
         @change="changeAll"
       >全选</van-checkbox>
       <div class="white"></div>
-      <button class="btn" :disabled="!checkedGoods.length" :class="{'disable_btn':!checkedGoods.length}" @click="deleteItem">删除{{selectCount}}</button>
+      <button
+        class="btn"
+        :disabled="!checkedGoods.length"
+        :class="{'disable_btn':!checkedGoods.length}"
+        @click="deleteItem"
+      >删除{{selectCount}}</button>
     </div>
   </div>
 </template>
@@ -66,8 +70,8 @@
 import Vue from "vue";
 import storeScroller from "@/components/store-scroller";
 import cardItem from "./cartItem";
-
 import { Checkbox, CheckboxGroup, Stepper, SubmitBar, Toast } from "vant";
+import { mapActions, mapState } from "vuex";
 Vue.use(Checkbox)
   .use(CheckboxGroup)
   .use(Stepper)
@@ -82,76 +86,19 @@ export default {
   data() {
     return {
       isOperate: false,
-      checkedGoods: ["1", "2", "3"],
-      itemList: [
-        {
-          id: "1",
-          title: "进口香蕉",
-          desc: "约250g，2根",
-          price: 200,
-          num: 1,
-          thumb:
-            "https://img.yzcdn.cn/public_files/2017/10/24/2f9a36046449dafb8608e99990b3c205.jpeg"
-        },
-        {
-          id: "2",
-          title: "陕西蜜梨",
-          desc: "约600g",
-          price: 690,
-          num: 1,
-          thumb:
-            "https://img.yzcdn.cn/public_files/2017/10/24/f6aabd6ac5521195e01e8e89ee9fc63f.jpeg"
-        },
-        {
-          id: "3",
-          title: "美国伽力果",
-          desc: "约680g/3个",
-          price: 2680,
-          num: 1,
-          thumb:
-            "https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg"
-        },
-        {
-          id: "4",
-          title: "美国伽力果",
-          desc: "约680g/3个",
-          price: 2680,
-          num: 1,
-          thumb:
-            "https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg"
-        },
-        {
-          id: "5",
-          title: "美国伽力果",
-          desc: "约680g/3个",
-          price: 2680,
-          num: 1,
-          thumb:
-            "https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg"
-        },
-        {
-          id: "6",
-          title: "美国伽力果",
-          desc: "约680g/3个",
-          price: 2680,
-          num: 1,
-          thumb:
-            "https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg"
-        },
-        {
-          id: "7",
-          title: "美国伽力果",
-          desc: "约680g/3个",
-          price: 2680,
-          num: 1,
-          thumb:
-            "https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg"
-        }
-      ],
-      isSelectAll: false
+      quantity: 2,
+      checkedGoods: [],
+      isSelectAll: false,
+      timeout: null
     };
   },
+  mounted() {
+    // this.getCartList()
+  },
   computed: {
+    ...mapState({
+      itemList: state => state.cart.itemList || []
+    }),
     selectCount() {
       const count = this.checkedGoods.length;
       if (count == this.itemList.length && count != 0) {
@@ -166,7 +113,7 @@ export default {
         (total, item) =>
           total +
           (this.checkedGoods.indexOf(item.id) !== -1
-            ? item.price * item.num
+            ? item.price * item.quantity
             : 0),
         0
       );
@@ -174,16 +121,7 @@ export default {
   },
 
   methods: {
-    getCartList() {
-      this.$http
-        .get("/cartItem/getCartItemList", {})
-        .then(res => {
-          this.itemList = res.info || []
-        })
-        .catch((error) => {
-          Toast(error.message);
-        });
-    },
+    ...mapActions("cart", ["getCartList"]),
     changeOperate() {
       this.isOperate = !this.isOperate;
     },
@@ -200,36 +138,60 @@ export default {
       return (price / 100).toFixed(2);
     },
     onChangeNum(val, item) {
-      item.num = val;
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        const params = {
+          id: item.id,
+          quantity: val
+        };
+        this.$http
+          .post("/cartItem/updateQuantity", params)
+          .then(res => {
+          })
+          .catch(error => {
+            Toast(error.message);
+          });
+      }, 500);
     },
     onSubmit() {
-      Toast("点击结算");
+      let sku = []
+      this.itemList.forEach(element => {
+        if(this.checkedGoods.includes(element.id)){
+          sku.push(element)
+        }
+      });
+      // console.log('sku',sku)
+      this.$store.commit("order/SET_CONFIRM_ORDER_LIST", [sku]);
+      this.$router.push({
+        name: 'confirmOrder',
+        query: {
+          type: 'dir'
+        }
+      })
     },
-    deleteItem(){
-      const ids = this.checkedGoods.map(ele => ele.id).join(',')
+    deleteItem() {
       this.$http
-        .get("/cartItem/delete", {ids})
+        .post("/cartItem/delete", { ids: this.checkedGoods })
         .then(res => {
-          Toast('删除成功')
-          this.checkedGoods = []
-          this.getCartList()
+          Toast("删除成功");
+          this.checkedGoods = [];
+          this.getCartList();
         })
-        .catch((error) => {
+        .catch(error => {
           Toast(error.message);
-        });   
-
+        });
     },
     onRefresh(done) {
-      setTimeout(() => {
+      this.getCartList().finally(() => {
         if (done) done();
-      }, 300);
+      });
     },
     onScroll(top) {},
     onLoad(done) {
       if (done) done(true);
       this.loading = false;
       this.finished = true;
-    },
+    }
   }
 };
 </script>
@@ -275,10 +237,10 @@ export default {
   .content {
     padding-top: 86px;
     .card-goods {
-      padding: 0 10px;
       background-color: #fff;
       border-radius: 5px;
       overflow: hidden;
+      min-height: calc(100vh - 186px);
       /deep/ .van-card {
         background: transparent;
         width: 100%;
@@ -287,23 +249,20 @@ export default {
         width: 100%;
         flex: 1;
       }
-      &__item {
-        position: relative;
-        background-color: #fafafa;
-        .card-goods-item {
-          padding: 0 15px;
-        }
-        .van-checkbox__icon {
-          top: 50%;
-          left: 10px;
-          z-index: 1;
-          position: absolute;
-          margin-top: -10px;
-        }
 
-        .van-card__price {
-          color: #f44;
-        }
+      /deep/.card-goods-item {
+        padding: 0 10px;
+      }
+      .van-checkbox__icon {
+        top: 50%;
+        left: 10px;
+        z-index: 1;
+        position: absolute;
+        margin-top: -10px;
+      }
+
+      .van-card__price {
+        color: #f44;
       }
     }
   }
@@ -340,7 +299,7 @@ export default {
       line-height: 48px;
       font-size: 16px;
       text-align: center;
-      &.disable_btn{
+      &.disable_btn {
         opacity: 0.5;
       }
     }
