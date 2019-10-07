@@ -1,6 +1,6 @@
 <template>
   <div class="edit-check-page">
-    <van-nav-bar title="修改手机号" left-arrow @click-left="onClickLeft" />
+    <van-nav-bar :title="bindPhone?'更换手机号':'绑定手机号'" left-arrow @click-left="onClickLeft" />
     <div class="login-body">
       <van-cell-group>
         <van-field v-model="newmobile" clearable type="tel" label="新手机号"  placeholder="请输入新手机号"/>
@@ -9,16 +9,16 @@
             <span :class="{gray:countDownSecond >= 0}">{{codeText}}</span>
           </div>
         </van-field>
-        <div class="main-btn" @click="sureHandle">修改</div>
+        <div class="main-btn" @click="sureHandle">确定</div>
       </van-cell-group>
     </div>
   </div>
 </template>
 <script>
 import Vue from "vue";
-import { NavBar, Icon } from "vant";
-import { CellGroup, Field, Toast } from "vant";
-import { mapActions } from 'vuex';
+import { CellGroup, Field, Toast, NavBar, Icon } from "vant";
+import { mapState, mapActions } from 'vuex';
+
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
@@ -34,6 +34,11 @@ export default {
       codeTimer: null,
       isEyeClose: true,
     };
+  },
+  computed: {
+    ...mapState('user',{
+      bindPhone: state => state.bindPhone,
+    }),
   },
   destroyed() {
     clearInterval(this.codeTimer);
@@ -52,7 +57,7 @@ export default {
         verCode: this.verCode
       };
       this.$http
-        .post("/user/updataMobile ", params)
+        .post("/user/updataMobile", params)
         .then(res => {
             Toast("修改成功");
             this.getUserInfo()

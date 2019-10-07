@@ -11,8 +11,8 @@
           placeholder="请输入手机号码"
           left-icon="phone"
         />
-        <div class="main-btn" @click="checkMobile">下一步</div>
       </van-cell-group>
+      <div class="main-btn" @click="checkMobile">下一步</div>
     </div>
   </div>
 </template>

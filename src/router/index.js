@@ -1,4 +1,7 @@
 import Vue from 'vue';
+import { getToken } from '@/utils/auth'
+import store from '@/store';
+
 import Router from 'vue-router';
 
 import user from './user';
@@ -64,11 +67,18 @@ router.beforeEach((to, from, next) => {
     }
     if (to.query.shopId) {
         next();
-        return;
+        return
+    }
+    let redirectPath = ""
+    if(!getToken()) {
+        if(to.path == '/main/user' || to.path == '/main/cart') { 
+            redirectPath = '/login'
+            store.commit("user/SET_BEFOREPATH", from.path);
+        }
     }
     if (from.query.shopId) {
         next({
-            path: to.path,
+            path: redirectPath || to.path,
             query: {
                 ...to.query, 
                 shopId:from.query.shopId,
@@ -77,7 +87,11 @@ router.beforeEach((to, from, next) => {
             }
         })
     } else {
-        next()
+        if(redirectPath){
+            next(redirectPath)
+        }else{
+            next()
+        }
     }
 });
 

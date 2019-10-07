@@ -5,6 +5,7 @@
 </template>
 <script>
 import sync from "@/utils/sync";
+import { mapActions } from 'vuex';
 
 export default {
   data() {
@@ -16,10 +17,13 @@ export default {
     }).catch(error => {
       console.log(error)
     });
+    
+    this.getCartList()
   },
   mounted() {
   },
   methods: {
+    ...mapActions('cart',['getCartList']),
   }
 };
 </script>
