@@ -7,6 +7,8 @@ import bill from './modules/bill'
 import bankCard from './modules/bankCard'
 import order from './modules/order'
 import afterSale from './modules/afterSale'
+import cart from './modules/cart'
+import comments from './modules/comments'
 
 Vue.use(Vuex)
 
@@ -18,6 +20,8 @@ export default new Vuex.Store({
     bill,
     bankCard,
     order,
-    afterSale
+    afterSale,
+    cart,
+    comments
   }
 })

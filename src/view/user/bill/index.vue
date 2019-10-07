@@ -5,11 +5,12 @@
   <div class="bill-page">
     <van-nav-bar class="nav" title="账单" left-arrow @click-left="onClickLeft" fixed />
     <div class="content">
-      <van-sticky :offset-top="46" :z-index="101">
+      <van-sticky :offset-top="66" :z-index="101">
         <div class="top-bar-wrapper">
           <div
             id="filter-node"
             class="top-bar van-hairline--bottom"
+            :class="{isPup:filterShow}"
             @click="filterShow = !filterShow"
           >
             <span :class="{'exp':filterShow}">
@@ -18,43 +19,10 @@
               <van-icon v-show="filterShow" name="arrow-up" />
             </span>
           </div>
-          <div>
-            <div class="option-pop" v-show="filterShow">
-              <div class="item">
-                <div class="title">收支类型</div>
-                <div class="option-wrapper">
-                  <div
-                    class="option-item"
-                    v-for="(item,index) in typekList"
-                    :class="{'active':queryParams.inExType == item.id}"
-                    :key="index"
-                    @click="selectType(item)"
-                  >{{item.name}}</div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="title">快捷筛选</div>
-                <div class="option-wrapper">
-                  <div
-                    class="option-item"
-                    v-for="(item,index) in quickList"
-                    :class="{'active':queryParams.typeFilter == item.id}"
-                    :key="index"
-                    @click="selectQuik(item)"
-                  >{{item.name}}</div>
-                </div>
-              </div>
-              <div class="bottom-btn">
-                <div class="btn reset" @click="reset">重置</div>
-                <div class="btn" @click="queryHandle">确定</div>
-              </div>
-            </div>
-            <van-overlay :show="filterShow" @click="filterShow = false" z-index="10" />
-          </div>
         </div>
       </van-sticky>
       <div class="month-item" ref="monthItem" v-for="i in 2">
-        <van-sticky :offset-top="76" :container="container1[i-1]">
+        <van-sticky :offset-top="96" :container="container1[i-1]">
           <div class="info-bar">
             <div class="time" @click="dateSelectshow = true">
               2019年{{i}}月
@@ -80,34 +48,68 @@
           </div>
         </div>
       </div>
+      <van-popup v-model="filterShow" position="top" :get-container="getContainer" :style="{top: '96px'}">
+         <div>
+            <div class="option-pop" v-show="filterShow">
+              <div class="item">
+                <div class="title">收支类型</div>
+                <div class="option-wrapper">
+                  <div
+                    class="option-item"
+                    v-for="(item,index) in typekList"
+                    :class="{'active':queryParams.type == item.id}"
+                    :key="index"
+                    @click="selectType(item)"
+                  >{{item.name}}</div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="title">快捷筛选</div>
+                <div class="option-wrapper">
+                  <div
+                    class="option-item"
+                    v-for="(item,index) in quickList"
+                    :class="{'active':queryParams.srcType == item.id}"
+                    :key="index"
+                    @click="selectQuik(item)"
+                  >{{item.name}}</div>
+                </div>
+              </div>
+              <div class="bottom-btn">
+                <div class="btn reset" @click="reset">重置</div>
+                <div class="btn" @click="queryHandle">确定</div>
+              </div>
+            </div>
+          </div>
+      </van-popup>
       <van-popup v-model="dateSelectshow" position="bottom" :style="{ height: '50%' }">
         <div class="tool-bar">
           <div class="cancel" @click="dateSelectshow=false">取消</div>
           <div class="sure" @click="queryHandle">确定</div>
         </div>
-        <van-tabs v-model="dateType" color="#ff4444">
+        <van-tabs v-model="dateType" color="#ff4444" @change="changeDateType">
           <van-tab title="按月选择">
-            <van-datetime-picker
-              v-model="currentMonth"
-              type="year-month"
-              :show-toolbar="false"
-              @confirm="selectDate"
-              @cancel="dateSelectshow=false"
-            />
+            <van-datetime-picker v-model="currentMonth" type="year-month" :show-toolbar="false" />
           </van-tab>
           <van-tab title="按日选择">
             <div class="date-select-wrapper">
-              <div class="date-input" :class="{active:dateInputType==0}" @click="selectInput(0,'startDate')">{{startDate|| '开始日期'}}</div>
+              <div
+                class="date-input"
+                :class="{active:dateInputType==0}"
+                @click="selectInput(0,'startDate')"
+              >{{startDate|| '开始日期'}}</div>
               <span>至</span>
-              <div class="date-input" :class="{active:dateInputType==1}" @click="selectInput(1,'endDate')">{{endDate|| '结束日期'}}</div>
+              <div
+                class="date-input"
+                :class="{active:dateInputType==1}"
+                @click="selectInput(1,'endDate')"
+              >{{endDate|| '结束日期'}}</div>
             </div>
             <van-datetime-picker
               v-model="currentDate"
               type="date"
               :show-toolbar="false"
               @change="changeCurrentDate"
-              @confirm="selectDate"
-              @cancel="dateSelectshow=false"
             />
           </van-tab>
         </van-tabs>
@@ -151,7 +153,7 @@ export default {
       typekList: [
         {
           name: "全部分类",
-          id: 0
+          id: null
         },
         {
           name: "收入",
@@ -159,32 +161,43 @@ export default {
         },
         {
           name: "支出",
-          id: 2
+          id: 0
         }
       ],
       quickList: [
         {
           name: "全部分类",
-          id: 0
+          id: null
         },
         {
           name: "订单交易",
-          id: 1
-        },
-        {
-          name: "分销佣金",
-          id: 2
-        },
-        {
-          name: "直推佣金",
-          id: 3
+          id: "0_1"
         },
         {
           name: "提现申请",
-          id: 4
+          id: "0_2"
+        },
+        {
+          name: "购物返现",
+          id: "1_1"
+        },
+        {
+          name: "分销佣金",
+          id: "1_2"
+        },
+        {
+          name: "直推佣金",
+          id: "1_3"
+        },
+        {
+          name: "取消订单",
+          id: "1_4"
+        },
+        {
+          name: "售后退款",
+          id: "1_5"
         }
       ],
-      currentMonth: new Date(),
       currentDate: new Date(),
       startDate: "2019-09-02",
       endDate: "",
@@ -195,15 +208,27 @@ export default {
   mounted() {
     this.container1 = this.$refs.monthItem;
     window.scrollTo(0, 0);
-    this.queryBill();
+    // this.queryBill();
   },
   computed: {
     ...mapState({
       queryParams: state => state.queryParams,
       bills: state => state.bills
-    })
+    }),
+    currentMonth: {
+      get() {
+        return new Date(this.$store.state.bill.queryParams.date);
+      },
+      set(val) {
+        this.$store.commit("bill/SET_DATE", val);
+      }
+    },
+
   },
   methods: {
+    getContainer() {
+      return document.querySelector('.top-bar-wrapper');
+    },
     ...mapActions(["setQueryparams", "queryBill"]),
     onClickLeft() {
       this.$router.go(-1);
@@ -212,17 +237,16 @@ export default {
       this.$router.push(path);
     },
     selectType(item) {
-      this.setQueryparams({ inExType: item.id });
+      this.$store.commit("bill/SET_TYPE", item.id);
     },
     selectQuik(item) {
-      this.setQueryparams({ typeFilter: item.id });
-    },
-    selectDate(date) {
-      this.setQueryparams({ dateTime: date });
+      this.$store.commit("bill/SET_SRCTYPE", item.id);
     },
     reset() {
-      this.setQueryparams({ inExType: 0, typeFilter: 0 });
+      this.$store.commit("bill/SET_TYPE", null);
+      this.$store.commit("bill/SET_SRCTYPE", null);
     },
+    changeDateType(val) {},
     queryHandle() {
       this.queryBill()
         .then(() => {
@@ -238,18 +262,16 @@ export default {
       if (this[name]) {
         this.currentDate = new Date(this[name]);
       } else {
-        this.currentDate = new Date()
-        this[name] = this.formatTime(new Date())
+        this.currentDate = new Date();
+        this[name] = this.formatTime(new Date());
       }
     },
-    changeCurrentDate(picker){
-      let currentVal = picker.getValues().join('-')
-
-      if(this.dateInputType){
-        this.endDate = currentVal
-      }else{
-        this.startDate = currentVal
-
+    changeCurrentDate(picker) {
+      let currentVal = picker.getValues().join("-");
+      if (this.dateInputType) {
+        this.endDate = currentVal;
+      } else {
+        this.startDate = currentVal;
       }
     }
   }
@@ -258,7 +280,7 @@ export default {
 <style lang="scss" scoped>
 .bill-page {
   /deep/ .nav {
-    z-index: 1000 !important;
+    z-index: 3000 !important;
   }
   .content {
     padding-top: 66px;
@@ -275,6 +297,9 @@ export default {
       z-index: 20;
       .exp {
         color: $red;
+      }
+      &.isPup{
+        z-index: 3000;
       }
     }
     .option-pop {
@@ -299,8 +324,8 @@ export default {
         padding: 8px 0;
         width: 22%;
         text-align: center;
-        margin-right: 10px;
-        margin-bottom: 10px;
+        margin: 0 2% 2% 0;
+
         &.active {
           background: #ffeeee;
           color: $red;
@@ -401,7 +426,7 @@ export default {
       text-align: center;
       border-bottom: 1px solid #333;
       padding-bottom: 4px;
-      &.active{
+      &.active {
         border-bottom: 1px solid $red;
         color: $red;
       }

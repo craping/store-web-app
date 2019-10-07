@@ -1,14 +1,14 @@
 <template>
   <div class="cart-item">
     <div class="left-col">
-      <img :src="item.thumb" />
+      <img :src="item.pic" />
     </div>
     <div class="right-col">
-      <div class="title">{{item.title}}</div>
-      <div class="desc">{{item.desc}}</div>
+      <div class="title">{{item.name}}</div>
+      <div class="desc">{{formatAttr(item.productAttr)}}</div>
       <div class="price">￥{{formatPrice(item.price)}}</div>
       <div class="num-step" @click.stop="stop">
-          <slot name="num-step"></slot>
+        <slot name="num-step"></slot>
       </div>
     </div>
   </div>
@@ -25,8 +25,12 @@ export default {
     formatPrice(price) {
       return (price / 100).toFixed(2);
     },
-    stop(){
-        //防止冒泡
+    formatAttr(data) {
+      const attrArray = JSON.parse(data)
+      return attrArray.map(ele => ele.value).join(",") || '';
+    },
+    stop() {
+      //防止冒泡
     }
   }
 };
@@ -67,14 +71,14 @@ export default {
       white-space: nowrap;
       text-overflow: ellipsis;
     }
-    .price{
-        display: inline-block;
-    color: #f44;
-    font-weight: 500;
+    .price {
+      display: inline-block;
+      color: #f44;
+      font-weight: 500;
     }
-    .num-step{
-        position: absolute;
-        right: 0;
+    .num-step {
+      position: absolute;
+      right: 0;
     }
   }
 }
