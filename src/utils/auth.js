@@ -1,7 +1,7 @@
 const TokenKey = 'token'
 
 export function getToken() {
-  return '8821f40509ee4e6291f7b8df4a3c8092'
+  return '6ac042205f2f4223b1718e3db31420e4'
   // return localStorage.getItem(TokenKey)
 }
 

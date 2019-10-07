@@ -102,7 +102,7 @@
         title-class="title text-ellipsis"
         :title="goods.sku"
         :is-link="true"
-        @click="sku.show=true"
+        @click="showSku"
       >
         <template v-slot:icon class="title">规格：</template>
       </van-cell>
@@ -193,8 +193,8 @@
         </van-goods-action-button>
       </template>
       <template v-else>
-        <van-goods-action-button type="warning" @click="sku.show=true">加入购物车</van-goods-action-button>
-        <van-goods-action-button type="danger" @click="sku.show=true">立即购买</van-goods-action-button>
+        <van-goods-action-button type="warning" @click="showSku">加入购物车</van-goods-action-button>
+        <van-goods-action-button type="danger" @click="showSku">立即购买</van-goods-action-button>
       </template>
     </van-goods-action>
 
@@ -206,7 +206,7 @@
       <div class="service-content popup-content">
         <div class="title">服务说明</div>
         <div class="item-wrapper">
-          <div class="item" v-for="i in 5">
+          <div class="item" v-for="i in 5" :key="i">
             <div class="left">
               <van-icon name="certificate" color="#f44"/>
             </div>
@@ -223,7 +223,7 @@
       <div class="params-content popup-content">
         <div class="title">产品参数</div>
         <div class="item-wrapper">
-          <div class="item van-hairline--bottom" v-for="i in 5">
+          <div class="item van-hairline--bottom" v-for="i in 5" :key="i">
             <div class="left">型号</div>
             <div class="right">Eu22923</div>
           </div>
@@ -291,11 +291,12 @@ export default {
   computed: {
     ...mapState({
       userInfo: state => state.user.userInfo,
+      isLogin: state => state.user.isLogin,
       shareEnable(state){
-        return /* state.user.client == 1 &&  */state.user.isLogin;
+        return state.user.client == 1 &&  state.user.isLogin;
       },
       vipEnable(state){
-        return /* state.user.client == 1 &&  */state.user.isVip && state.user.vipEnable;
+        return state.user.client == 1 &&  state.user.isVip && state.user.vipEnable;
       }
     }),
     commission: function(){
@@ -558,6 +559,10 @@ export default {
     },
 
     onClickCart() {
+      if(!this.isLogin){
+        Toast('用户未登录')
+        return
+      }
       this.$router.push('/cart')
     },
 
@@ -578,6 +583,13 @@ export default {
       this.preImage = ['https://img.yzcdn.cn/vant/apple-1.jpg']
       this.prePicShow = true
     },
+    showSku(){
+      if(!this.isLogin){
+        Toast('用户未登录')
+        return;
+      }
+      this.sku.show = true;
+    },
     /********点击立即购买去到确认订单中心******/
     buy(skuData) {
       const sku = {
@@ -585,6 +597,7 @@ export default {
         num:skuData.selectedNum,
         recommenderId:this.recommenderId
       };
+      console.log(sku);
       this.$store.commit("order/SET_CONFIRM_ORDER_LIST", [sku]);
       this.$router.push({
         name: 'confirmOrder',

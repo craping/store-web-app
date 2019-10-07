@@ -41,7 +41,7 @@ export default {
           return
         }
         request
-          .get('user/getUserInfo', {})
+          .post('user/getUserInfo', {})
           .then(data => {
             commit('SET_USERINFO', data.info)
             resolve(data)
