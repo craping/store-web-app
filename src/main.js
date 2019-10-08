@@ -17,6 +17,7 @@ var onPlusReady = function (callback, context = this) {
     document.addEventListener('plusready', callback.bind(context));
   }
 };
+
 Vue.mixin({
   beforeCreate: function () {
     onPlusReady(function () {

@@ -19,10 +19,12 @@ service.interceptors.request.use(
       config.params = { ...{ format: 'json', token: getToken() }, ...config.params }
     }
 
-    if (!config.data) {
-      config.data = { format: 'json', token: getToken() }
-    } else {
-      config.data = { ...{ format: 'json', token: getToken() }, ...config.data }
+    if(config.headers["Content-Type"].includes("application/json")){
+      if (!config.data) {
+        config.data = { format: 'json', token: getToken() }
+      } else {
+        config.data = { ...{ format: 'json', token: getToken() }, ...config.data }
+      }
     }
     return config
   },

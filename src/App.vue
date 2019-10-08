@@ -5,6 +5,7 @@
 </template>
 <script>
 import sync from "@/utils/sync";
+import service from "@/utils/service";
 
 export default {
   data() {
@@ -12,12 +13,14 @@ export default {
   },
   created() {
     this.$store.dispatch("user/getUserInfo").then(data => {
-      sync.connect();
+      // sync.connect();
+      // service.init(data.info);
     }).catch(error => {
       console.log(error)
     });
   },
   mounted() {
+    
   },
   methods: {
   }

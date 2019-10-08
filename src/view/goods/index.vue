@@ -132,7 +132,6 @@
     </van-cell-group>
 
     <store-share v-if="shareEnable" v-model="share.msg" :show="share.show" @cancel="share.show=false"></store-share>
-
     <van-sku
       ref="sku"
       v-model="sku.show"
@@ -176,7 +175,7 @@
     </van-sku>
 
     <van-goods-action>
-      <van-goods-action-icon icon="chat-o" @click="sorry">客服</van-goods-action-icon>
+      <van-goods-action-icon icon="chat-o" @click="openService" info="5">客服</van-goods-action-icon>
       <van-goods-action-icon icon="cart-o" @click="onClickCart">购物车</van-goods-action-icon>
       <template v-if="vipEnable">
         <van-goods-action-button type="warning" @click="sku.show=true">
@@ -232,6 +231,7 @@
       </div>
     </van-popup>
     <van-image-preview v-model="prePicShow" :images="preImage" :show-index="false"></van-image-preview>
+    <store-service :value.sync="showService"></store-service>
   </div>
 </template>
 
@@ -257,15 +257,18 @@ import {
 } from 'vant'
 import storeNavBar from '@/components/store-nav-bar'
 import storeShare from '@/components/store-share'
+import storeService from '@/components/store-service'
+
 import judgeSheet from './judgeSheet'
 import { PrefixInteger } from '@/utils/util'
+import service from "@/utils/service";
 import Big from 'big.js'
 import Vue from 'vue'
 import { mapState } from 'vuex'
 import sync from "@/utils/sync";
 
 Vue.use(ImagePreview)
-const service = ['', '7天退换', '正品保障', '免费包邮']
+const serviceItems = ['', '7天退换', '正品保障', '免费包邮']
 export default {
   components: {
     [Tag.name]: Tag,
@@ -286,6 +289,7 @@ export default {
     [Button.name]: Button,
     storeNavBar,
     storeShare,
+    storeService,
     judgeSheet
   },
   computed: {
@@ -359,6 +363,7 @@ export default {
         show: false
       },
       comments: [],
+      showService:false,
       showJudgeSheet: false,
       prePicShow: false,
       preImage: [],
@@ -399,7 +404,7 @@ export default {
           product.maxPrice = skus[skus.length - 1].price
         }
         product.serviceIds.split(',').forEach(e => {
-          product.service += service[parseInt(e)] + ' '
+          product.service += serviceItems[parseInt(e)] + ' '
         })
         this.goods = product
         //参数初始化
@@ -450,8 +455,10 @@ export default {
           title:product.title,
           content:product.subTitle,
           thumbs:[product.pic],
-          href:"http://localhost:9090/#/goods/"+product.id+"?shopId="+product.id
+          href:process.env.VUE_APP_SHARE+product.id+"?shopId="+product.id
         }
+        //初始化客服商品内容
+        service.product(product);
         this.comments = comments
       })
   },
@@ -550,7 +557,7 @@ export default {
       })
     },
     formatPrice(minPrice, maxPrice) {
-      if (!minPrice) return ''
+      // if (!minPrice) return ''
       return (
         '¥' +
         new Big(minPrice).toFixed(2) +
@@ -644,6 +651,25 @@ export default {
         else
           this.sku.maxCommission = null;
       }
+    },
+    openService(){
+      let me = this;
+      if(!this.isLogin){
+        Toast('用户未登录')
+        return;
+      }
+      const { umsMember} = this.userInfo;
+      // ysf('product', {
+      //     show: 1,
+      //     title: me.goods.title,
+      //     desc: me.goods.subTitle,
+      //     picture: me.goods.pic,
+      //     note: me.formatPrice(me.goods.price),
+      //     url: process.env.VUE_APP_SHARE+me.goods.id,
+      //     sendByUser: umsMember.id
+      // });
+      // ysf('open');
+      this.showService = true;
     }
   }
 }
