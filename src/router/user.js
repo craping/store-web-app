@@ -62,7 +62,10 @@ export default [{
   path: '/inputsms',
   component: () => import('@/view/user/login/mobileLogin/inputsms.vue')
 },
-
+{
+  path: '/bindAgentNo',
+  component: () => import('@/view/user/login/bindAgentNo.vue')
+},
 {
   path: '/register',
   component: () => import('@/view/user/login/register.vue')

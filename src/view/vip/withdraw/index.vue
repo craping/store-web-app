@@ -6,10 +6,12 @@
     <van-nav-bar title="提现" left-arrow @click-left="onClickLeft" />
     <div class="bank-bar" @click="jumpLink('bankCard',{from:'choose'})">
       <div class="col-left">
-        <img class="bank-icon" src />
-        <div class="col-mid">
-          <div class="title">招商银行</div>
-          <div class="info">尾号1223 快捷</div>
+        <div class="col-mid" v-if="currentCard.id">
+          <div class="title">{{currentCard.bankName}}</div>
+          <div class="info">尾号{{currentCard.bankCardNumber.slice(-4)}}</div>
+        </div>
+        <div class="col-mid" v-else>
+          <div class="title">请选择</div>
         </div>
       </div>
       <div>
@@ -23,39 +25,63 @@
         <input type="text" v-model="money" :maxlength="10" />
       </div>
       <div class="bottom-bar">
-        <div class="can-use">可用余额 {{balance}}元</div>
+        <div class="can-use">可用余额 {{amsAccount.balance}}元</div>
         <div class="btn-text" @click="getAll">全部提现</div>
       </div>
     </div>
-    <div class="btn" :class="{'disable':!money}" @click="sureHandle">立即到账，确认提现</div>
+    <div class="btn" :class="{'disable':!canApply}" @click="sureHandle">提交申请，确认提现</div>
   </div>
 </template>
 <script>
 import Vue from "vue";
-import { NavBar, Icon, Field } from "vant";
+import { NavBar, Icon, Field, Toast } from "vant";
+import { mapState } from "vuex";
+
 Vue.use(Field)
   .use(NavBar)
+  .use(Toast)
   .use(Icon);
 export default {
   data() {
     return {
-      money: "",
-      balance: "12.3"
+      money: ""
     };
+  },
+  computed: {
+    ...mapState("user", {
+      amsAccount: state => state.userInfo.amsAccount || {}
+    }),
+    ...mapState("bankCard", {
+      currentCard: state => state.currentCard
+    }),
+    canApply() {
+      return this.money && this.currentCard.id;
+    }
   },
   methods: {
     onClickLeft() {
       this.$router.go(-1);
     },
     getAll() {
-      this.money = this.balance;
+      this.money = this.amsAccount.balance;
     },
     jumpLink(path, query) {
       this.$router.push({ path, query });
     },
     sureHandle() {
-      if (money) {
-      }
+      if (!this.canApply) return;
+      const params = {
+        bankCardId: currentCard.id,
+        amount: money
+      };
+      this.$http
+        .post("/user/withdraw", params)
+        .then(res => {
+          Toast("提交申请成功");
+        })
+        .catch(error => {
+          Toast(error.message);
+        });
     }
   }
 };

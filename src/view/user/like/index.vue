@@ -44,41 +44,49 @@ export default {
   },
 
   created() {
-    this.$store.dispatch("home/content");
+    this.getLikeList();
   },
   methods: {
     onClickLeft() {
       this.$router.go(-1);
     },
     getLikeList() {
-      this.$http
-        .get("/collec/getProductList", {})
-        .then(res => {
-          this.likeList = res.data || {};
-        })
-        .catch(error => {});
+      return new Promise((resolve, reject) => {
+        this.$http
+          .post("/collec/getProductList", {})
+          .then(res => {
+            this.likeList = res.info || [];
+            resolve();
+          })
+          .catch(error => {
+            Toast(error.message);
+            reject();
+          });
+      });
     },
     jumpLink(path) {
       this.$router.push(path);
     },
     onRefresh(done) {
-      setTimeout(() => {
+      this.getLikeList().finally(() => {
         if (done) done();
-      }, 300);
+      });
     },
     onLoad(done) {
       if (done) done(true);
     },
     toDetail(item) {
-      console.log("todetail");
+      this.$router.push({name:'goods',params:{id:item.id}})
     },
     cancelLike(item) {
       this.$http
-        .post("/collec/deleteProduct", {id:item.itemId})
+        .post("/collec/deleteProduct", { id: item.itemId })
         .then(res => {
-
+          Toast('删除成功');
         })
-        .catch(error => {});
+        .catch(error => {
+          Toast(error.message);
+        });
     }
   }
 };

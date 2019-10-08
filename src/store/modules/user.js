@@ -15,6 +15,8 @@ export default {
     vipEnable: true,
     // 绑定的手机号
     bindPhone: '',
+    // 登录前的路由地址
+    beforePath: '/main/home'
   },
   getters: {
     bindPhoneStr: state => {
@@ -31,7 +33,10 @@ export default {
     SET_SAFE(state, safe) {
       console.log("invoke SET_SAFE:"+safe)
       state.isSafe = safe;
-    }
+    },
+    SET_BEFOREPATH(state, data) {
+      state.beforePath = data
+    },
   },
   actions: {
     getUserInfo({ commit }) {
@@ -50,6 +55,6 @@ export default {
             reject(error)
           })
       })
-    }
+    },
   }
 }

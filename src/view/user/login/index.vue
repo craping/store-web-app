@@ -30,11 +30,11 @@ import Vue from "vue";
 import { NavBar, Icon } from "vant";
 import { setToken } from "@/utils/auth";
 import { CellGroup, Field, Toast } from "vant";
+import { mapState } from 'vuex';
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
   .use(NavBar);
-const aweixin = null;
 export default {
   data() {
     return {};
@@ -44,15 +44,17 @@ export default {
       this.initWeChatService();
     });
   },
+  computed: {
+    ...mapState('user',{
+      beforePath: state => state.beforePath,
+    })
+  },
   methods: {
     onClickLeft() {
       this.$router.go(-1);
     },
     jumpLink(path) {
       this.$router.push(path);
-    },
-    toHome() {
-      this.$router.push("/main/home");
     },
     initWeChatService() {
       if (window.aweixin) return;
@@ -75,17 +77,23 @@ export default {
         if (!window.aweixin.authResult) {
           window.aweixin.authorize(
             e => {
-              // Toast("e.code+:" + e.code); //app端获取到的code
+              // alert("e.code+:" + e.code); //app端获取到的code
+              // if(this.)
               this.$http
-                .post("/wxLogin/Login", { code: e.code })
+                .post("/wx/Login", { code: e.code })
                 .then(res => {
-                  // userName 不存在就是未注册
-                  if (!res.info.umsMember.userName) {
-                    this.jumpLink("register");
-                  }
+                  // console.log("e.code+:" + e.code); //app端获取到的code
+                  // console.log(JSON.stringify(res))
+                  setToken(res.info.token);
+                  this.$store.commit('user/SET_USERINFO',res.info)
+                  this.$router.push(this.beforePath)
                 })
                 .catch(error => {
-                  Toast(error.message);
+                  if (error.code= -1){
+                    this.$router.push("/home");
+                  } else {
+                    Toast(error.message);
+                  }
                 });
             },
             function(e) {

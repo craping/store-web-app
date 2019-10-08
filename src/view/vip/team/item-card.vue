@@ -1,5 +1,5 @@
 <template>
-  <div class="team-card van-hairline--bottom" @click="toNext">
+  <div class="team-card van-hairline--bottom">
     <div class="left-col">
       <div class="head-img">
         <img src />
@@ -35,9 +35,7 @@ export default {
       }
   },
   methods: {
-      toNext(){
-          this.$emit('toNext')
-      }
+
   }
 };
 </script>

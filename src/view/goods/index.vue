@@ -108,9 +108,9 @@
       </van-cell>
     </van-cell-group>
 
-    <van-cell-group class="goods-cell-group" ref="comment" @click="showJudge">
+    <van-cell-group  class="goods-cell-group" ref="comment" @click="showJudge">
       <div class="judge-top van-hairline--bottom">
-        <div>商品评价(1111)</div>
+        <div>商品评价({{commentsTotalnum}})</div>
         <div class="right">
           查看全部
           <van-icon name="arrow" color="#f44"/>
@@ -198,7 +198,7 @@
     </van-goods-action>
 
     <van-popup class="judge-popup" v-model="showJudgeSheet" position="right">
-      <judge-sheet @showPre="showPre"></judge-sheet>
+      <comments @showPre="showPre"></comments>
     </van-popup>
 
     <van-popup class="bottom-popup" v-model="showServiceSheet" position="bottom">
@@ -258,13 +258,12 @@ import {
 import storeNavBar from '@/components/store-nav-bar'
 import storeShare from '@/components/store-share'
 import storeService from '@/components/store-service'
-
-import judgeSheet from './judgeSheet'
+import comments from './comments'
 import { PrefixInteger } from '@/utils/util'
 import service from "@/utils/service";
 import Big from 'big.js'
 import Vue from 'vue'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import sync from "@/utils/sync";
 
 Vue.use(ImagePreview)
@@ -290,12 +289,15 @@ export default {
     storeNavBar,
     storeShare,
     storeService,
-    judgeSheet
+    judgeSheet,
+    comments
   },
   computed: {
     ...mapState({
       userInfo: state => state.user.userInfo,
       isLogin: state => state.user.isLogin,
+      commentList: state => state.comments.commentList,
+      commentsTotalnum: state => state.comments.commentsTotalnum,
       shareEnable(state){
         return state.user.client == 1 &&  state.user.isLogin;
       },
@@ -461,6 +463,12 @@ export default {
         service.product(product);
         this.comments = comments
       })
+
+    this.queryComments({
+      id: this.$route.params.id,
+      pageNum: 1,
+      pageSize: 10
+    })
   },
   mounted() {
     window.addEventListener('scroll', this.handleScroll, true)
@@ -469,6 +477,7 @@ export default {
     window.removeEventListener('scroll', this.handleScroll, true)
   },
   methods: {
+    ...mapActions('comments',['queryComments']),
     handleScroll(e) {
       const scrollTop =
         window.pageYOffset ||
@@ -513,7 +522,6 @@ export default {
       }, 500)
     },
     left(e) {
-      console.log('ss', this.showJudgeSheet)
       if (this.showJudgeSheet) {
         this.showJudgeSheet = false
         const scrollTop =
@@ -566,11 +574,7 @@ export default {
     },
 
     onClickCart() {
-      if(!this.isLogin){
-        Toast('用户未登录')
-        return
-      }
-      this.$router.push('/cart')
+      this.$router.push('/main/cart')
     },
 
     sorry() {
@@ -619,6 +623,7 @@ export default {
         num:skuData.selectedNum,
         recommenderId:this.recommenderId
       };
+      // console.log(sku)
       this.$http.post("cartItem/addCart", {
         productSkuId:sku.id,
         quantity:sku.num,
@@ -627,8 +632,9 @@ export default {
       }).then(data => {
         Toast.success('添加成功');
         this.sku.show = false;
-      })
-      console.log(sku)
+      }).catch(error => {
+        Toast(error.message);
+      });
     },
     skuSelected({skuValue, selectedSku, selectedSkuComb}){
       // console.log(skuValue)
@@ -821,7 +827,7 @@ export default {
     min-height: 100px;
     padding: 15px;
     &.inPopup {
-      margin: 10px;
+      margin: 10px 0;
       border-radius: 4px;
       overflow: hidden;
       background: #fff;
@@ -870,7 +876,7 @@ export default {
   .judge-popup {
     height: 100%;
     width: 100%;
-    padding-top: 76px;
+    padding-top: 66px;
     background: #f2f2f2;
   }
   .bottom-popup {
