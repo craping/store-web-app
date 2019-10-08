@@ -9,6 +9,7 @@ import order from './modules/order'
 import afterSale from './modules/afterSale'
 import cart from './modules/cart'
 import comments from './modules/comments'
+import sys from './modules/sys'
 
 Vue.use(Vuex)
 
@@ -22,6 +23,7 @@ export default new Vuex.Store({
     order,
     afterSale,
     cart,
-    comments
+    comments,
+    sys
   }
 })

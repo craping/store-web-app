@@ -31,7 +31,7 @@
     </div>
     <div class="commentPicture">
       <div class="title">上传图片</div>
-      <van-uploader v-model="fileList" :before-read="beforeRead" accept="*" multiple :max-count="3"/>
+      <van-uploader v-model="fileList" :before-read="beforeRead" multiple :max-count="3"/>
     </div>
     <div class="confirm">
       <van-button type="danger" size="large" @click="doSubmit">提交</van-button>

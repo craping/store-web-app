@@ -5,9 +5,17 @@ export default {
   state: {
     itemList: []
   },
+  getters: {
+    cartNum: state => {
+      return state.itemList.length?state.itemList.length:"";
+    }
+  },
   mutations: {
     SET_CARTLIST(state, data) {
       state.itemList = data
+    },
+    ADD_CARTLIST(state, item) {
+      state.itemList.push(item);
     }
   },
   actions: {

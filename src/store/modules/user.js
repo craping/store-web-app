@@ -5,18 +5,15 @@ import { getClient } from '@/utils/util'
 export default {
   namespaced: true,
   state: {
-    client: getClient(),
     userInfo: {},
     // 用户是否登录
     isLogin: false,
     // 用户是否是会员
     isVip: false,
-    // 是否开启会员模块
-    vipEnable: true,
     // 绑定的手机号
     bindPhone: '',
     // 登录前的路由地址
-    beforePath: '/main/home'
+    beforePath: '/main/home',
   },
   getters: {
     bindPhoneStr: state => {
@@ -30,13 +27,9 @@ export default {
       state.isLogin = true
       state.isVip = userInfo.amsAccount.orders > 0;
     },
-    SET_SAFE(state, safe) {
-      console.log("invoke SET_SAFE:"+safe)
-      state.isSafe = safe;
-    },
     SET_BEFOREPATH(state, data) {
       state.beforePath = data
-    },
+    }
   },
   actions: {
     getUserInfo({ commit }) {

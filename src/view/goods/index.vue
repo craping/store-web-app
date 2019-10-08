@@ -175,8 +175,8 @@
     </van-sku>
 
     <van-goods-action>
-      <van-goods-action-icon icon="chat-o" @click="openService" info="5">客服</van-goods-action-icon>
-      <van-goods-action-icon icon="cart-o" @click="onClickCart">购物车</van-goods-action-icon>
+      <van-goods-action-icon icon="chat-o" @click="openService" :info="unread">客服</van-goods-action-icon>
+      <van-goods-action-icon icon="cart-o" @click="onClickCart" :info="cartNum">购物车</van-goods-action-icon>
       <template v-if="vipEnable">
         <van-goods-action-button type="warning" @click="sku.show=true">
           <div style="line-height:normal">
@@ -197,7 +197,7 @@
       </template>
     </van-goods-action>
 
-    <van-popup class="judge-popup" v-model="showJudgeSheet" position="right">
+    <van-popup class="judge-popup" :zIndex="2000" v-model="showJudgeSheet" position="right">
       <comments @showPre="showPre"></comments>
     </van-popup>
 
@@ -263,7 +263,7 @@ import { PrefixInteger } from '@/utils/util'
 import service from "@/utils/service";
 import Big from 'big.js'
 import Vue from 'vue'
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import sync from "@/utils/sync";
 
 Vue.use(ImagePreview)
@@ -289,7 +289,6 @@ export default {
     storeNavBar,
     storeShare,
     storeService,
-    judgeSheet,
     comments
   },
   computed: {
@@ -298,13 +297,10 @@ export default {
       isLogin: state => state.user.isLogin,
       commentList: state => state.comments.commentList,
       commentsTotalnum: state => state.comments.commentsTotalnum,
-      shareEnable(state){
-        return state.user.client == 1 &&  state.user.isLogin;
-      },
-      vipEnable(state){
-        return state.user.client == 1 &&  state.user.isVip && state.user.vipEnable;
-      }
+      unread: state => state.sys.unread
     }),
+    ...mapGetters("cart", ["cartNum"]),
+    ...mapGetters("sys", ["shareEnable", "vipEnable"]),
     commission: function(){
       return this.formatPrice(this.goods.commission, this.goods.maxCommission);
     },
@@ -565,7 +561,7 @@ export default {
       })
     },
     formatPrice(minPrice, maxPrice) {
-      // if (!minPrice) return ''
+      if (!minPrice) return ''
       return (
         '¥' +
         new Big(minPrice).toFixed(2) +
@@ -632,6 +628,7 @@ export default {
       }).then(data => {
         Toast.success('添加成功');
         this.sku.show = false;
+        this.$store.dispatch("cart/getCartList");
       }).catch(error => {
         Toast(error.message);
       });

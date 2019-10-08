@@ -13,9 +13,14 @@ export default {
     return {};
   },
   created() {
-    this.$store.dispatch("user/getUserInfo").then(data => {
-      // sync.connect();
-      // service.init(data.info);
+    // 初始化APP配置信息
+    this.getSysConfig().then(data => {
+      console.log(data.info)
+    });
+    // 初始化获取用户信息
+    this.getUserInfo().then(data => {
+      sync.connect();
+      service.init(data.info);
     }).catch(error => {
       console.log(error)
     });
@@ -27,6 +32,8 @@ export default {
   },
   methods: {
     ...mapActions('cart',['getCartList']),
+    ...mapActions('sys',['getSysConfig']),
+    ...mapActions('user',['getUserInfo'])
   }
 };
 </script>

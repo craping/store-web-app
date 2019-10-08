@@ -1,8 +1,8 @@
 import { format } from '@/utils/util'
 import Big from 'big.js'
+import store from '@/store';
 
 const Service = {
-    
     init(userinfo) {
         // (function (w, d, n, a, j) {
         //     w[n] = w[n] || function () {
@@ -27,7 +27,7 @@ const Service = {
                 { "index": 1, "key": "sex", "label": "性别", "value": sex[umsMember.gender] },
                 { "index": 5, "key": "reg_date", "label": "注册日期", "value": format(umsMember.createTime, "yyyy-MM-dd") }
             ]),
-            level: amsAccount.orders,
+            level: amsAccount.id,
             success: function(){
                 console.log("用户信息配置成功")
             },
@@ -36,8 +36,9 @@ const Service = {
             }
         });
 
-        ysf('onunread', function(data) {
+        ysf('onunread', (data) => {
             console.log(data);
+            store.commit("sys/SET_UNREAD", data.total?data.total:"");
         });
     },
     product(goods){
