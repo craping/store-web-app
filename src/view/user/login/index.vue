@@ -30,7 +30,7 @@ import Vue from "vue";
 import { NavBar, Icon } from "vant";
 import { setToken } from "@/utils/auth";
 import { CellGroup, Field, Toast } from "vant";
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
@@ -50,6 +50,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions('user',['getUserInfo']),
     onClickLeft() {
       this.$router.go(-1);
     },
@@ -77,27 +78,27 @@ export default {
         if (!window.aweixin.authResult) {
           window.aweixin.authorize(
             e => {
-              // alert("e.code+:" + e.code); //app端获取到的code
-              // if(this.)
               this.$http
                 .post("/wx/Login", { code: e.code })
                 .then(res => {
-                  // console.log("e.code+:" + e.code); //app端获取到的code
-                  // console.log(JSON.stringify(res))
+                  console.log("e.code+:" + e.code); //app端获取到的code
+                  console.log(JSON.stringify(res))
+                  console.log('token+:'+res.info.token)
                   setToken(res.info.token);
-                  this.$store.commit('user/SET_USERINFO',res.info)
+                  this.getUserInfo()
+                  // this.$store.commit('user/SET_USERINFO',res.info)
                   this.$router.push(this.beforePath)
                 })
                 .catch(error => {
                   if (error.code= -1){
-                    this.$router.push("/home");
+                    this.$router.push("/bindAgentNo");
                   } else {
                     Toast(error.message);
                   }
                 });
             },
             function(e) {
-              alert("微信授权失败" + JSON.stringify(e));
+              Toast("微信授权失败" + JSON.stringify(e));
             }
           );
         }

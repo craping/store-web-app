@@ -60,7 +60,7 @@ export default {
         .post("/user/updataMobile", params)
         .then(res => {
             Toast("修改成功");
-            this.getUserInfo()
+            this.$store.commit('user/SET_PHONE',this.newMobile)
             this.$router.go(-2);
         })
         .catch(error => {

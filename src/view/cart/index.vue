@@ -93,7 +93,7 @@ export default {
     };
   },
   mounted() {
-    // this.getCartList()
+    this.getCartList()
   },
   computed: {
     ...mapState({

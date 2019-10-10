@@ -19,28 +19,22 @@
 <script>
 import Vue from "vue";
 import { NavBar, Cell, CellGroup } from "vant";
+import { mapActions } from 'vuex';
 Vue.use(Cell)
   .use(CellGroup)
   .use(NavBar);
 export default {
   mounted() {
-    this.getAbout();
+    this.getSysConfig();
   },
   methods: {
+    ...mapActions('sys',['getSysConfig']),
     onClickLeft() {
       this.$router.go(-1);
     },
     jumpLink(title) {
       this.$router.push({ path: "about-detail", query: { title } });
     },
-    getAbout() {
-      this.$http
-        .post("/config/getSystemConfigInfo", {})
-        .then(res => {})
-        .catch(error => {
-          Toast(error.message);
-        });
-    }
   }
 };
 </script>
