@@ -3,7 +3,7 @@
     <van-nav-bar title="验证" left-arrow @click-left="onClickLeft" />
     <div class="login-body">
       <van-cell-group>
-        <van-field :value="bindPhoneStr" clearable label="原手机号" disabled />
+        <van-field :value="bindPhoneStr" clearable label="手机号" disabled />
         <van-field v-model="verCode" clearable label="短信验证码" placeholder="请输入短信验证码">
           <div class="code-operate" slot="button" @click="getCode">
             <span :class="{gray:countDownSecond >= 0}">{{codeText}}</span>
@@ -31,7 +31,6 @@ export default {
       codeText: "获取验证码",
       countDownSecond: -1,
       codeTimer: null,
-      isEyeClose: true,
       mode: this.$route.query.mode
     };
   },
@@ -50,9 +49,6 @@ export default {
     },
     jumpLink(path) {
       this.$router.push(path);
-    },
-    changeShow() {
-      this.isEyeClose = !this.isEyeClose;
     },
     sureHandle() {
       if (!this.verCode) {
