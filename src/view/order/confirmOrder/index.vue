@@ -27,17 +27,25 @@
       <div class="orderSpec">
         <div class="order-item" v-for="item in confirmOrderList" :key="item.id">
           <van-card
-            :num="item.num"
+            :num="item.quantity || item.num"
             :price="item.price"
-            :desc="item.subTitle"
+            :desc="item.subTitle || item.name"
             :title="item.title"
             :thumb="item.pic"
           >
-            <div slot="tags">
+            <div slot="tags" v-if="$route.query.type == 'dir' ">
               <van-tag
                 plain
                 type="danger"
                 v-for="item in item.productAttr"
+                :key="item.key"
+              >{{item.key}}:{{item.value}}</van-tag>
+            </div>
+            <div slot="tags" v-else>
+              <van-tag
+                plain
+                type="danger"
+                v-for="item in JSON.parse(item.productAttr)"
                 :key="item.key"
               >{{item.key}}:{{item.value}}</van-tag>
             </div>
@@ -87,7 +95,6 @@ Vue.use(NavBar)
   .use(TabbarItem)
   .use(Dialog)
 
-let channel = null
 export default {
   name: 'confirmOrder',
   components: {
@@ -102,7 +109,11 @@ export default {
         name: '',
         tel: '',
         address: ''
-      } //默认显示地址
+      }, //默认显示地址
+      payParamsObj: {}, //传给自己后台支付接口的数据
+      channel: null,
+      aliChannel: null,
+      wxChannel: null
     }
   },
   computed: {
@@ -159,21 +170,53 @@ export default {
         return
       }
       const { confirmOrderList } = this
-      const params = {
-        skuIds: [confirmOrderList[0].id],
+      let temSkuids = []
+      if (this.$route.query.type == 'dir') {
+        temSkuids = [confirmOrderList[0].id]
+      } else {
+        temSkuids = confirmOrderList.map(item => {
+          return item.skuId
+        })
+      }
+      let params = {
+        skuIds: temSkuids,
         addressId: this.addressInfo.id,
         type: this.$route.query.type,
         // sourceType: this.platform,
-        sourceType: 1,
-        quantity: confirmOrderList[0].num,
-        productAttr: confirmOrderList[0].productAttr,
-        note: '备注'
-        // recommenderId: confirmOrderList[0].recommenderId || '0'
+        sourceType: 1
       }
+      if (this.$route.query.type == 'dir') {
+        params = {
+          ...params,
+          quantity: confirmOrderList[0].num,
+          productAttr: confirmOrderList[0].productAttr,
+          note: '备注'
+        }
+        if (confirmOrderList[0].recommenderId) {
+          params = {
+            ...params,
+            recommenderId: confirmOrderList[0].recommenderId
+          }
+        }
+      }
+      // const params = {
+      //   skuIds: temSkuids,
+      //   addressId: this.addressInfo.id,
+      //   type: this.$route.query.type,
+      //   // sourceType: this.platform,
+      //   sourceType: 1,
+      //   quantity: confirmOrderList[0].num,
+      //   productAttr: confirmOrderList[0].productAttr,
+      //   note: '备注'
+      // }
       this.$http
         .post('/order/create', params)
         .then(data => {
-          console.log(data)
+          console.log(data.info)
+          this.payParamsObj = {
+            orderSn: data.info.orderSn,
+            orderIds: data.info.orderIds.split(',')
+          }
         })
         .catch(error => {
           console.log(error)
@@ -193,20 +236,33 @@ export default {
       console.log('sfsdf', this.payType)
       var requestUrl = null
       if (this.payType == 'wx') {
-        requestUrl = '/wx/pay'
+        requestUrl = '/trade/pay'
+        this.channel = this.wxChannel
+        this.payParamsObj.channel = 'WXPAY'
       } else if (this.payType == 'ali') {
         requestUrl = '/ali/pay'
+        this.channel = this.aliChannel
       } else {
-        requestUrl = '/balance/pay'
+        requestUrl = '/trade/pay'
+        this.channel = this.wxChannel
       }
-      this.$http.get(requestUrl).then(data => {
+
+      this.$http.post(requestUrl, this.payParamsObj).then(data => {
+        let temPrams = data.info
+        temPrams.timestamp = parseInt(data.info.timestamp)
+        console.log(temPrams)
+        console.log('获取的通道', this.channel)
         plus.payment.request(
-          channel,
-          data.content,
+          this.channel,
+          temPrams,
           res => {
-            plus.nativeUI.alert('支付成功！', function() {
-              location.href = './index.html'
-            })
+            this.$http
+              .post('trade/tradeDetail', { tradeNo: temPrams.tradeNo })
+              .then(data => {
+                plus.nativeUI.alert('支付成功！', function() {
+                  this.$router.push('/order')
+                })
+              })
           },
           error => {
             plus.nativeUI.alert('支付失败：' + error.code)
@@ -235,8 +291,14 @@ export default {
     getPayChannel() {
       // 获取支付通道
       plus.payment.getChannels(
-        function(channels) {
-          channel = channels[1]
+        channels => {
+          for (var i = 0; i < channels.length; i++) {
+            if (channels[i].id == 'alipay') {
+              this.aliChannel = channels[i]
+            } else if (channels[i].id == 'wxpay') {
+              this.wxChannel = channels[i]
+            }
+          }
         },
         function(e) {
           plus.nativeUI.alert('获取支付通道失败：' + e.message)
@@ -250,8 +312,8 @@ export default {
 .confirmOrder {
   padding-top: 46px;
   .ordercontent {
-    position: relative;
-    top: 20px;
+    padding-bottom: 50px;
+    padding-top: 20px;
   }
   .orderAddress {
     margin-top: 10px;

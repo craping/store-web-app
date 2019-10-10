@@ -8,8 +8,8 @@
         <div class="code-operate" @click="timeCountDown">
           <span :class="{gray:countDownSecond >= 0}">{{codeText}}</span>
         </div>
-        <div class="main-btn" @click="sureHandle">登录</div>
       </van-cell-group>
+      <div class="main-btn" @click="sureHandle">登录</div>
     </div>
   </div>
 </template>
@@ -18,6 +18,7 @@ import Vue from "vue";
 import { NavBar, Icon } from "vant";
 import { setToken } from "@/utils/auth";
 import { CellGroup, Field, Toast } from "vant";
+import { mapState } from 'vuex';
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
@@ -35,6 +36,11 @@ export default {
   },
   destroyed() {
     clearInterval(this.codeTimer);
+  },
+  computed: {
+    ...mapState('user',{
+      beforePath: state => state.beforePath,
+    })
   },
   methods: {
     onClickLeft() {
@@ -58,7 +64,7 @@ export default {
         .then(res => {
           setToken(res.info.token);
           this.$store.commit('user/SET_USERINFO',res.info)
-          this.$router.push("/main/home");
+          this.$router.push(this.beforePath);
         })
         .catch(error => {
           Toast(error.message);

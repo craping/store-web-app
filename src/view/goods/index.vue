@@ -102,15 +102,15 @@
         title-class="title text-ellipsis"
         :title="goods.sku"
         :is-link="true"
-        @click="sku.show=true"
+        @click="showSku"
       >
         <template v-slot:icon class="title">规格：</template>
       </van-cell>
     </van-cell-group>
 
-    <van-cell-group class="goods-cell-group" ref="comment" @click="showJudge">
+    <van-cell-group  class="goods-cell-group" ref="comment" @click="showJudge">
       <div class="judge-top van-hairline--bottom">
-        <div>商品评价(1111)</div>
+        <div>商品评价({{commentsTotalnum}})</div>
         <div class="right">
           查看全部
           <van-icon name="arrow" color="#f44"/>
@@ -132,7 +132,6 @@
     </van-cell-group>
 
     <store-share v-if="shareEnable" v-model="share.msg" :show="share.show" @cancel="share.show=false"></store-share>
-
     <van-sku
       ref="sku"
       v-model="sku.show"
@@ -176,8 +175,8 @@
     </van-sku>
 
     <van-goods-action>
-      <van-goods-action-icon icon="chat-o" @click="sorry">客服</van-goods-action-icon>
-      <van-goods-action-icon icon="cart-o" @click="onClickCart">购物车</van-goods-action-icon>
+      <van-goods-action-icon icon="chat-o" @click="openService" :info="unread">客服</van-goods-action-icon>
+      <van-goods-action-icon icon="cart-o" @click="onClickCart" :info="cartNum">购物车</van-goods-action-icon>
       <template v-if="vipEnable">
         <van-goods-action-button type="warning" @click="sku.show=true">
           <div style="line-height:normal">
@@ -193,20 +192,20 @@
         </van-goods-action-button>
       </template>
       <template v-else>
-        <van-goods-action-button type="warning" @click="sku.show=true">加入购物车</van-goods-action-button>
-        <van-goods-action-button type="danger" @click="sku.show=true">立即购买</van-goods-action-button>
+        <van-goods-action-button type="warning" @click="showSku">加入购物车</van-goods-action-button>
+        <van-goods-action-button type="danger" @click="showSku">立即购买</van-goods-action-button>
       </template>
     </van-goods-action>
 
-    <van-popup class="judge-popup" v-model="showJudgeSheet" position="right">
-      <judge-sheet @showPre="showPre"></judge-sheet>
+    <van-popup class="judge-popup" :zIndex="2000" v-model="showJudgeSheet" position="right">
+      <comments @showPre="showPre"></comments>
     </van-popup>
 
     <van-popup class="bottom-popup" v-model="showServiceSheet" position="bottom">
       <div class="service-content popup-content">
         <div class="title">服务说明</div>
         <div class="item-wrapper">
-          <div class="item" v-for="i in 5">
+          <div class="item" v-for="i in 5" :key="i">
             <div class="left">
               <van-icon name="certificate" color="#f44"/>
             </div>
@@ -223,7 +222,7 @@
       <div class="params-content popup-content">
         <div class="title">产品参数</div>
         <div class="item-wrapper">
-          <div class="item van-hairline--bottom" v-for="i in 5">
+          <div class="item van-hairline--bottom" v-for="i in 5" :key="i">
             <div class="left">型号</div>
             <div class="right">Eu22923</div>
           </div>
@@ -232,6 +231,7 @@
       </div>
     </van-popup>
     <van-image-preview v-model="prePicShow" :images="preImage" :show-index="false"></van-image-preview>
+    <store-service :value.sync="showService"></store-service>
   </div>
 </template>
 
@@ -257,15 +257,17 @@ import {
 } from 'vant'
 import storeNavBar from '@/components/store-nav-bar'
 import storeShare from '@/components/store-share'
-import judgeSheet from './judgeSheet'
+import storeService from '@/components/store-service'
+import comments from './comments'
 import { PrefixInteger } from '@/utils/util'
+import service from "@/utils/service";
 import Big from 'big.js'
 import Vue from 'vue'
-import { mapState } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import sync from "@/utils/sync";
 
 Vue.use(ImagePreview)
-const service = ['', '7天退换', '正品保障', '免费包邮']
+const serviceItems = ['', '7天退换', '正品保障', '免费包邮']
 export default {
   components: {
     [Tag.name]: Tag,
@@ -286,18 +288,19 @@ export default {
     [Button.name]: Button,
     storeNavBar,
     storeShare,
-    judgeSheet
+    storeService,
+    comments
   },
   computed: {
     ...mapState({
       userInfo: state => state.user.userInfo,
-      shareEnable(state){
-        return /* state.user.client == 1 &&  */state.user.isLogin;
-      },
-      vipEnable(state){
-        return /* state.user.client == 1 &&  */state.user.isVip && state.user.vipEnable;
-      }
+      isLogin: state => state.user.isLogin,
+      commentList: state => state.comments.commentList,
+      commentsTotalnum: state => state.comments.commentsTotalnum,
+      unread: state => state.sys.unread
     }),
+    ...mapGetters("cart", ["cartNum"]),
+    ...mapGetters("sys", ["shareEnable", "vipEnable"]),
     commission: function(){
       return this.formatPrice(this.goods.commission, this.goods.maxCommission);
     },
@@ -358,6 +361,7 @@ export default {
         show: false
       },
       comments: [],
+      showService:false,
       showJudgeSheet: false,
       prePicShow: false,
       preImage: [],
@@ -398,7 +402,7 @@ export default {
           product.maxPrice = skus[skus.length - 1].price
         }
         product.serviceIds.split(',').forEach(e => {
-          product.service += service[parseInt(e)] + ' '
+          product.service += serviceItems[parseInt(e)] + ' '
         })
         this.goods = product
         //参数初始化
@@ -449,10 +453,18 @@ export default {
           title:product.title,
           content:product.subTitle,
           thumbs:[product.pic],
-          href:"http://localhost:9090/#/goods/"+product.id+"?shopId="+product.id
+          href:process.env.VUE_APP_SHARE+product.id+"?shopId="+product.id
         }
+        //初始化客服商品内容
+        service.product(product);
         this.comments = comments
       })
+
+    this.queryComments({
+      id: this.$route.params.id,
+      pageNum: 1,
+      pageSize: 10
+    })
   },
   mounted() {
     window.addEventListener('scroll', this.handleScroll, true)
@@ -461,6 +473,7 @@ export default {
     window.removeEventListener('scroll', this.handleScroll, true)
   },
   methods: {
+    ...mapActions('comments',['queryComments']),
     handleScroll(e) {
       const scrollTop =
         window.pageYOffset ||
@@ -505,7 +518,6 @@ export default {
       }, 500)
     },
     left(e) {
-      console.log('ss', this.showJudgeSheet)
       if (this.showJudgeSheet) {
         this.showJudgeSheet = false
         const scrollTop =
@@ -558,7 +570,7 @@ export default {
     },
 
     onClickCart() {
-      this.$router.push('/cart')
+      this.$router.push('/main/cart')
     },
 
     sorry() {
@@ -578,6 +590,13 @@ export default {
       this.preImage = ['https://img.yzcdn.cn/vant/apple-1.jpg']
       this.prePicShow = true
     },
+    showSku(){
+      if(!this.isLogin){
+        Toast('用户未登录')
+        return;
+      }
+      this.sku.show = true;
+    },
     /********点击立即购买去到确认订单中心******/
     buy(skuData) {
       const sku = {
@@ -585,6 +604,7 @@ export default {
         num:skuData.selectedNum,
         recommenderId:this.recommenderId
       };
+      console.log(sku);
       this.$store.commit("order/SET_CONFIRM_ORDER_LIST", [sku]);
       this.$router.push({
         name: 'confirmOrder',
@@ -599,6 +619,7 @@ export default {
         num:skuData.selectedNum,
         recommenderId:this.recommenderId
       };
+      // console.log(sku)
       this.$http.post("cartItem/addCart", {
         productSkuId:sku.id,
         quantity:sku.num,
@@ -607,8 +628,10 @@ export default {
       }).then(data => {
         Toast.success('添加成功');
         this.sku.show = false;
-      })
-      console.log(sku)
+        this.$store.dispatch("cart/getCartList");
+      }).catch(error => {
+        Toast(error.message);
+      });
     },
     skuSelected({skuValue, selectedSku, selectedSkuComb}){
       // console.log(skuValue)
@@ -631,6 +654,25 @@ export default {
         else
           this.sku.maxCommission = null;
       }
+    },
+    openService(){
+      let me = this;
+      if(!this.isLogin){
+        Toast('用户未登录')
+        return;
+      }
+      const { umsMember} = this.userInfo;
+      // ysf('product', {
+      //     show: 1,
+      //     title: me.goods.title,
+      //     desc: me.goods.subTitle,
+      //     picture: me.goods.pic,
+      //     note: me.formatPrice(me.goods.price),
+      //     url: process.env.VUE_APP_SHARE+me.goods.id,
+      //     sendByUser: umsMember.id
+      // });
+      // ysf('open');
+      this.showService = true;
     }
   }
 }
@@ -782,7 +824,7 @@ export default {
     min-height: 100px;
     padding: 15px;
     &.inPopup {
-      margin: 10px;
+      margin: 10px 0;
       border-radius: 4px;
       overflow: hidden;
       background: #fff;
@@ -831,7 +873,7 @@ export default {
   .judge-popup {
     height: 100%;
     width: 100%;
-    padding-top: 76px;
+    padding-top: 66px;
     background: #f2f2f2;
   }
   .bottom-popup {

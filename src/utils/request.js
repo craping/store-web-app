@@ -28,18 +28,20 @@ service.interceptors.request.use(
       }
     }
 
-    if (!config.data) {
-      config.data = {
-        format: config.url == '/order/create' ? 'async' : 'json',
-        token: getToken()
-      }
-    } else {
-      config.data = {
-        ...{
+    if (config.headers['Content-Type'].includes('application/json')) {
+      if (!config.data) {
+        config.data = {
           format: config.url == '/order/create' ? 'async' : 'json',
           token: getToken()
-        },
-        ...config.data
+        }
+      } else {
+        config.data = {
+          ...{
+            format: config.url == '/order/create' ? 'async' : 'json',
+            token: getToken()
+          },
+          ...config.data
+        }
       }
     }
 

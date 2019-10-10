@@ -9,22 +9,22 @@
                 <div class="card-row-1">
                     <div>
                         <div class="title-1">账户余额</div>
-                        <div class="rest-money"> <span class="sign">￥</span> 1632.2</div>
+                        <div class="rest-money"> <span class="sign">￥</span> {{amsAccount.balance}}</div>
                     </div>
                     <div class="btn" @click="jumpLink('/withdraw')"><van-icon name="bill" />去提现</div>
                 </div>
                 <div class="card-row-2">
                     <div> 
                         <div class="title-2">累计收入(元)</div>
-                        <div>111000.1</div>
+                        <div>{{amsAccount.income}}</div>
                     </div>
                     <div>
                         <div class="title-2">已提现(元)</div>
-                        <div>1112323</div>
+                        <!-- <div>{{amsAccount}}</div> -->
                     </div>
                     <div>
                         <div class="title-2">未结算(元)</div>
-                        <div>111</div>
+                        <div>{{amsAccount.unreceivedIncome}}</div>
                     </div>
                 </div>
             </div>
@@ -106,7 +106,7 @@
                         </div>
                     </div>
                 </div>
-                <p class="look-detail" @click="jumpLink('team')">查看详情></p>
+                <p class="look-detail" @click="jumpLink('/team',{parentId:amsAccount.parents})">查看详情></p>
             </div>
             <div class="bottom-bar">
                 <van-cell title="提现记录" @click="toBill(2,4)" is-link />
@@ -117,9 +117,8 @@
 </template>
 <script>
 import Vue from 'vue';
-import { createNamespacedHelpers } from "vuex";
-const { mapActions } = createNamespacedHelpers("bill");
 import { NavBar, Cell, CellGroup, Tab, Tabs ,Icon } from 'vant';
+import { mapState, mapActions } from 'vuex';
 Vue.use(Tab).use(Tabs).use(Cell).use(CellGroup).use(NavBar).use(Icon);
 export default {
     data(){
@@ -127,13 +126,18 @@ export default {
             active: 0
         }
     },
+    computed: {
+        ...mapState('user',{
+            amsAccount: state => state.userInfo.amsAccount || {},
+        }),
+    },
     methods:{
-        ...mapActions(['setQueryparams']),
+        ...mapActions('bill',['setQueryparams']),
         onClickLeft() {
             this.$router.go(-1)
         },   
-        jumpLink(path) {
-            this.$router.push(path)
+        jumpLink(path, query) {
+        this.$router.push({ path, query });
         },
         /**
          * @method: 

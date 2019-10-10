@@ -25,8 +25,8 @@
           :right-icon="isEyeClose ? 'closed-eye' : 'eye-o'"
           @click-right-icon="changeShow"
         />
-        <div class="main-btn" @click="sureHandle">完成</div>
       </van-cell-group>
+      <div class="main-btn" @click="sureHandle">完成</div>
     </div>
   </div>
 </template>

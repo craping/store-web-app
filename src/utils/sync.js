@@ -52,8 +52,7 @@ const Sync = {
     invokes:{
         USER:{
             SAFE(data){
-                console.log("SAFE:"+data)
-                store.commit("user/SET_SAFE", data);
+                store.commit("sys/SET_VIPENABLE", data);
             }
         }
     }
