@@ -1,6 +1,6 @@
 <template>
   <div class="edit-check-page">
-    <van-nav-bar title="验证" left-arrow @click-left="onClickLeft" />
+    <van-nav-bar title="手机验证" left-arrow @click-left="onClickLeft" />
     <div class="login-body">
       <van-cell-group>
         <van-field :value="bindPhoneStr" clearable label="手机号" disabled />
@@ -9,7 +9,7 @@
             <span :class="{gray:countDownSecond >= 0}">{{codeText}}</span>
           </div>
         </van-field>
-        <div class="main-btn" @click="sureHandle">下一步</div>
+        <div class="main-btn" @click="sureHandle">完成</div>
       </van-cell-group>
     </div>
   </div>
@@ -31,7 +31,8 @@ export default {
       codeText: "获取验证码",
       countDownSecond: -1,
       codeTimer: null,
-      mode: this.$route.query.mode
+      amount: this.$route.query.amount,
+      bankCardId: this.$route.query.bankCardId,
     };
   },
   destroyed() {
@@ -56,22 +57,20 @@ export default {
         return
       }
       const params = {
-        mobile: this.bindPhone,
-        verCode: this.verCode,
-        type: 3
+        bankCardId: this.bankCardId,
+        amount: this.amount,
+        verCode: this.verCode
       };
+      debugger
       this.$http
-        .post("/authCode/checkingCode", params)
+        .post("/user/withdraw", params)
         .then(res => {
-          if (this.mode == "mobile") {
-            this.jumpLink("editMobile");
-          } else if (this.mode == "password") {
-            this.jumpLink("editPassword");
-          }
+          Toast("提交申请成功");
         })
         .catch(error => {
           Toast(error.message);
         });
+      
     },
     getCode() {
       if (this.countDownSecond > 0) {

@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import { getToken, removeToken} from '@/utils/auth'
+import { getToken } from '@/utils/auth'
 import { getClient } from '@/utils/util'
 
 export default {
@@ -57,7 +57,6 @@ export default {
             resolve(data)
           })
           .catch(error => {
-            removeToken()
             reject(error)
           })
       })
