@@ -197,7 +197,7 @@
       </template>
     </van-goods-action>
 
-    <van-popup class="judge-popup" :zIndex="2000" v-model="showJudgeSheet" position="right">
+    <van-popup class="judge-popup" :zIndex="500" v-model="showJudgeSheet" position="right">
       <comments @showPre="showPre"></comments>
     </van-popup>
 

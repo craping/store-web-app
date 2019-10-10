@@ -4,6 +4,7 @@
       v-model="showDialog"
       @click-overlay="cancel"
       @cancel="cancel"
+      :zIndex="3000"
       cancel-text="取消"
     >
       <van-grid :column-num="3" :border="false">

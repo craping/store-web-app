@@ -30,7 +30,9 @@
       <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad" @onScroll="onScroll">
         <van-swipe :autoplay="3000" :height="130" class="round">
           <van-swipe-item v-for="(ad, index) in content.advertiseList" :key="index">
-            <img v-lazy="ad.pic" height="130" width="100%" />
+            <router-link :to="ad.url">
+              <img v-lazy="ad.pic" height="130" width="100%" />
+            </router-link>
           </van-swipe-item>
         </van-swipe>
         <br />

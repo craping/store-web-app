@@ -1,5 +1,5 @@
 <template>
-	<van-nav-bar class="store-nav-bar" :style="{backgroundColor: background, opacity:opacity}" :z-index="2050" fixed>
+	<van-nav-bar class="store-nav-bar" :style="{backgroundColor: background, opacity:opacity}" :z-index="1000" fixed>
     <template v-slot:left>
       <slot name="left"></slot>
     </template>
