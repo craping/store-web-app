@@ -1,18 +1,18 @@
 <template>
   <div class="comment-sheet">
     <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
-      <div class="judge-area inPopup" v-for="i in 10">
+      <div class="comments-area inPopup" v-for="item in commentList" :key="item.id">
         <div class="row-1">
-          <img class="head-img" src />
-          <span class="user-name">名**字</span>
+          <img class="head-img" :src="item.memberIcon">
+          <span class="user-name">{{item.memberUsername}}</span>
         </div>
         <div class="row-2">
-          很好看很好看很好看很好看很好看，很好看很好看很好看很好看，很好看很好看很好看很好很好看很好看很好看，很好看很好看很好看很好看很好看很好看很好看很好看很好看很好看很好看很好看很好看
-          <div class="pic-area">
-            <img v-for="j in 3" src="https://img.yzcdn.cn/vant/apple-1.jpg" @click="showPre(j)" />
+          <div>{{item.content}}</div>
+          <div class="pic-area" >
+            <img v-for="(pic,index) in (item.pics.split(','))" :key="index" :src="pic" @click="showPre(index+1)" />
           </div>
         </div>
-        <div class="row-3">2019-09-10 规格：红色</div>
+        <div class="row-3">{{formatTime(item.createTime)}} 规格:{{formatAttr(item.productAttribute)}}</div>
       </div>
     </van-list>
   </div>
@@ -29,8 +29,13 @@ export default {
     return {
       loading: false,
       finished: false,
-      pageNum: 0,
+      pageNum: 1,
     };
+  },
+  computed:{
+    ...mapState({
+      commentList: state => state.comments.commentList,
+    })
   },
   methods: {
     ...mapActions('comments',['queryComments']),
@@ -45,11 +50,12 @@ export default {
       console.log('load')
       let params = {
         id: this.$route.params.id,
-        pageNum: this.pageNum++,
+        pageNum: this.pageNum,
         pageSize: 10
       }
       this.loading = true
       this.queryComments(params).then((data)=>{
+        this.pageSize++
         if(data.info && data.info.length == 0){
           this.finished = true
         }

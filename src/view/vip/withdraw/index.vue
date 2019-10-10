@@ -22,7 +22,7 @@
       <div class="tip">提现金额（免收服务费）</div>
       <div class="input-wrapper">
         <span>￥</span>
-        <input type="text" v-model="money" :maxlength="10" />
+        <input type="tel" v-model="money" :maxlength="10" />
       </div>
       <div class="bottom-bar">
         <div class="can-use">可用余额 {{amsAccount.balance}}元</div>
@@ -70,18 +70,7 @@ export default {
     },
     sureHandle() {
       if (!this.canApply) return;
-      const params = {
-        bankCardId: currentCard.id,
-        amount: money
-      };
-      this.$http
-        .post("/user/withdraw", params)
-        .then(res => {
-          Toast("提交申请成功");
-        })
-        .catch(error => {
-          Toast(error.message);
-        });
+      this.jumpLink('verCodeCheck',{amount:this.money,bankCardId:this.currentCard.id})
     }
   }
 };

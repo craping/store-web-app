@@ -10,7 +10,8 @@
 </template>
 <script>
 import Vue from "vue";
-import { NavBar, Field, CellGroup } from "vant";
+import { NavBar, Field, CellGroup,Toast } from "vant";
+import { mapActions } from 'vuex';
 Vue.use(Field)
   .use(CellGroup)
   .use(NavBar);
@@ -21,6 +22,7 @@ export default {
     };
   },
   methods: {
+    ...mapActions('user',['getUserInfo']),
     onClickLeft() {
       this.$router.go(-1);
     },
@@ -32,6 +34,8 @@ export default {
         .post("/user/updataNickName", params)
         .then(res => {
           Toast("修改成功");
+          this.$store.commit('user/SET_NICKNAME',this.nickName)
+          this.$router.go(-1);
         })
         .catch(error => {
           Toast(error.message)

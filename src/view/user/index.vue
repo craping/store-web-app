@@ -9,7 +9,7 @@
       </div>
       <div class="row-2">
         <div class="head-img" @click="jumpLink('/userInfo')"> 
-          <img src="" alt="">
+          <img :src="umsMember.icon">
         </div>
         <div class="base-info">
           <div class="nick-phone" @click="jumpLink('/userInfo')">{{umsMember.nickname || bindPhoneStr}}</div>
@@ -217,10 +217,13 @@ export default {
       margin-top: 16px;
       display: flex;
       .head-img {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
         background: #eee;
+        border-radius: 50%;
+        overflow: hidden;
+        img{
+          width: 60px;
+          height: 60px;
+        }
       }
       .base-info {
         margin-left: 20px;

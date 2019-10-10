@@ -1,5 +1,5 @@
 import axios from 'axios'
-import sync from "@/utils/sync";
+import sync from '@/utils/sync'
 import { Toast, Dialog } from 'vant'
 import { getToken } from '@/utils/auth'
 
@@ -14,18 +14,37 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     if (!config.params) {
-      config.params = { format: 'json', token: getToken() }
+      config.params = {
+        format: config.url == '/order/create' ? 'async' : 'json',
+        token: getToken()
+      }
     } else {
-      config.params = { ...{ format: 'json', token: getToken() }, ...config.params }
-    }
-
-    if(config.headers["Content-Type"].includes("application/json")){
-      if (!config.data) {
-        config.data = { format: 'json', token: getToken() }
-      } else {
-        config.data = { ...{ format: 'json', token: getToken() }, ...config.data }
+      config.params = {
+        ...{
+          format: config.url == '/order/create' ? 'async' : 'json',
+          token: getToken()
+        },
+        ...config.params
       }
     }
+
+    if (config.headers['Content-Type'].includes('application/json')) {
+      if (!config.data) {
+        config.data = {
+          format: config.url == '/order/create' ? 'async' : 'json',
+          token: getToken()
+        }
+      } else {
+        config.data = {
+          ...{
+            format: config.url == '/order/create' ? 'async' : 'json',
+            token: getToken()
+          },
+          ...config.data
+        }
+      }
+    }
+
     return config
   },
   error => {
@@ -47,22 +66,19 @@ service.interceptors.response.use(
 
       // result:1 token错误集;
       if (res.result == 1) {
-        sync.disconnect();
+        sync.disconnect()
       }
-      let error = new Error(res.msg || 'Error');
-      error.errcode = res.errcode;
+      let error = new Error(res.msg || 'Error')
+      error.errcode = res.errcode
       return Promise.reject(error)
     } else {
-      if(res.hasOwnProperty('result'))
-        return res.data
-      else
-        return res;
+      if (res.hasOwnProperty('result')) return res.data
+      else return res
     }
   },
   error => {
     console.log('err' + error) // for debug
-    if(error.errcode)
-      Toast.fail(error.message)
+    if (error.errcode) Toast.fail(error.message)
     return Promise.reject(error)
   }
 )

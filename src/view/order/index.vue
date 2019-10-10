@@ -12,36 +12,48 @@
       <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad">
         <van-tab v-for="(item,index) in productStatus" :key="item.id" :title="item.title">
           <div v-for="product in showProductList" :key="product.id" class="pro-container">
-            <div class="status">{{proStatus[product.status]}}</div>
-            <van-card
-              :num="product.nums"
-              :title="product.title"
-              :desc="product.desc"
-              :price="product.price"
-              thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"
-              @click="checkInfo(product.pid)"
-            >
-              <div slot="tags">
-                <van-tag plain type="danger">{{product.tag}}</van-tag>
-              </div>
-              <div slot="footer" class="productSpec">
-                <div>共{{product.nums}}件商品</div>
-                <div>
-                  应付款：￥
-                  <span>{{product.nums*product.price}}</span>
-                  (含运费￥{{product.freight}})
+            <div class="status">{{proStatus[product.confirmStatus]}}</div>
+            <div>
+              <van-card
+                v-for="(item,index) in product.orderItemList"
+                :key="item.id"
+                :num="item.productQuantity"
+                :title="item.productName"
+                :price="item.productPrice"
+                :thumb="item.productPic"
+                @click="checkInfo(item.productId)"
+              >
+                <div slot="tags">
+                  <van-tag
+                    plain
+                    type="danger"
+                    v-for="(item,index) in JSON.parse(item.productAttr)"
+                    :key="index"
+                  >{{item.key}}:{{item.value}}</van-tag>
                 </div>
-              </div>
-              <div slot="footer">
-                <van-button
-                  v-for="item in proEventList[`event${product.status}`]"
-                  :key="item.id"
-                  size="mini"
-                  :class="item == '立即付款' ? 'tored' : ''"
-                  @click.stop="proEventClick(product.pid,item)"
-                >{{item}}</van-button>
-              </div>
-            </van-card>
+                <div
+                  v-show="index == product.orderItemList.length-1"
+                  slot="footer"
+                  class="productSpec"
+                >
+                  <!-- <div v-show="product.orderItemList">共{{product.orderItemList[0].productQuantity}}件商品</div> -->
+                  <div>
+                    应付款：￥
+                    <span>{{product.payAmount}}</span>
+                    (含运费￥{{product.freightAmount}})
+                  </div>
+                </div>
+                <div slot="footer" v-show="index == product.orderItemList.length-1">
+                  <van-button
+                    v-for="(item,index) in proEventList[`event${product.confirmStatus}`]"
+                    :key="index"
+                    size="mini"
+                    :class="item == '立即付款' ? 'tored' : ''"
+                    @click.stop="proEventClick(product.id,item)"
+                  >{{item}}</van-button>
+                </div>
+              </van-card>
+            </div>
           </div>
           <div class="mayLike" v-show="index != 0">
             <div class="mayLikeTitle">
@@ -165,13 +177,14 @@ export default {
           freight: '0.00'
         }
       ],
-      proStatus: ['已发货', '待付款', '待发货', '待收货', '待评价'],
+      proStatus: ['待付款', '待发货', '已发货', '已收货', '已关闭', '已完成'],
+      // 0->待付款；1->待发货；2->已发货；3->已收货；4->已关闭；5->已完成
       showProductList: [],
       proEventList: {
-        event1: ['立即付款', '取消订单'],
-        event2: ['取消订单'],
-        event3: ['确认收货', '查看物流', '退款'],
-        event4: ['评价商品', '退货退款', '删除订单']
+        event0: ['立即付款', '取消订单'],
+        event1: ['取消订单'],
+        event2: ['确认收货', '查看物流', '退款'],
+        event3: ['评价商品', '退货退款', '删除订单']
       },
       showPayDialog: false, //支付弹框默认隐藏
       patyType: '', //获取支付方式
@@ -181,9 +194,8 @@ export default {
     }
   },
   created() {
-    this.showProductList = this.productList
-    this.active = this.$route.query.tabId
     this.initData()
+    this.active = this.$route.query.tabId
   },
   computed: {
     ...mapState({
@@ -198,10 +210,14 @@ export default {
 
     /*************初始化数据************ */
     initData() {
-      this.$store.dispatch('order/getOrderList', {
-        pageNum: 1,
-        pageSize: 10
-      })
+      this.$store
+        .dispatch('order/getOrderList', {
+          pageNum: 1,
+          pageSize: 10
+        })
+        .then(data => {
+          this.showProductList = this.orderList
+        })
     },
 
     /*************点击查看详情事件***************/
@@ -216,12 +232,13 @@ export default {
 
     /*************tab切换标签点击事件*********/
     onClick(name) {
+      // 0->待付款；1->待发货；2->已发货；3->已收货；4->已关闭；5->已完成
       if (name != 0) {
-        this.showProductList = this.productList.filter(item => {
-          return item.status == name
+        this.showProductList = this.orderList.filter(item => {
+          return item.confirmStatus == name - 1
         })
       } else {
-        this.showProductList = this.productList
+        this.showProductList = this.orderList
       }
     },
 
@@ -408,7 +425,7 @@ export default {
     z-index: 10;
   }
   /deep/.van-tabs__content {
-    margin-top: 115px;
+    // margin-top: 115px;
     height: 100vh;
     width: 100%;
     .van-button {
@@ -429,6 +446,9 @@ export default {
     .van-tab {
       flex-basis: 20% !important;
     }
+  }
+  /deep/._v-container {
+    padding-top: 115px;
   }
 
   .mayLike {
@@ -476,11 +496,12 @@ export default {
     .pro-container {
       margin-top: 8px;
       border-radius: 5px;
+      background-color: #fff;
     }
 
     .van-card {
       margin: 0;
-      background-color: #fff;
+      background: #fff;
       border-radius: 0 0 8px 8px;
       .productSpec {
         div {

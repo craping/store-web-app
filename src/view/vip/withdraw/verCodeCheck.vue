@@ -1,24 +1,24 @@
 <template>
   <div class="edit-check-page">
-    <van-nav-bar :title="bindPhone?'更换手机号':'绑定手机号'" left-arrow @click-left="onClickLeft" />
+    <van-nav-bar title="手机验证" left-arrow @click-left="onClickLeft" />
     <div class="login-body">
       <van-cell-group>
-        <van-field v-model="newmobile" clearable type="tel" label="新手机号"  placeholder="请输入新手机号"/>
+        <van-field :value="bindPhoneStr" clearable label="手机号" disabled />
         <van-field v-model="verCode" clearable label="短信验证码" placeholder="请输入短信验证码">
           <div class="code-operate" slot="button" @click="getCode">
             <span :class="{gray:countDownSecond >= 0}">{{codeText}}</span>
           </div>
         </van-field>
-        <div class="main-btn" @click="sureHandle">确定</div>
+        <div class="main-btn" @click="sureHandle">完成</div>
       </van-cell-group>
     </div>
   </div>
 </template>
 <script>
 import Vue from "vue";
-import { CellGroup, Field, Toast, NavBar, Icon } from "vant";
-import { mapState, mapActions } from 'vuex';
-
+import { NavBar, Icon } from "vant";
+import { CellGroup, Field, Toast } from "vant";
+import { mapState, mapGetters } from "vuex";
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
@@ -27,24 +27,24 @@ const aweixin = null;
 export default {
   data() {
     return {
-      newmobile: "",
       verCode: "",
       codeText: "获取验证码",
       countDownSecond: -1,
       codeTimer: null,
-      isEyeClose: true,
+      amount: this.$route.query.amount,
+      bankCardId: this.$route.query.bankCardId,
     };
-  },
-  computed: {
-    ...mapState('user',{
-      bindPhone: state => state.bindPhone,
-    }),
   },
   destroyed() {
     clearInterval(this.codeTimer);
   },
+  computed: {
+    ...mapState("user", {
+      bindPhone: state => state.bindPhone
+    }),
+    ...mapGetters("user", ["bindPhoneStr"])
+  },
   methods: {
-    ...mapActions('user',['getUserInfo']),
     onClickLeft() {
       this.$router.go(-1);
     },
@@ -52,27 +52,28 @@ export default {
       this.$router.push(path);
     },
     sureHandle() {
+      if (!this.verCode) {
+        Toast("请输入验证码");
+        return
+      }
       const params = {
-        newMobile: this.newMobile,
+        bankCardId: this.bankCardId,
+        amount: this.amount,
         verCode: this.verCode
       };
+      debugger
       this.$http
-        .post("/user/updataMobile", params)
+        .post("/user/withdraw", params)
         .then(res => {
-            Toast("修改成功");
-            this.$store.commit('user/SET_PHONE',this.newMobile)
-            this.$router.go(-2);
+          Toast("提交申请成功");
         })
         .catch(error => {
           Toast(error.message);
         });
+      
     },
     getCode() {
       if (this.countDownSecond > 0) {
-        return;
-      }
-      if (this.mobile == "") {
-        Toast("请输入新手机号码");
         return;
       }
       this.timeCountDown();
@@ -101,10 +102,11 @@ export default {
      * 获取验证码接口
      */
     getCodeReq() {
-      const params = { mobile: this.mobile };
+      const params = { mobile: this.bindPhone };
       this.$http
-        .post("/login/getVerCode", params)
+        .post("/authCode/getUpdateCode", params)
         .then(res => {
+          Toast("已发送");
         })
         .catch(error => {
           Toast(error.message);

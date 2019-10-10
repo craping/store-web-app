@@ -67,16 +67,16 @@
 </template>
 
 <script>
-import Vue from "vue";
-import storeScroller from "@/components/store-scroller";
-import cardItem from "./cartItem";
-import { Checkbox, CheckboxGroup, Stepper, SubmitBar, Toast } from "vant";
-import { mapActions, mapState } from "vuex";
+import Vue from 'vue'
+import storeScroller from '@/components/store-scroller'
+import cardItem from './cartItem'
+import { Checkbox, CheckboxGroup, Stepper, SubmitBar, Toast } from 'vant'
+import { mapActions, mapState } from 'vuex'
 Vue.use(Checkbox)
   .use(CheckboxGroup)
   .use(Stepper)
   .use(SubmitBar)
-  .use(Toast);
+  .use(Toast)
 
 export default {
   components: {
@@ -90,23 +90,23 @@ export default {
       checkedGoods: [],
       isSelectAll: false,
       timeout: null
-    };
+    }
   },
   mounted() {
-    // this.getCartList()
+    this.getCartList()
   },
   computed: {
     ...mapState({
       itemList: state => state.cart.itemList || []
     }),
     selectCount() {
-      const count = this.checkedGoods.length;
+      const count = this.checkedGoods.length
       if (count == this.itemList.length && count != 0) {
-        this.isSelectAll = true;
+        this.isSelectAll = true
       } else {
-        this.isSelectAll = false;
+        this.isSelectAll = false
       }
-      return count ? `(${count})` : "";
+      return count ? `(${count})` : ''
     },
     totalPrice() {
       return this.itemList.reduce(
@@ -116,84 +116,83 @@ export default {
             ? item.price * item.quantity
             : 0),
         0
-      );
+      )
     }
   },
 
   methods: {
-    ...mapActions("cart", ["getCartList"]),
+    ...mapActions('cart', ['getCartList']),
     changeOperate() {
-      this.isOperate = !this.isOperate;
+      this.isOperate = !this.isOperate
     },
     changeAll(val) {
       if (this.isSelectAll) {
-        this.checkedGoods = this.itemList.map(item => item.id);
+        this.checkedGoods = this.itemList.map(item => item.id)
       } else {
         if (this.checkedGoods.length == this.itemList.length) {
-          this.checkedGoods = [];
+          this.checkedGoods = []
         }
       }
     },
     formatPrice(price) {
-      return (price / 100).toFixed(2);
+      return (price / 100).toFixed(2)
     },
     onChangeNum(val, item) {
-      clearTimeout(this.timeout);
+      clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
         const params = {
           id: item.id,
           quantity: val
-        };
+        }
         this.$http
-          .post("/cartItem/updateQuantity", params)
-          .then(res => {
-          })
+          .post('/cartItem/updateQuantity', params)
+          .then(res => {})
           .catch(error => {
-            Toast(error.message);
-          });
-      }, 500);
+            Toast(error.message)
+          })
+      }, 500)
     },
     onSubmit() {
       let sku = []
       this.itemList.forEach(element => {
-        if(this.checkedGoods.includes(element.id)){
+        if (this.checkedGoods.includes(element.id)) {
           sku.push(element)
         }
-      });
+      })
       // console.log('sku',sku)
-      this.$store.commit("order/SET_CONFIRM_ORDER_LIST", [sku]);
+      this.$store.commit('order/SET_CONFIRM_ORDER_LIST', [...sku])
       this.$router.push({
         name: 'confirmOrder',
         query: {
-          type: 'dir'
+          type: 'cart'
         }
       })
     },
     deleteItem() {
       this.$http
-        .post("/cartItem/delete", { ids: this.checkedGoods })
+        .post('/cartItem/delete', { ids: this.checkedGoods })
         .then(res => {
-          Toast("删除成功");
-          this.checkedGoods = [];
-          this.getCartList();
+          Toast('删除成功')
+          this.checkedGoods = []
+          this.getCartList()
         })
         .catch(error => {
-          Toast(error.message);
-        });
+          Toast(error.message)
+        })
     },
     onRefresh(done) {
       this.getCartList().finally(() => {
-        if (done) done();
-      });
+        if (done) done()
+      })
     },
     onScroll(top) {},
     onLoad(done) {
-      if (done) done(true);
-      this.loading = false;
-      this.finished = true;
+      if (done) done(true)
+      this.loading = false
+      this.finished = true
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

@@ -17,19 +17,31 @@ export default {
   },
   getters: {
     bindPhoneStr: state => {
-      return state.bindPhone.replace(/^(\d{3})\d{4}(\d+)/,"$1****$2")
+      if (state.bindPhone) {
+        return state.bindPhone.replace(/^(\d{3})\d{4}(\d+)/,"$1****$2")
+      }
+      return ''
     }
   },
   mutations: {
     SET_USERINFO(state, userInfo) {
       state.userInfo = userInfo
-      state.bindPhone = userInfo.umsMember.phone
+      state.bindPhone = userInfo.umsMember.phone || ''
       state.isLogin = true
-      state.isVip = userInfo.amsAccount.orders > 0;
+      state.isVip = userInfo.amsAccoun && userInfo.amsAccount.orders > 0
     },
     SET_BEFOREPATH(state, data) {
       state.beforePath = data
-    }
+    },
+    SET_NICKNAME(state, data) {
+      state.userInfo.umsMember.nickname = data
+    },
+    SET_PHONE(state, data) {
+      state.userInfo.umsMember.phone = data
+    },
+    SET_ICON(state, data) {
+      state.userInfo.umsMember.icon = data
+    },
   },
   actions: {
     getUserInfo({ commit }) {

@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path')
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -31,15 +31,14 @@ module.exports = {
     }
   },
   chainWebpack: config => {
-    config.plugins.delete('prefetch');
-    config.plugins.delete('preload');
+    config.plugins.delete('prefetch')
+    config.plugins.delete('preload')
   },
   css: {
     loaderOptions: {
       sass: {
-        data:
-          '@import "@/assets/scss/_var.scss";'
+        data: '@import "@/assets/scss/_var.scss";'
       }
     }
   }
-};
+}

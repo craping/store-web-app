@@ -25,19 +25,27 @@
         </van-cell-group>
       </div>
       <div class="orderSpec">
-        <div class="order-item" v-for="item in confirmOrderList" :key="item.skuId">
+        <div class="order-item" v-for="item in confirmOrderList" :key="item.id">
           <van-card
-            :num="item.num"
+            :num="item.quantity || item.num"
             :price="item.price"
-            :desc="item.subTitle"
+            :desc="item.subTitle || item.name"
             :title="item.title"
             :thumb="item.pic"
           >
-            <div slot="tags">
+            <div slot="tags" v-if="$route.query.type == 'dir' ">
               <van-tag
                 plain
                 type="danger"
                 v-for="item in item.productAttr"
+                :key="item.key"
+              >{{item.key}}:{{item.value}}</van-tag>
+            </div>
+            <div slot="tags" v-else>
+              <van-tag
+                plain
+                type="danger"
+                v-for="item in JSON.parse(item.productAttr)"
                 :key="item.key"
               >{{item.key}}:{{item.value}}</van-tag>
             </div>
@@ -54,7 +62,6 @@
       <van-button type="danger" plain size="mini" @click="toSumbitOrder">去支付</van-button>
     </van-tabbar>
     <store-pay-dialog @closeDialog="closeDialog" @toPay="toPay" :show="showPayDialog"></store-pay-dialog>
-    <van-action-sheet v-model="showAddress" :actions="addressList" @select="onSelect"/>
   </van-row>
 </template>
 <script>
@@ -87,6 +94,7 @@ Vue.use(NavBar)
   .use(Tabbar)
   .use(TabbarItem)
   .use(Dialog)
+
 export default {
   name: 'confirmOrder',
   components: {
@@ -94,80 +102,25 @@ export default {
   },
   data() {
     return {
-      // addressList: {
-      //   id: '1',
-      //   name: '张三',
-      //   tel: '13000000000',
-      //   address: '浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室'
-      // },
       showPayDialog: false, //支付弹框默认隐藏
-      patyType: '', //获取支付方式
-
-      /********联调后做的数据*******/
-      confirmOrderList: [
-        {
-          skuId: 1, //skuId
-          title: '标题', //标题
-          subTitle: '子标题', //子标题
-          supId: 1, //供应商ID
-          price: 100, //商品价格
-          pic:
-            'http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20180607/5ac1bf58Ndefaac16.jpg', //图片
-          num: 2, //数量
-          productAttr: [
-            {
-              key: '颜色',
-              value: '金色'
-            },
-            {
-              key: '容量',
-              value: '4G'
-            }
-          ]
-        },
-        {
-          skuId: 2, //skuId
-          title: '标题', //标题
-          subTitle: '子标题', //子标题
-          supId: 1, //供应商ID
-          price: 100, //商品价格
-          pic:
-            'http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20180607/5ac1bf58Ndefaac16.jpg', //图片
-          num: 2, //数量
-          productAttr: [
-            {
-              key: '颜色',
-              value: '白色'
-            },
-            {
-              key: '容量',
-              value: '4G'
-            }
-          ]
-        }
-      ],
+      payType: '', //获取支付方式
       showAddress: false, //显示地址列表
-      confirmedAddress: {}, //默认显示地址
-      addressList: [
-        {
-          id: '1',
-          name: '张三',
-          tel: '13000000000',
-          address: '浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室'
-        },
-        {
-          id: '2',
-          name: '李四',
-          tel: '1310000000',
-          address: '浙江省杭州市拱墅区莫干山路 50 号'
-        }
-      ]
+      confirmedAddress: {
+        name: '',
+        tel: '',
+        address: ''
+      }, //默认显示地址
+      payParamsObj: {}, //传给自己后台支付接口的数据
+      channel: null,
+      aliChannel: null,
+      wxChannel: null
     }
   },
   computed: {
     ...mapState({
-      // confirmOrderList: state => state.order.confirmOrderList,
-      platform: state => state.user.client
+      confirmOrderList: state => state.order.confirmOrderList,
+      platform: state => state.user.client,
+      addressInfo: state => state.address.addressInfo
     }),
     totalPrice() {
       return this.confirmOrderList.reduce((pre, cur) => {
@@ -176,7 +129,12 @@ export default {
     }
   },
   created() {
-    this.getAddress()
+    this.initAddress()
+  },
+  mounted() {
+    this.onPlusReady(() => {
+      this.getPayChannel()
+    })
   },
   methods: {
     /*************返回点击事件***************/
@@ -191,39 +149,79 @@ export default {
     },
 
     /*********获取用户的收货地址*********** */
-    getAddress() {
-      this.$http
-        .get('/address/getUserInfoAddress')
-        .then(data => {
-          this.addressList = data.alert
-          this.confirmedAddress = this.addressList[0] //默认地址
-        })
-        .catch(error => {
-          console.log(error)
-        })
+    initAddress() {
+      const { addressInfo } = this
+      this.confirmedAddress.name = addressInfo.name || '请先选择地址'
+      this.confirmedAddress.tel = addressInfo.tel || ''
+      console.log(addressInfo)
+      if (addressInfo.addressDetail) {
+        this.confirmedAddress.address = `${addressInfo.province}${
+          addressInfo.city
+        }${addressInfo.county}${addressInfo.addressDetail}`
+      } else {
+        this.confirmedAddress.address = ''
+      }
     },
 
     //点击支付触发提交订单接口
     toSumbitOrder() {
-      const params = {
-        skuIds: ['134', '135'],
-        addressId: '1',
-        type: this.$route.query.type,
-        sourceType: this.platform,
-        quantity: 1,
-        productAttr: { color: 'gold' },
-        note: '备注',
-        recommenderId: '123'
+      if (!this.confirmedAddress.address) {
+        Toast.fail('请选择地址')
+        return
       }
+      const { confirmOrderList } = this
+      let temSkuids = []
+      if (this.$route.query.type == 'dir') {
+        temSkuids = [confirmOrderList[0].id]
+      } else {
+        temSkuids = confirmOrderList.map(item => {
+          return item.skuId
+        })
+      }
+      let params = {
+        skuIds: temSkuids,
+        addressId: this.addressInfo.id,
+        type: this.$route.query.type,
+        // sourceType: this.platform,
+        sourceType: 1
+      }
+      if (this.$route.query.type == 'dir') {
+        params = {
+          ...params,
+          quantity: confirmOrderList[0].num,
+          productAttr: confirmOrderList[0].productAttr,
+          note: '备注'
+        }
+        if (confirmOrderList[0].recommenderId) {
+          params = {
+            ...params,
+            recommenderId: confirmOrderList[0].recommenderId
+          }
+        }
+      }
+      // const params = {
+      //   skuIds: temSkuids,
+      //   addressId: this.addressInfo.id,
+      //   type: this.$route.query.type,
+      //   // sourceType: this.platform,
+      //   sourceType: 1,
+      //   quantity: confirmOrderList[0].num,
+      //   productAttr: confirmOrderList[0].productAttr,
+      //   note: '备注'
+      // }
       this.$http
         .post('/order/create', params)
         .then(data => {
-          console.log(data)
-          this.toShowPay()
+          console.log(data.info)
+          this.payParamsObj = {
+            orderSn: data.info.orderSn,
+            orderIds: data.info.orderIds.split(',')
+          }
         })
         .catch(error => {
           console.log(error)
         })
+      this.toShowPay()
     },
 
     /*************支付弹框事件群start******/
@@ -234,8 +232,43 @@ export default {
     /***********点击支付按钮事件并获取支付方式*********/
     toPay(type) {
       Toast.success('去支付页面')
-      this.patyType = type
-      console.log('sfsdf', this.patyType)
+      this.payType = type
+      console.log('sfsdf', this.payType)
+      var requestUrl = null
+      if (this.payType == 'wx') {
+        requestUrl = '/trade/pay'
+        this.channel = this.wxChannel
+        this.payParamsObj.channel = 'WXPAY'
+      } else if (this.payType == 'ali') {
+        requestUrl = '/ali/pay'
+        this.channel = this.aliChannel
+      } else {
+        requestUrl = '/trade/pay'
+        this.channel = this.wxChannel
+      }
+
+      this.$http.post(requestUrl, this.payParamsObj).then(data => {
+        let temPrams = data.info
+        temPrams.timestamp = parseInt(data.info.timestamp)
+        console.log(temPrams)
+        console.log('获取的通道', this.channel)
+        plus.payment.request(
+          this.channel,
+          temPrams,
+          res => {
+            this.$http
+              .post('trade/tradeDetail', { tradeNo: temPrams.tradeNo })
+              .then(data => {
+                plus.nativeUI.alert('支付成功！', function() {
+                  this.$router.push('/order')
+                })
+              })
+          },
+          error => {
+            plus.nativeUI.alert('支付失败：' + error.code)
+          }
+        )
+      })
     },
     /*************支付弹框事件群end******/
 
@@ -246,12 +279,31 @@ export default {
 
     /********打开地址列表**** */
     confirmAddress() {
-      this.showAddress = true
+      this.$router.push({
+        path: '/address',
+        query: {
+          type: 'select'
+        }
+      })
     },
-    /********确定好地址******* */
-    onSelect(item) {
-      this.confirmedAddress = item
-      this.showAddress = false
+
+    /*******调用5+支付功能********** */
+    getPayChannel() {
+      // 获取支付通道
+      plus.payment.getChannels(
+        channels => {
+          for (var i = 0; i < channels.length; i++) {
+            if (channels[i].id == 'alipay') {
+              this.aliChannel = channels[i]
+            } else if (channels[i].id == 'wxpay') {
+              this.wxChannel = channels[i]
+            }
+          }
+        },
+        function(e) {
+          plus.nativeUI.alert('获取支付通道失败：' + e.message)
+        }
+      )
     }
   }
 }
@@ -260,8 +312,8 @@ export default {
 .confirmOrder {
   padding-top: 46px;
   .ordercontent {
-    position: relative;
-    top: 20px;
+    padding-bottom: 50px;
+    padding-top: 20px;
   }
   .orderAddress {
     margin-top: 10px;

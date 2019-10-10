@@ -9,15 +9,14 @@
           v-for="(item) in likeList"
           :key="item.id"
           :price="item.price"
-          :origin-price="item.originalPrice"
           :title="item.name"
-          :desc="item.subTitle"
+          :desc="item.description"
           :thumb="item.pic"
           :lazy-load="true"
           @click="toDetail(item)"
         >
           <template v-slot:num>
-            <van-button type="danger" size="mini" round @click.stop="cancelLike">取消收藏</van-button>
+            <van-button type="danger" size="mini" round @click.stop="cancelLike(item)">取消收藏</van-button>
           </template>
         </van-card>
       </div>

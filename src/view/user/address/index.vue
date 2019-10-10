@@ -1,12 +1,8 @@
 <template>
   <van-row>
-    <van-nav-bar
-      title="收货地址列表"
-      left-arrow
-      @click-left="onClickLeft"
-    />
+    <van-nav-bar title="收货地址列表" left-arrow @click-left="onClickLeft"/>
     <van-address-list
-      v-if="chosenAddressId" 
+      v-if="chosenAddressId"
       v-model="chosenAddressId"
       :list="addressList"
       :disabled-list="disabledList"
@@ -16,7 +12,7 @@
     />
     <van-address-list
       v-else
-      :switchable="false"
+      :switchable="canSelect"
       :list="addressList"
       @add="onAdd"
       @edit="onEdit"
@@ -25,11 +21,13 @@
   </van-row>
 </template>
 <script>
-import Vue from 'vue';
+import Vue from 'vue'
 import { createNamespacedHelpers } from 'vuex'
-const {mapState,mapActions} = createNamespacedHelpers('address')
-import { Row, NavBar, AddressList} from 'vant';
-Vue.use(Row).use(NavBar).use(AddressList);
+const { mapState, mapActions } = createNamespacedHelpers('address')
+import { Row, NavBar, AddressList } from 'vant'
+Vue.use(Row)
+  .use(NavBar)
+  .use(AddressList)
 export default {
   data() {
     return {
@@ -61,31 +59,39 @@ export default {
   mounted() {
     this.getAddressList()
   },
-  computed:{
+  computed: {
     ...mapState({
-      addressList:state=>state.addressList
-    })
+      addressList: state => state.addressList
+    }),
+    canSelect() {
+      //判断是否显示可以选择地址，默认不可以，只有从选择收货地址过来才显示
+      return this.$route.query.type === 'select'
+    }
   },
   methods: {
-    ...mapActions(['setAddressInfo','getAddressList']),
+    ...mapActions(['setAddressInfo', 'getAddressList']),
     onClickLeft() {
       this.$router.go(-1)
     },
     // 新增地址
     onAdd() {
       this.setAddressInfo({})
-      this.$router.push({path:'/addAddress', query:{mode: 'add'}})
+      this.$router.push({ path: '/addAddress', query: { mode: 'add' } })
     },
     // 编辑地址
     onEdit(item, index) {
-      const coby = JSON.parse(JSON.stringify(item).replace(/address/, "addressDetail"))
+      const coby = JSON.parse(
+        JSON.stringify(item).replace(/address/, 'addressDetail')
+      )
       coby.isDefault = !coby.isDefault
       this.setAddressInfo(coby)
-      this.$router.push({path:'/addAddress', query:{mode:'edit'}})
+      this.$router.push({ path: '/addAddress', query: { mode: 'edit' } })
     },
     // 选择地址
     onSelect(item, index) {
-      this.setAddressInfo(JSON.parse(JSON.stringify(item).replace(/address/, "addressDetail")))
+      this.setAddressInfo(
+        JSON.parse(JSON.stringify(item).replace(/address/, 'addressDetail'))
+      )
       this.$router.go(-1)
     }
   }

@@ -20,7 +20,7 @@
       <template v-slot:title>
         <van-tabs
           v-model="activeTab"
-          :class="{'visibility':showJudgeSheet}"
+          :class="{'visibility':showCommentsSheet}"
           line-width="40"
           :border="false"
           @click="scrollToAnchor"
@@ -85,7 +85,7 @@
         title-class="title text-ellipsis"
         value-class="flex-0"
         :title="goods.service"
-        @click="showServiceSheet = true"
+        @click="serviceSheet.show = true"
         :is-link="true"
       >
         <template v-slot:icon class="title">服务：</template>
@@ -94,7 +94,7 @@
         title-class="title text-ellipsis"
         :title="goods.params"
         :is-link="true"
-        @click="params.show=true"
+        @click="paramsSheet.show=true"
       >
         <template v-slot:icon class="title">参数：</template>
       </van-cell>
@@ -108,23 +108,29 @@
       </van-cell>
     </van-cell-group>
 
-    <van-cell-group  class="goods-cell-group" ref="comment" @click="showJudge">
-      <div class="judge-top van-hairline--bottom">
+    <van-cell-group  class="goods-cell-group" ref="comment" >
+      <div class="comments-top van-hairline--bottom" @click="showCommentsHandle">
         <div>商品评价({{commentsTotalnum}})</div>
-        <div class="right">
+        <div class="right" v-if="comments.length">
           查看全部
           <van-icon name="arrow" color="#f44"/>
         </div>
       </div>
-      <div class="judge-area">
+      <div class="no-comments-area" v-if='comments.length == 0'>暂无评价</div>
+      <div v-else class="comments-area" v-for="item in comments" :key="item.id">
         <div class="row-1">
-          <img class="head-img" src>
-          <span class="user-name">名**字</span>
+          <img class="head-img" :src="item.memberIcon">
+          <span class="user-name">{{item.memberUsername}}</span>
         </div>
-        <div
-          class="row-2 overhide"
-        >很好看很好看很好看很好看很好看，很好看很好看很好看很好看，很好看很好看很好看很好很好看很好看很好看，很好看很好看很好看很好看很好看很好看很好看很好看很好看很好看很好看很好看很好看</div>
+        <div class="row-2">
+          <div class="overhide">{{item.content}}</div>
+          <div class="pic-area" >
+            <img v-for="(pic,index) in (item.pics.split(','))" :key="index" :src="pic" @click="showPre(index+1)" />
+          </div>
+        </div>
+        <div class="row-3">{{formatTime(item.createTime)}} 规格:{{formatAttr(item.productAttribute)}}</div>
       </div>
+
     </van-cell-group>
     <van-cell-group class="goods-cell-group" ref="detail">
       <van-cell title="图文详细" @click="sorry"/>
@@ -197,37 +203,37 @@
       </template>
     </van-goods-action>
 
-    <van-popup class="judge-popup" :zIndex="500" v-model="showJudgeSheet" position="right">
+    <van-popup class="comments-popup" :zIndex="500" v-model="showCommentsSheet" position="right">
       <comments @showPre="showPre"></comments>
     </van-popup>
 
-    <van-popup class="bottom-popup" v-model="showServiceSheet" position="bottom">
+    <van-popup class="bottom-popup" v-model="serviceSheet.show" position="bottom">
       <div class="service-content popup-content">
         <div class="title">服务说明</div>
         <div class="item-wrapper">
-          <div class="item" v-for="i in 5" :key="i">
+          <div class="item" v-for="(item,index) in serviceSheet.list" :key="index">
             <div class="left">
               <van-icon name="certificate" color="#f44"/>
             </div>
             <div class="right">
-              <div class="itme-title">正品保证</div>
-              <div class="itme-info">本商品是滴是滴时间来得及啊第四季度是本商品是滴是滴时间来得及啊第四季度是</div>
+              <div class="itme-title">{{item.value}}</div>
+              <div class="itme-info">{{item.desc}}</div>
             </div>
           </div>
         </div>
-        <div class="btn" @click="showServiceSheet=false">完成</div>
+        <div class="btn" @click="serviceSheet.show=false">完成</div>
       </div>
     </van-popup>
-    <van-popup class="bottom-popup" v-model="showParamSheet" position="bottom">
+    <van-popup class="bottom-popup" v-model="paramsSheet.show" position="bottom">
       <div class="params-content popup-content">
         <div class="title">产品参数</div>
         <div class="item-wrapper">
-          <div class="item van-hairline--bottom" v-for="i in 5" :key="i">
-            <div class="left">型号</div>
-            <div class="right">Eu22923</div>
+          <div class="item van-hairline--bottom" v-for="(item,index) in paramsSheet.list" :key="index">
+            <div class="left">{{item.name}}</div>
+            <div class="right">{{item.inputList}}</div>
           </div>
         </div>
-        <div class="btn" @click="showServiceSheet=false">完成</div>
+        <div class="btn" @click="paramsSheet.show=false">完成</div>
       </div>
     </van-popup>
     <van-image-preview v-model="prePicShow" :images="preImage" :show-index="false"></van-image-preview>
@@ -265,9 +271,26 @@ import Big from 'big.js'
 import Vue from 'vue'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import sync from "@/utils/sync";
+import { format } from "@/utils/util";
 
 Vue.use(ImagePreview)
-const serviceItems = ['', '7天退换', '正品保障', '免费包邮']
+const serviceItems = [
+  {
+    key: '1',
+    value: '7天退换',
+    desc: '满足相应条件时，消费者可申请“七天无理由退换货”'
+  },
+  {
+    key: '2',
+    value: '正品保障',
+    desc: '本商品由海内外认证的供应商或品牌商直供货源，保证100%正品。'
+  },
+  {
+    key: '3',
+    value: '免费包邮',
+    desc: '物流费用由卖家承担'
+  }
+]
 export default {
   components: {
     [Tag.name]: Tag,
@@ -295,7 +318,6 @@ export default {
     ...mapState({
       userInfo: state => state.user.userInfo,
       isLogin: state => state.user.isLogin,
-      commentList: state => state.comments.commentList,
       commentsTotalnum: state => state.comments.commentsTotalnum,
       unread: state => state.sys.unread
     }),
@@ -356,17 +378,19 @@ export default {
         commission:0,
         maxCommission:0
       },
-      params: {
+      paramsSheet: {
+        list: [],
+        show: false
+      },
+      serviceSheet: {
         list: [],
         show: false
       },
       comments: [],
       showService:false,
-      showJudgeSheet: false,
+      showCommentsSheet: false,
       prePicShow: false,
       preImage: [],
-      showServiceSheet: false,
-      showParamSheet: false
     }
   },
   created() {
@@ -401,14 +425,18 @@ export default {
           product.maxCommission = skus[skus.length - 1].commission
           product.maxPrice = skus[skus.length - 1].price
         }
-        product.serviceIds.split(',').forEach(e => {
-          product.service += serviceItems[parseInt(e)] + ' '
+        //服务初始化
+        this.serviceSheet.list = serviceItems.filter(ele=> product.serviceIds.split(',').includes(ele.key))
+        console.log('this.serviceSheet.list',this.serviceSheet.list)
+        this.serviceSheet.list.forEach(e => {
+          product.service += e.value + ' '
         })
         this.goods = product
         //参数初始化
         data.info.params.forEach(e => {
           this.goods.params += e.name + ' '
         })
+        this.paramsSheet.list = data.info.params || []
 
         //sku初始化
         this.sku.price = new Big(product.price).toFixed(2)
@@ -479,7 +507,7 @@ export default {
         window.pageYOffset ||
         document.documentElement.scrollTop ||
         document.body.scrollTop
-      if (this.showJudgeSheet) return
+      if (this.showCommentsSheet) return
       this.opacityIn = scrollTop / (this.$refs.product.offsetTop - 66)
       this.opacityOut = 1 - scrollTop / (this.$refs.product.offsetTop - 66)
 
@@ -518,8 +546,8 @@ export default {
       }, 500)
     },
     left(e) {
-      if (this.showJudgeSheet) {
-        this.showJudgeSheet = false
+      if (this.showCommentsSheet) {
+        this.showCommentsSheet = false
         const scrollTop =
           window.pageYOffset ||
           document.documentElement.scrollTop ||
@@ -576,9 +604,13 @@ export default {
     sorry() {
       Toast('暂无后续逻辑~')
     },
-    showJudge() {
-      this.opacityIn = 1
-      this.showJudgeSheet = true
+    showCommentsHandle() {
+        this.showCommentsSheet = true
+
+      if (this.comments.length) {
+        this.opacityIn = 1
+        this.showCommentsSheet = true
+      }
     },
     showHTMLPre(e) {
       if (e.target.nodeName === 'IMG') {
@@ -673,7 +705,14 @@ export default {
       // });
       // ysf('open');
       this.showService = true;
-    }
+    },
+    formatTime(time) {
+      return format(time, "yyyy-MM-dd");
+    },
+    formatAttr(data) {
+      const attrArray = JSON.parse(data)
+      return attrArray.map(ele => ele.value).join(",") || '';
+    },
   }
 }
 </script>
@@ -807,7 +846,7 @@ export default {
   .visibility {
     visibility: hidden;
   }
-  .judge-top {
+  .comments-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -820,7 +859,13 @@ export default {
       font-size: 12px;
     }
   }
-  .judge-area {
+  .no-comments-area{
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    color: #999;
+  }
+  .comments-area {
     min-height: 100px;
     padding: 15px;
     &.inPopup {
@@ -844,7 +889,7 @@ export default {
     }
     .row-2 {
       margin-top: 10px;
-      &.overhide {
+      & .overhide {
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
@@ -870,7 +915,7 @@ export default {
   .van-image-preview {
     z-index: 3120 !important;
   }
-  .judge-popup {
+  .comments-popup {
     height: 100%;
     width: 100%;
     padding-top: 66px;
