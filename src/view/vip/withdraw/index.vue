@@ -29,7 +29,7 @@
         <div class="btn-text" @click="getAll">全部提现</div>
       </div>
     </div>
-    <div class="btn" :class="{'disable':!canApply}" @click="sureHandle">提交申请，确认提现</div>
+    <div class="btn" :class="{'disable':!canApply}" @click="sureHandle">下一步</div>
   </div>
 </template>
 <script>

@@ -62,7 +62,7 @@
                 </div>
               </div>
             </div>
-            <p class="look-detail" @click="toBill(1,0)">查看详情></p>
+            <p class="look-detail" @click="toUnliquidated('d')">查看详情></p>
           </div>
         </van-tab>
         <van-tab title="本月收益">
@@ -93,7 +93,7 @@
                 </div>
               </div>
             </div>
-            <p class="look-detail" @click="toBill(1,0)">查看详情></p>
+            <p class="look-detail" @click="toUnliquidated('m')">查看详情></p>
           </div>
         </van-tab>
       </van-tabs>
@@ -177,6 +177,9 @@ export default {
     toBill(inExType, typeFilter) {
       this.setQueryparams({ inExType, typeFilter });
       this.jumpLink("/bill");
+    },
+    toUnliquidated(mode) {
+      this.jumpLink("/unliquidated",{mode});
     }
   }
 };

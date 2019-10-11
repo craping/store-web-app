@@ -21,33 +21,35 @@
           </div>
         </div>
       </van-sticky>
-      <div class="month-item" ref="monthItem" v-for="i in 2">
-        <van-sticky :offset-top="96" :container="container1[i-1]">
-          <div class="info-bar">
-            <div class="time" @click="dateSelectshow = true">
-              2019年{{i}}月
-              <van-icon name="arrow-down" />
+      <van-list v-model="loading" :finished="finished" :error.sync="error" error-text="请求失败，点击重新加载"  finished-text="没有更多了" @load="onLoad">
+        <div class="month-item" ref="monthItem" v-for="i in 2">
+          <van-sticky :offset-top="96" :container="container1[i-1]">
+            <div class="info-bar">
+              <div class="time" @click="dateSelectshow = true">
+                2019年{{i}}月
+                <van-icon name="arrow-down" />
+              </div>
+              <div class="all-money">
+                <div>收入：￥111</div>
+                <div>支出：￥222</div>
+              </div>
             </div>
-            <div class="all-money">
-              <div>收入：￥111</div>
-              <div>支出：￥222</div>
+          </van-sticky>
+          <div class="bill-list">
+            <div class="bill-item" @click="jumpLink('/billDetail',{id:i})" v-for="i in 8">
+              <div class="col-1">
+                <van-icon name="cart" size="35" color="#fcc" />
+              </div>
+              <div class="col-2">
+                <div class="title">购买商品名购买商品名称是多少来得及称是多少来得及</div>
+                <div class="type">订单交易</div>
+                <div class="time">2019-07-23 12:13</div>
+              </div>
+              <div class="col-3">+15.00</div>
             </div>
-          </div>
-        </van-sticky>
-        <div class="bill-list">
-          <div class="bill-item" @click="jumpLink('/billDetail')" v-for="i in 8">
-            <div class="col-1">
-              <van-icon name="cart" size="35" color="#fcc" />
-            </div>
-            <div class="col-2">
-              <div class="title">购买商品名购买商品名称是多少来得及称是多少来得及</div>
-              <div class="type">订单交易</div>
-              <div class="time">2019-07-23 12:13</div>
-            </div>
-            <div class="col-3">+15.00</div>
           </div>
         </div>
-      </div>
+      </van-list>
       <van-popup v-model="filterShow" position="top" :get-container="getContainer" :style="{top: '96px'}">
          <div>
             <div class="option-pop" v-show="filterShow">
@@ -131,18 +133,18 @@ import {
   DatetimePicker,
   Icon,
   Tab,
-  Tabs
+  Tabs,
+  List
 } from "vant";
 Vue.use(Tab)
   .use(Tabs)
-  .use(Overlay)
   .use(Sticky)
   .use(ActionSheet)
   .use(Popup)
   .use(DatetimePicker)
   .use(NavBar)
   .use(Icon)
-  .use(Sticky)
+  .use(List)
   .use(Overlay);
 export default {
   data() {
@@ -202,13 +204,14 @@ export default {
       startDate: "2019-09-02",
       endDate: "",
       dateType: 0, // 0按月，1按日
-      dateInputType: 0 //0开始，1结束
+      dateInputType: 0, //0开始，1结束
+      loading: false,
+      finished: false,
+      error: false,
     };
   },
   mounted() {
     this.container1 = this.$refs.monthItem;
-    window.scrollTo(0, 0);
-    // this.queryBill();
   },
   computed: {
     ...mapState({
@@ -223,7 +226,6 @@ export default {
         this.$store.commit("bill/SET_DATE", val);
       }
     },
-
   },
   methods: {
     getContainer() {
@@ -233,8 +235,8 @@ export default {
     onClickLeft() {
       this.$router.go(-1);
     },
-    jumpLink(path) {
-      this.$router.push(path);
+    jumpLink(path, query) {
+      this.$router.push({ path, query });
     },
     selectType(item) {
       this.$store.commit("bill/SET_TYPE", item.id);
@@ -248,6 +250,7 @@ export default {
     },
     changeDateType(val) {},
     queryHandle() {
+      this.$store.commit("bill/SET_PAGENUM", 1);
       this.queryBill()
         .then(() => {
           this.filterShow = false;
