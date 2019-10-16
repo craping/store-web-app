@@ -12,7 +12,7 @@ module.exports = {
     open: false,
     proxy: {
       [process.env.VUE_APP_BASE_API]: {
-        // target: 'http://45.15.11.187',
+        // target: 'http://m.5gyungou.com',
         target: 'http://localhost',
         changeOrigin: true,
         pathRewrite: {
