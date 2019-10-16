@@ -210,7 +210,11 @@ export default {
       //   note: '备注'
       // }
       this.$http
-        .post('/order/create', params)
+        .post('/order/create', params, {
+          params: {
+            format: "sync"
+          }
+        })
         .then(data => {
           console.log(data.info)
           this.payParamsObj = {

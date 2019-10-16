@@ -42,7 +42,7 @@ export default {
   }
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .store-nav-bar {
     transition: background-color .2s linear;
     display: flex;

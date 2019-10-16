@@ -83,6 +83,16 @@ textarea {
     }
   }
 }
+.goods{
+  .goods-detail {
+    img {
+      width: 100%;
+    }
+  }
+  .store-nav-bar.nav-in .van-nav-bar__title{
+    margin-bottom: -10px;
+  }
+}
 
 .text-ellipsis{
   overflow:hidden;

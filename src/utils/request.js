@@ -14,34 +14,16 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     if (!config.params) {
-      config.params = {
-        format: config.url == '/order/create' ? 'async' : 'json',
-        token: getToken()
-      }
+      config.params = { format: 'json', token: getToken() }
     } else {
-      config.params = {
-        ...{
-          format: config.url == '/order/create' ? 'async' : 'json',
-          token: getToken()
-        },
-        ...config.params
-      }
+      config.params = { ...{ format: 'json', token: getToken() }, ...config.params }
     }
 
     if (config.headers['Content-Type'].includes('application/json')) {
       if (!config.data) {
-        config.data = {
-          format: config.url == '/order/create' ? 'async' : 'json',
-          token: getToken()
-        }
+        config.data = { format: 'json', token: getToken() }
       } else {
-        config.data = {
-          ...{
-            format: config.url == '/order/create' ? 'async' : 'json',
-            token: getToken()
-          },
-          ...config.data
-        }
+        config.data = { ...{ format: 'json', token: getToken() }, ...config.data }
       }
     }
 

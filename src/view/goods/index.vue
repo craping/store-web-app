@@ -717,7 +717,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .goods {
   margin-bottom: 50px;
 
