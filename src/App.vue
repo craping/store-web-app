@@ -25,10 +25,10 @@ export default {
       service.init(data.info);
     }).catch(error => {
       console.log(error)
-      if(getClient == 3 && !getToken()){
+      if(getClient() == 3 && !getToken()){
           //微信中
           const appid = 'wx455d4595caac679c'
-          const redirect_uri =  encodeURIComponent(`http://5gyungou.com/wxLogin.html?returnUrl=${location.href}`) 
+          const redirect_uri =  encodeURIComponent(`http://m.5gyungou.com/wx.html?returnUrl=${location.href}`) 
           window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${}&response_type=code&scope=snsapi_userinfo#wechat_redirect`
         }
     });
