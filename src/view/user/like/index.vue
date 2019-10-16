@@ -1,13 +1,13 @@
  <!--我的收藏-->
 <template>
   <div class="like-page">
-    <van-nav-bar title="我的收藏" left-arrow @click-left="onClickLeft" />
-    <store-scroller class="scoll-s" @onRefresh="onRefresh" @onInfinite="onLoad">
+    <van-nav-bar title="我的收藏" left-arrow fixed @click-left="onClickLeft" />
+    <!-- <store-scroller class="scoll-s" @onRefresh="onRefresh" @onInfinite="onLoad"> -->
       <div class="content">
         <van-card
           class="round"
           v-for="(item) in likeList"
-          :key="item.id"
+          :key="item.productId"
           :price="item.price"
           :title="item.name"
           :desc="item.description"
@@ -20,7 +20,7 @@
           </template>
         </van-card>
       </div>
-    </store-scroller>
+    <!-- </store-scroller> -->
   </div>
 </template>
 <script>
@@ -75,11 +75,11 @@ export default {
       if (done) done(true);
     },
     toDetail(item) {
-      this.$router.push({name:'goods',params:{id:item.id}})
+      this.$router.push({name:'goods',params:{id:item.productId}})
     },
     cancelLike(item) {
       this.$http
-        .post("/collec/deleteProduct", { id: item.itemId })
+        .post("/collec/deleteProduct", { id: item.productId })
         .then(res => {
           Toast('删除成功');
         })

@@ -111,7 +111,7 @@
             </div>
           </div>
         </div>
-        <p class="look-detail" @click="jumpLink('/team',{parentId:amsAccount.parents})">查看详情></p>
+        <p class="look-detail" @click="jumpLink('/team',{parentId:amsAccount.parentId})">查看详情></p>
       </div>
       <div class="bottom-bar">
         <van-cell title="提现记录" @click="toBill(2,4)" is-link />

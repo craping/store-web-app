@@ -3,9 +3,11 @@
     <div class="curtain" ref="curtain">
       <div class="cav"></div>
     </div>
-    <div class="fix-bar">
-      <span class="title">购物车</span>
-      <span class="operate" @click="changeOperate">{{isOperate?'完成':'管理'}}</span>
+    <div class="top-bar">
+      <div class="fix-bar">
+        <span class="title">购物车</span>
+        <span class="operate" @click="changeOperate">{{isOperate?'完成':'管理'}}</span>
+      </div>
     </div>
     <store-scroller class="scoll-s" @onRefresh="onRefresh">
       <div class="content">
@@ -215,14 +217,18 @@ export default {
       overflow: hidden;
     }
   }
+  .top-bar{
+    padding-top: 86px;
+  }
   .fix-bar {
     position: fixed;
     width: 100vw;
     text-align: center;
     z-index: 10;
     background: $red;
-    height: 66px;
+    height: 86px;
     padding-top: 35px;
+    top: 0;
     .title {
       font-size: 14px;
       color: #fff;
@@ -233,8 +239,12 @@ export default {
       right: 15px;
     }
   }
+  .scoll-s {
+    /deep/._v-container.scroll{
+      padding-top: 86px;
+    }
+  }
   .content {
-    padding-top: 86px;
     .card-goods {
       background-color: #fff;
       border-radius: 5px;

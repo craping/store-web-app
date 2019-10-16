@@ -51,8 +51,8 @@ export default {
     },
     getSubAgents() {
       const params = {
-        parentId: this.$route.query.parentId,
-        pageNum: 0,
+        parentId: this.parentId,
+        pageNum: 1,
         pageSize: 10,
       }
       this.$http
