@@ -54,6 +54,9 @@ const Sync = {
             SAFE(data){
                 store.commit("sys/SET_VIPENABLE", data);
             }
+        },
+        MESSAGE:{
+            
         }
     }
 }
