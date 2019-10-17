@@ -624,7 +624,9 @@ export default {
     },
     showSku(){
       if(!this.isLogin){
-        Toast('用户未登录')
+        this.$router.push("/login")
+        this.$store.commit("user/SET_BEFOREPATH", this.$route.path);
+        // Toast('用户未登录')
         return;
       }
       this.sku.show = true;
@@ -690,7 +692,9 @@ export default {
     openService(){
       let me = this;
       if(!this.isLogin){
-        Toast('用户未登录')
+        this.$router.push("/login")
+        this.$store.commit("user/SET_BEFOREPATH", this.$route.path);
+        // Toast('用户未登录')
         return;
       }
       const { umsMember} = this.userInfo;
