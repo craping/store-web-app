@@ -4,14 +4,21 @@ export default {
   namespaced: true,
   state: {
     orderList: [],
-    confirmOrderList: []
+    confirmOrderList: [],
+    checkInfoList: {}
   },
   mutations: {
     SET_ORDER_LIST(state, content) {
-      state.orderList = content
+      state.orderList = [...content, ...state.orderList]
+    },
+    SET_ORDER_LIST_INIT(state) {
+      state.orderList = []
     },
     SET_CONFIRM_ORDER_LIST(state, content) {
       state.confirmOrderList = content
+    },
+    SET_CHECK_INFO_LIST(state, content) {
+      state.checkInfoList = content
     }
   },
   actions: {

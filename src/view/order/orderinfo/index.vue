@@ -12,8 +12,8 @@
       <store-scroller @onRefresh="onRefresh">
         <div class="ordestatus">
           <div class="tip">
-            <h2>交易成功</h2>
-            <div class="ordersubinfo" v-show="whichStep != 'success'">{{ordersubinfo}}</div>
+            <h2>{{proStatus[checkInfoList.status]}}</h2>
+            <!-- <div class="ordersubinfo" v-show="whichStep != 'success'">{{ordersubinfo}}</div> -->
           </div>
           <div class="ordericon">
             <van-icon name="send-gift"/>
@@ -31,36 +31,79 @@
         </div>
         <div class="orderSpec">
           <van-card
-            :num="orderSpec.sellnums"
-            :price="orderSpec.price"
-            :desc="orderSpec.tag"
-            :title="orderSpec.title"
-            thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"
+            v-for="(item,index) in checkInfoList.orderItemList"
+            :key="item.id"
+            :num="item.productQuantity"
+            :title="item.productName"
+            :price="item.productPrice"
+            :thumb="item.productPic"
           >
-            <div slot="footer" class="footerBtn">
-              <van-button>退款</van-button>
+            <div slot="tags">
+              <van-tag
+                plain
+                type="danger"
+                v-for="(item,index) in JSON.parse(item.productAttr)"
+                :key="index"
+              >{{item.key}}:{{item.value}}</van-tag>
             </div>
             <div
+              v-show="index == checkInfoList.orderItemList.length-1"
               slot="footer"
-              class="footerPl"
-              v-for="(value,key,index) in orderSpec.pricespec"
-              :key="index"
+              class="productSpec"
             >
-              <div>{{priceSpecList[index]}}</div>
-              <div>{{index == 2 ? '-' : ''}}￥{{value.toFixed(2)}}</div>
+              <!-- <div v-show="product.orderItemList">共{{product.orderItemList[0].productQuantity}}件商品</div> -->
+              <div>
+                应付款：￥
+                <span>{{checkInfoList.totalAmount}}</span>
+                (含运费￥{{checkInfoList.freightAmount}})
+              </div>
             </div>
           </van-card>
-          <van-cell title="实付款" :value="`￥${orderSpec.pricespec.orderprice.toFixed(2)}`"/>
+          <van-cell title="实付款" :value="`￥${checkInfoList.payAmount}`"/>
         </div>
 
         <div class="orderinfos">
           <van-cell title="订单信息"/>
-          <van-cell :border="false" v-for="(item,key,index) in orderinfos" :key="key">
+          <van-cell :border="false">
             <!-- 使用 title 插槽来自定义标题 -->
             <template slot="title">
-              <span class="custom-title">{{key}}</span>
-              <span class="custom-content">{{item}}</span>
-              <van-button type="danger" size="mini" v-show="index == 0">复制</van-button>
+              <span class="custom-title">订单编号</span>
+              <span class="custom-content">{{checkInfoList.orderItemList[0].orderSn}}</span>
+              <van-button
+                type="danger"
+                size="mini"
+                class="copyNumClass"
+                :data-clipboard-text="checkInfoList.orderItemList[0].orderSn"
+                @click="copyNum"
+              >复制</van-button>
+            </template>
+          </van-cell>
+          <van-cell :border="false">
+            <!-- 使用 title 插槽来自定义标题 -->
+            <template slot="title">
+              <span class="custom-title">创建时间</span>
+              <span class="custom-content">{{checkInfoList.createTime}}</span>
+            </template>
+          </van-cell>
+          <van-cell :border="false">
+            <!-- 使用 title 插槽来自定义标题 -->
+            <template slot="title">
+              <span class="custom-title">付款时间</span>
+              <span class="custom-content">暂时无</span>
+            </template>
+          </van-cell>
+          <van-cell :border="false">
+            <!-- 使用 title 插槽来自定义标题 -->
+            <template slot="title">
+              <span class="custom-title">发货时间</span>
+              <span class="custom-content">暂时无</span>
+            </template>
+          </van-cell>
+          <van-cell :border="false">
+            <!-- 使用 title 插槽来自定义标题 -->
+            <template slot="title">
+              <span class="custom-title">成交时间</span>
+              <span class="custom-content">暂时无</span>
             </template>
           </van-cell>
         </div>
@@ -75,17 +118,21 @@
         </div>
       </store-scroller>
     </div>
-    <van-tabbar>
-      <van-button type="danger" plain size="mini" @click="deleteOrder">删除订单</van-button>
-      <van-button type="danger" plain size="mini" @click="checkFee">查看物流</van-button>
-      <van-button type="danger" plain size="mini" @click="toAssess">评价</van-button>
+    <van-tabbar v-show="isSendProduct || isGetProduct">
+      <van-button type="danger" plain size="mini" v-show="isShowDelete" @click="deleteOrder">删除订单</van-button>
+      <van-button type="danger" plain size="mini" v-show="isSendProduct" @click="checkFee">查看物流</van-button>
+      <van-button type="danger" plain size="mini" v-show="isGetProduct" @click="toAssess">评价</van-button>
     </van-tabbar>
+    <store-loding v-show="loding"></store-loding>
   </van-row>
 </template>
 <script>
 import Vue from 'vue'
+import { mapState } from 'vuex'
 import storeScroller from '@/components/store-scroller'
 import storeCard from '@/components/store-card'
+import ClipboardJS from 'clipboard'
+import storeLoding from '@/components/store-loding'
 import {
   AddressList,
   Tab,
@@ -122,32 +169,16 @@ export default {
   name: 'orderinfo',
   components: {
     storeScroller,
-    storeCard
+    storeCard,
+    storeLoding
   },
   data() {
     return {
       ordersubinfo: '去评价下本次的购物体验吧~',
       whichStep: 'success',
-      orderSpec: {
-        pid: '1',
-        title: '漂亮衣服',
-        price: 20,
-        sellnums: 1,
-        tag: '七天无理由退货',
-        pricespec: {
-          totelprice: 100,
-          fee: 20,
-          discount: 10,
-          orderprice: 110
-        }
-      },
-      addressList: {
-        id: '1',
-        name: '张三',
-        tel: '13000000000',
-        address: '浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室'
-      },
+      proStatus: ['待付款', '待发货', '已发货', '已收货', '已关闭', '已完成'],
       priceSpecList: ['商品总价', '运费', '店铺优惠', '订单总价'],
+      loding: false,
       productList: [
         {
           pid: '1',
@@ -220,6 +251,41 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapState({
+      checkInfoList: state => state.order.checkInfoList
+    }),
+    addressList() {
+      return {
+        name: this.checkInfoList.receiverName,
+        tel: this.checkInfoList.receiverPhone,
+        address: `${this.checkInfoList.receiverProvince}${
+          this.checkInfoList.receiverCity
+        }${this.checkInfoList.receiverRegion}${
+          this.checkInfoList.receiverDetailAddress
+        }邮编：${this.checkInfoList.receiverPostCode}`
+      }
+    },
+    isSendProduct() {
+      return (
+        this.checkInfoList.status != '0' &&
+        this.checkInfoList.status != '1' &&
+        this.checkInfoList.status != '4'
+      )
+    },
+    isGetProduct() {
+      return (
+        this.checkInfoList.status != '1' &&
+        this.checkInfoList.status != '2' &&
+        this.checkInfoList.status != '0'
+      )
+    },
+    isShowDelete() {
+      return (
+        this.checkInfoList.status == '4' || this.checkInfoList.status == '5'
+      )
+    }
+  },
   created() {},
   methods: {
     /*************返回点击事件***************/
@@ -232,13 +298,18 @@ export default {
       this.$router.push({
         name: 'productExpress',
         params: {
-          pid: '0000'
+          pid: this.checkInfoList.orderItemList[0].orderId
         }
       })
     },
     /*************点击立即评价事件*********/
     toAssess() {
-      console.log('去评价页面')
+      this.$router.push({
+        name: 'comment',
+        params: {
+          pid: this.checkInfoList.orderItemList[0].orderId
+        }
+      })
     },
 
     /***********下拉刷新事件*********/
@@ -258,10 +329,38 @@ export default {
       })
         .then(() => {
           // on confirm
-          type == 'cancel' ? this.cancelOrder(pid) : this.deleteOrder(pid)
+          this.deleteOrder()
         })
         .catch(() => {
           // on cancel
+        })
+    },
+    /************复制按钮点击点击事件*********/
+    copyNum() {
+      var clipboard = new ClipboardJS('.copyNumClass')
+      clipboard.on('success', function(e) {
+        Toast.success(`复制成功`)
+        e.clearSelection()
+      })
+
+      clipboard.on('error', function(e) {
+        Toast.fail('复制失败')
+      })
+    },
+    /***********删除订单事件*********/
+    deleteOrder() {
+      this.loding = true
+      const params = {
+        orderId: this.checkInfoList.orderItemList[0].orderId
+      }
+      this.$http
+        .post('/order/deleteOrder', params)
+        .then(data => {
+          this.loding = false
+          this.$router.go(-1)
+        })
+        .catch(error => {
+          console.log(error)
         })
     }
   }
@@ -371,7 +470,7 @@ export default {
         width: 30%;
       }
       .custom-content {
-        width: 50%;
+        width: 55%;
         color: $gray-deep;
       }
     }

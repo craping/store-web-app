@@ -12,7 +12,7 @@
       <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad">
         <van-tab v-for="(item,index) in productStatus" :key="item.id" :title="item.title">
           <div v-for="product in showProductList" :key="product.id" class="pro-container">
-            <div class="status">{{proStatus[product.confirmStatus]}}</div>
+            <div class="status">{{proStatus[product.status]}}</div>
             <div>
               <van-card
                 v-for="(item,index) in product.orderItemList"
@@ -21,7 +21,7 @@
                 :title="item.productName"
                 :price="item.productPrice"
                 :thumb="item.productPic"
-                @click="checkInfo(item.productId)"
+                @click="checkInfo(product)"
               >
                 <div slot="tags">
                   <van-tag
@@ -45,11 +45,11 @@
                 </div>
                 <div slot="footer" v-show="index == product.orderItemList.length-1">
                   <van-button
-                    v-for="(item,index) in proEventList[`event${product.confirmStatus}`]"
+                    v-for="(item,index) in proEventList[`event${product.status}`]"
                     :key="index"
                     size="mini"
                     :class="item == '立即付款' ? 'tored' : ''"
-                    @click.stop="proEventClick(product.id,item)"
+                    @click.stop="proEventClick(product,item)"
                   >{{item}}</van-button>
                 </div>
               </van-card>
@@ -68,6 +68,7 @@
       </store-scroller>
     </van-tabs>
     <store-pay-dialog @closeDialog="closeDialog" @toPay="toPay" :show="showPayDialog"></store-pay-dialog>
+    <store-loding v-show="loding"></store-loding>
   </van-row>
 </template>
 <script>
@@ -76,6 +77,7 @@ import { mapState } from 'vuex'
 import storeScroller from '@/components/store-scroller'
 import storeCard from '@/components/store-card'
 import storePayDialog from '@/components/store-pay-dialog'
+import storeLoding from '@/components/store-loding'
 import {
   Tab,
   Tabs,
@@ -103,11 +105,13 @@ export default {
   components: {
     storeScroller,
     storeCard,
-    storePayDialog
+    storePayDialog,
+    storeLoding
   },
   data() {
     return {
       active: 0, //默认为1
+      loding: false,
       productStatus: [
         { id: '1', title: '全部' },
         { id: '2', title: '待付款' },
@@ -184,18 +188,29 @@ export default {
         event0: ['立即付款', '取消订单'],
         event1: ['取消订单'],
         event2: ['确认收货', '查看物流', '退款'],
-        event3: ['评价商品', '退货退款', '删除订单']
+        event3: ['评价商品', '退货退款'],
+        event4: ['删除订单'],
+        event5: ['评价商品', '删除订单']
       },
       showPayDialog: false, //支付弹框默认隐藏
       patyType: '', //获取支付方式
 
       /***********联调用的的数据************* */
-      pageNums: 1 //请求数据的页数
+      pageNums: 1, //请求数据的页数
+      channel: null,
+      aliChannel: null,
+      wxChannel: null,
+      payParamsObj: {}
     }
   },
   created() {
     this.initData()
     this.active = this.$route.query.tabId
+  },
+  mounted() {
+    this.onPlusReady(() => {
+      this.getPayChannel()
+    })
   },
   computed: {
     ...mapState({
@@ -210,24 +225,27 @@ export default {
 
     /*************初始化数据************ */
     initData() {
+      this.loding = true
+      this.$store.commit('order/SET_ORDER_LIST_INIT')
       this.$store
         .dispatch('order/getOrderList', {
-          pageNum: 1,
+          pageNum: this.pageNums,
           pageSize: 10
         })
         .then(data => {
           this.showProductList = this.orderList
         })
+        .finally(() => {
+          this.loding = false
+        })
     },
 
     /*************点击查看详情事件***************/
-    checkInfo(id) {
+    checkInfo(item) {
       this.$router.push({
-        name: 'orderinfo',
-        params: {
-          id
-        }
+        name: 'orderinfo'
       })
+      this.$store.commit('order/SET_CHECK_INFO_LIST', item)
     },
 
     /*************tab切换标签点击事件*********/
@@ -235,7 +253,7 @@ export default {
       // 0->待付款；1->待发货；2->已发货；3->已收货；4->已关闭；5->已完成
       if (name != 0) {
         this.showProductList = this.orderList.filter(item => {
-          return item.confirmStatus == name - 1
+          return item.status == name - 1
         })
       } else {
         this.showProductList = this.orderList
@@ -243,19 +261,19 @@ export default {
     },
 
     /************产品按钮点击点击事件*********/
-    proEventClick(pid, event) {
+    proEventClick(product, event) {
       switch (event) {
         case '取消订单':
-          this.confirmDialog('cancel', pid)
+          this.confirmDialog('cancel', product.orderItemList)
           break
         case '删除订单':
-          this.confirmDialog('delete', pid)
+          this.confirmDialog('delete', product.orderItemList)
           break
         case '查看物流':
           this.$router.push({
             name: 'productExpress',
             params: {
-              pid
+              id: product.id
             }
           })
           break
@@ -263,37 +281,43 @@ export default {
           this.$router.push({
             name: 'comment',
             params: {
-              pid
+              id: product.id
             }
           })
           break
         case '退款':
+          this.$store.commit('order/SET_CHECK_INFO_LIST', product)
           this.$router.push({
             name: 'refund',
             params: {
-              pid
+              id: product.id
             }
           })
           break
         case '退货退款':
+          this.$store.commit('order/SET_CHECK_INFO_LIST', product)
           this.$router.push({
             name: 'refund',
             params: {
-              pid
+              id: product.id
             }
           })
           break
         case '立即付款':
           this.showPayDialog = true
+          this.payParamsObj = {
+            orderSn: product.orderSn,
+            orderIds: product.orderItemList.map(item => item.orderId)
+          }
           break
         case '确认收货':
-          this.confirmOrder(pid)
+          this.confirmOrder(product)
           break
       }
     },
 
     /***********点击取消订单和删除订单弹窗事件*********/
-    confirmDialog(type, pid) {
+    confirmDialog(type, pArr) {
       let title = ''
       let message = ''
       if (type == 'cancel') {
@@ -303,13 +327,14 @@ export default {
         title = '删除订单'
         message = '确定删除这个订单吗？'
       }
+      const id = pArr[0].orderId
       Dialog.confirm({
         title,
         message
       })
         .then(() => {
           // on confirm
-          type == 'cancel' ? this.cancelOrder(pid) : this.deleteOrder(pid)
+          type == 'cancel' ? this.cancelOrder(id) : this.deleteOrder(id)
         })
         .catch(() => {
           // on cancel
@@ -317,9 +342,10 @@ export default {
     },
 
     /***********取消订单事件*********/
-    cancelOrder(pid) {
+    cancelOrder(orderId) {
+      this.loding = true
       const params = {
-        orderId: pid
+        orderId
       }
       this.$http
         .post('/order/cancelOrder', params)
@@ -333,6 +359,7 @@ export default {
 
     /***********删除订单事件*********/
     deleteOrder(pid) {
+      this.loding = true
       const params = {
         orderId: pid
       }
@@ -343,13 +370,15 @@ export default {
         })
         .catch(error => {
           console.log(error)
+          this.loding = false
         })
     },
 
     /*********确认收货事件******** */
-    confirmOrder(pid) {
+    confirmOrder(p) {
+      this.loding = true
       const params = {
-        orderId: pid
+        orderId: p.orderItemList[0].orderId
       }
       this.$http
         .post('/order/confirmOrder', params)
@@ -357,12 +386,13 @@ export default {
           this.$router.push({
             name: 'successfulOrder',
             params: {
-              pid
+              pid: p.id
             }
           })
         })
         .catch(error => {
           console.log(error)
+          this.loding = false
         })
     },
 
@@ -374,8 +404,61 @@ export default {
     /***********点击支付按钮事件并获取支付方式*********/
     toPay(type) {
       Toast.success('去支付页面')
-      this.patyType = type
-      console.log('sfsdf', this.patyType)
+      this.payType = type
+      console.log('sfsdf', this.payType)
+      var requestUrl = null
+      if (this.payType == 'wx') {
+        requestUrl = '/trade/pay'
+        this.channel = this.wxChannel
+        this.payParamsObj.channel = 'WXPAY'
+      } else if (this.payType == 'ali') {
+        requestUrl = '/ali/pay'
+        this.channel = this.aliChannel
+      } else {
+        requestUrl = '/trade/pay'
+        this.channel = this.wxChannel
+      }
+
+      this.$http.post(requestUrl, this.payParamsObj).then(data => {
+        let temPrams = data.info
+        temPrams.timestamp = parseInt(data.info.timestamp)
+        console.log(temPrams)
+        console.log('获取的通道', this.channel)
+        plus.payment.request(
+          this.channel,
+          temPrams,
+          res => {
+            this.$http
+              .post('trade/tradeDetail', { tradeNo: temPrams.tradeNo })
+              .then(data => {
+                plus.nativeUI.alert('支付成功！', function() {
+                  this.$router.push('/order')
+                })
+              })
+          },
+          error => {
+            plus.nativeUI.alert('支付失败：' + error.code)
+          }
+        )
+      })
+    },
+    /*******调用5+支付功能********** */
+    getPayChannel() {
+      // 获取支付通道
+      plus.payment.getChannels(
+        channels => {
+          for (var i = 0; i < channels.length; i++) {
+            if (channels[i].id == 'alipay') {
+              this.aliChannel = channels[i]
+            } else if (channels[i].id == 'wxpay') {
+              this.wxChannel = channels[i]
+            }
+          }
+        },
+        function(e) {
+          plus.nativeUI.alert('获取支付通道失败：' + e.message)
+        }
+      )
     },
     /*************支付弹框事件群end******/
 
@@ -387,8 +470,12 @@ export default {
           pageNum: this.pageNums,
           pageSize: 10
         })
+        .then(data => {
+          this.showProductList = this.orderList
+          console.log('this.showProductList', this.showProductList)
+          this.onClick(this.active)
+        })
         .finally(() => {
-          this.isLoading = false
           if (done) done()
         })
     },
@@ -400,6 +487,7 @@ export default {
   },
   watch: {
     active(newValue, oldValue) {
+      this.pageNums = 1
       this.onClick(newValue)
     }
   }

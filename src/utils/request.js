@@ -13,15 +13,17 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(
   config => {
+    const isNeedAsync =
+      config.url == '/order/create' || config.url == '/order/cancelOrder'
     if (!config.params) {
       config.params = {
-        format: config.url == '/order/create' ? 'async' : 'json',
+        format: isNeedAsync ? 'async' : 'json',
         token: getToken()
       }
     } else {
       config.params = {
         ...{
-          format: config.url == '/order/create' ? 'async' : 'json',
+          format: isNeedAsync ? 'async' : 'json',
           token: getToken()
         },
         ...config.params
@@ -31,13 +33,13 @@ service.interceptors.request.use(
     if (config.headers['Content-Type'].includes('application/json')) {
       if (!config.data) {
         config.data = {
-          format: config.url == '/order/create' ? 'async' : 'json',
+          format: isNeedAsync ? 'async' : 'json',
           token: getToken()
         }
       } else {
         config.data = {
           ...{
-            format: config.url == '/order/create' ? 'async' : 'json',
+            format: isNeedAsync ? 'async' : 'json',
             token: getToken()
           },
           ...config.data
