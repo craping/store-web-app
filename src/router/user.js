@@ -99,10 +99,6 @@ export default [{
   component: () => import('@/view/user/message/index.vue')
 },
 {
-  path: '/messageList',
-  component: () => import('@/view/user/message/list.vue')
-},
-{
   path: '/messageDetail',
   component: () => import('@/view/user/message/detail.vue')
 }

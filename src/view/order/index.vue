@@ -217,7 +217,8 @@ export default {
       channel: null,
       aliChannel: null,
       wxChannel: null,
-      payParamsObj: {}
+      payParamsObj: {},
+      isBalanceEnough: true
     }
   },
   created() {
@@ -232,7 +233,9 @@ export default {
   computed: {
     ...mapState({
       orderList: state => state.order.orderList,
-      totalnum: state => state.order.totalNum
+      totalnum: state => state.order.totalNum,
+      platform: state => state.sys.client,
+      userInfo: state => state.user.userInfo
     })
   },
   methods: {
@@ -312,10 +315,14 @@ export default {
           this.refundEvent(product)
           break
         case '立即付款':
-          this.showPayDialog = true
+          this.$store.dispatch('payChannel/getPayChannel').then(data => {
+            this.showPayDialog = true
+            this.isBalanceEnough =
+              this.userInfo.amsAccount.balance >= product.payAmount
+          })
           this.payParamsObj = {
-            orderSn: product.orderSn,
-            orderIds: product.orderItemList.map(item => item.orderId)
+            orderIds: product.orderItemList.map(item => item.orderId),
+            sourceType: this.platform
           }
           break
         case '确认收货':
@@ -425,23 +432,34 @@ export default {
     },
     /***********点击支付按钮事件并获取支付方式*********/
     toPay(type) {
-      Toast.success('去支付页面')
       this.payType = type
       console.log('sfsdf', this.payType)
       var requestUrl = null
-      if (this.payType == 'wx') {
+      if (this.payType == 'WXPAY') {
         requestUrl = '/trade/pay'
         this.channel = this.wxChannel
-        this.payParamsObj.channel = 'WXPAY'
-      } else if (this.payType == 'ali') {
+        this.payParamsObj.channelId = 2
+      } else if (this.payType == 'ALIPAYPAYS') {
         requestUrl = '/ali/pay'
         this.channel = this.aliChannel
+        this.payParamsObj.channelId = 4
       } else {
         requestUrl = '/trade/pay'
         this.channel = this.wxChannel
+        this.payParamsObj.channelId = 1
+        if (!this.isBalanceEnough) {
+          Toast.fail('余额不足以支付该产品')
+          return
+        }
       }
 
       this.$http.post(requestUrl, this.payParamsObj).then(data => {
+        if (this.payType == 'BALANCE') {
+          this.showPayDialog = false
+          Toast.success('支付成功')
+          this.initData()
+          return
+        }
         let temPrams = data.info
         temPrams.timestamp = parseInt(data.info.timestamp)
         console.log(temPrams)

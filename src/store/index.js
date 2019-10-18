@@ -9,7 +9,9 @@ import order from './modules/order'
 import afterSale from './modules/afterSale'
 import cart from './modules/cart'
 import comments from './modules/comments'
+import message from './modules/comments'
 import sys from './modules/sys'
+import payChannel from './modules/payChannel'
 
 Vue.use(Vuex)
 
@@ -24,6 +26,8 @@ export default new Vuex.Store({
     afterSale,
     cart,
     comments,
-    sys
+    message,
+    sys,
+    payChannel
   }
 })

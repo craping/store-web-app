@@ -113,14 +113,16 @@ export default {
       payParamsObj: {}, //传给自己后台支付接口的数据
       channel: null,
       aliChannel: null,
-      wxChannel: null
+      wxChannel: null,
+      isBalanceEnough: false
     }
   },
   computed: {
     ...mapState({
       confirmOrderList: state => state.order.confirmOrderList,
-      platform: state => state.user.client,
-      addressInfo: state => state.address.addressInfo
+      platform: state => state.sys.client,
+      addressInfo: state => state.address.addressInfo,
+      userInfo: state => state.user.userInfo
     }),
     totalPrice() {
       return this.confirmOrderList.reduce((pre, cur) => {
@@ -145,7 +147,11 @@ export default {
     /*************点击打开支付弹框事件*********/
 
     toShowPay() {
-      this.showPayDialog = true
+      this.$store.dispatch('payChannel/getPayChannel').then(data => {
+        this.showPayDialog = true
+        this.isBalanceEnough =
+          this.userInfo.amsAccount.balance >= this.totalPrice
+      })
     },
 
     /*********获取用户的收货地址*********** */
@@ -199,27 +205,15 @@ export default {
           }
         }
       }
-      // const params = {
-      //   skuIds: temSkuids,
-      //   addressId: this.addressInfo.id,
-      //   type: this.$route.query.type,
-      //   // sourceType: this.platform,
-      //   sourceType: 1,
-      //   quantity: confirmOrderList[0].num,
-      //   productAttr: confirmOrderList[0].productAttr,
-      //   note: '备注'
-      // }
+
       this.$http
-        .post('/order/create', params, {
-          params: {
-            format: "sync"
-          }
-        })
+        .post('/order/create', params)
         .then(data => {
           console.log(data.info)
           this.payParamsObj = {
-            orderSn: data.info.orderSn,
-            orderIds: data.info.orderIds.split(',')
+            // orderSn: data.info.orderSn,
+            orderIds: data.info.orderIds.split(','),
+            sourceType: this.platform
           }
         })
         .catch(error => {
@@ -235,23 +229,34 @@ export default {
     },
     /***********点击支付按钮事件并获取支付方式*********/
     toPay(type) {
-      Toast.success('去支付页面')
       this.payType = type
       console.log('sfsdf', this.payType)
       var requestUrl = null
-      if (this.payType == 'wx') {
+      if (this.payType == 'WXPAY') {
         requestUrl = '/trade/pay'
         this.channel = this.wxChannel
-        this.payParamsObj.channel = 'WXPAY'
-      } else if (this.payType == 'ali') {
+        this.payParamsObj.channelId = 2
+      } else if (this.payType == 'ALIPAYPAYS') {
         requestUrl = '/ali/pay'
         this.channel = this.aliChannel
+        this.payParamsObj.channelId = 4
       } else {
         requestUrl = '/trade/pay'
         this.channel = this.wxChannel
+        this.payParamsObj.channelId = 1
+        if (!this.isBalanceEnough) {
+          Toast.fail('余额不足以支付该产品')
+          return
+        }
       }
 
       this.$http.post(requestUrl, this.payParamsObj).then(data => {
+        if (this.payType == 'BALANCE') {
+          this.showPayDialog = false
+          Toast.success('支付成功')
+          this.$router.push('/order')
+          return
+        }
         let temPrams = data.info
         temPrams.timestamp = parseInt(data.info.timestamp)
         console.log(temPrams)
