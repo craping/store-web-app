@@ -12,10 +12,8 @@ module.exports = {
     open: false,
     proxy: {
       [process.env.VUE_APP_BASE_API]: {
-        target: 'http://20g5198x42.imwork.net:53639',
         // target: 'http://m.5gyungou.com/api',
-
-        // target: 'http://localhost',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''

@@ -647,11 +647,11 @@ export default {
     /********点击立即购买去到确认订单中心******/
     buy(skuData) {
       const sku = {
-        ...skuData.selectedSkuComb,
-        quantity: skuData.selectedNum,
-        recommenderId: this.recommenderId
-      }
-      sku.price /= 100
+        ...skuData.selectedSkuComb, 
+        quantity:skuData.selectedNum,
+        recommenderId:this.recommenderId
+      };
+      sku.price /= 100; 
       // console.log(sku);
       this.$store.commit('order/SET_CONFIRM_ORDER_LIST', [sku])
       this.$router.push({
@@ -663,11 +663,11 @@ export default {
     },
     addCart(skuData) {
       const sku = {
-        ...skuData.selectedSkuComb,
-        num: skuData.selectedNum,
-        recommenderId: this.recommenderId
-      }
-      sku.price /= 100
+        ...skuData.selectedSkuComb, 
+        quantity:skuData.selectedNum,
+        recommenderId:this.recommenderId
+      };
+      sku.price /= 100; 
       // console.log(sku)
       this.$http
         .post('cartItem/addCart', {
