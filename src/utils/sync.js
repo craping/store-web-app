@@ -50,9 +50,13 @@ const Sync = {
             this.source.cancel();
     },
     invokes:{
-        USER:{
-            SAFE(data){
-                store.commit("sys/SET_VIPENABLE", data);
+        SYS:{
+            //后台修改配置通知
+            CONFIG(data){
+                // store.dispatch("sys/getSysConfig").then(data => {
+                //     console.log(data.info)
+                // });
+                store.commit("sys/SET_CONFIG_SINGLE", data);
             }
         },
         MESSAGE:{

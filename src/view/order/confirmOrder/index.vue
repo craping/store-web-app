@@ -59,14 +59,14 @@
       </div>
     </div>
     <van-tabbar>
-      <van-button type="danger" plain size="mini" @click="toSumbitOrder">去支付</van-button>
+      <van-button type="info" @click="toSumbitOrder">去支付</van-button>
     </van-tabbar>
     <store-pay-dialog @closeDialog="closeDialog" @toPay="toPay" :show="showPayDialog"></store-pay-dialog>
   </van-row>
 </template>
 <script>
 import Vue from 'vue'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import storePayDialog from '@/components/store-pay-dialog'
 import {
   NavBar,
@@ -126,7 +126,7 @@ export default {
     }),
     totalPrice() {
       return this.confirmOrderList.reduce((pre, cur) => {
-        return pre + cur.price
+        return pre + cur.price * cur.quantity
       }, 0)
     }
   },
@@ -139,6 +139,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions('user', ['getUserInfo']),
     /*************返回点击事件***************/
     onClickLeft() {
       this.$router.go(-1)
@@ -254,6 +255,7 @@ export default {
         if (this.payType == 'BALANCE') {
           this.showPayDialog = false
           Toast.success('支付成功')
+          this.getUserInfo()
           this.$router.push('/order')
           return
         }
@@ -371,7 +373,7 @@ export default {
     align-items: center;
     .van-button {
       border-radius: 11px;
-      padding: 0 10px;
+
       margin: 0 10px;
     }
   }

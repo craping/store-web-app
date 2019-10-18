@@ -10,11 +10,10 @@
     />
     <div class="ordercontent">
       <store-scroller @onRefresh="onRefresh">
-        <div class="ordestatus">
+        <div class="ordestatus" v-if="isShow">
           <div class="tip">
-            <h2>{{refundStep[1]}}</h2>
-            <span>2019年12月12日</span>
-            <span>12:12</span>
+            <h2>{{afterSaleStatus[refundSpecObj.status]}}</h2>
+            <p>{{formatTime(refundSpecObj.createTime)}}</p>
           </div>
           <div class="ordericon">
             <van-icon name="after-sale"/>
@@ -22,27 +21,45 @@
         </div>
         <div class="refundMoney">
           <van-cell-group>
-            <van-cell title="退款总金额" :value="`￥${totalMoney}`"/>
-            <van-cell title="退回微信钱包" class="redMoney" :value="`￥${totalMoney}`"/>
+            <van-cell title="退款总金额" :value="`￥${refundSpecObj.returnAmount}`"/>
+            <!-- <van-cell title="退回微信钱包" class="redMoney" :value="returnAmount"/> -->
           </van-cell-group>
         </div>
         <div class="refundSpec">
           <van-cell title="退款信息"/>
           <van-card
-            :num="refundSpec.sellnums"
-            :price="refundSpec.price"
-            :desc="refundSpec.tag"
-            :title="refundSpec.title"
-            thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"
+            :num="refundSpecObj.productCount"
+            :price="refundSpecObj.productPrice"
+            :title="refundSpecObj.productName"
+            :thumb="refundSpecObj.productPic"
           >
-            <div
-              slot="footer"
-              class="footerPl"
-              v-for="(value,key,index) in refundSpec.reasons"
-              :key="index"
-            >
-              <div>{{refundSpecList[index]}}:</div>
-              <div>{{value}}</div>
+            <div slot="tags" v-if="refundSpecObj.productAttr">
+              <van-tag
+                plain
+                type="danger"
+                v-for="(item,index) in JSON.parse(refundSpecObj.productAttr)"
+                :key="index"
+              >{{item.key}}:{{item.value}}</van-tag>
+            </div>
+            <div slot="footer" class="footerPl">
+              <p>退款金额:</p>
+              <p>{{refundSpecObj.returnAmount}}元</p>
+            </div>
+            <div slot="footer" class="footerPl">
+              <p>退款原因:</p>
+              <p>{{refundSpecObj.reason}}</p>
+            </div>
+            <div slot="footer" class="footerPl">
+              <p>申请时间:</p>
+              <p>{{formatTime(refundSpecObj.createTime)}}</p>
+            </div>
+            <div slot="footer" class="footerPl">
+              <p>申请人电话:</p>
+              <p>{{refundSpecObj.returnPhone}}</p>
+            </div>
+            <div slot="footer" class="footerPl">
+              <p>备注:</p>
+              <p>{{refundSpecObj.description}}</p>
             </div>
           </van-card>
         </div>
@@ -70,10 +87,9 @@
           </van-cell-group>
           <van-cell-group v-else>
             <van-cell title="退货物流信息"/>
-            <van-field v-model="expressNo" type="number" label="物流单号" placeholder="000" disabled/>
+            <van-field v-model="refundSpecObj.deliverySn" type="number" label="物流单号" disabled/>
 
-            <van-field v-model="expressCom" type="text" label="物流公司" placeholder="顺丰" disabled/>
-            <van-button plain hairline size="large" type="danger" @click="postExpressInfo">提交</van-button>
+            <van-field v-model="refundSpecObj.deliveryCompany" type="text" label="物流公司" disabled/>
           </van-cell-group>
         </div>
         <div class="mayLike">
@@ -93,6 +109,7 @@
 import Vue from 'vue'
 import storeScroller from '@/components/store-scroller'
 import storeCard from '@/components/store-card'
+import { format } from '@/utils/util'
 import {
   Tab,
   Tabs,
@@ -128,6 +145,7 @@ export default {
   data() {
     return {
       refundStep: ['退款处理中', '退款成功'],
+      afterSaleStatus: ['待处理', '退货中', '已完成', '已拒绝', '已取消'],
       whichStep: 'success',
       totalMoney: '88',
       refundSpec: {
@@ -214,15 +232,11 @@ export default {
       isShowSumbit: false, //是否显示提交物流信息
 
       /*******联调的新数据*******/
-      refundSpecObj: {}
+      refundSpecObj: {},
+      isShow: false
     }
   },
   created() {
-    this.isShowSumbit =
-      this.refundSpec.expressInfo == '' &&
-      this.refundSpec.applyStatus == 1 &&
-      this.refundSpec.productStatus == 1
-
     this.getRefund()
   },
   methods: {
@@ -241,28 +255,44 @@ export default {
     /***********提交物流信息事件*********/
     postExpressInfo() {
       const deliverySn = this.expressNo
-      const expressCom = this.expressCom
+      const deliveryCompany = this.expressCom
       if (!deliverySn) {
         Toast.fail('请填写物流单号')
         return
       }
-      if (!expressCom) {
+      if (!deliveryCompany) {
         Toast.fail('请填写物流公司')
         return
       }
       const params = {
         returnId: this.$route.params.id,
         deliverySn,
-        expressCom
+        deliveryCompany
       }
-      this.$http.post('/orderReturnApply/insertDeliveryInfo', params)
+      this.$http
+        .post('/orderReturnApply/insertDeliveryInfo', params)
+        .then(data => {
+          this.getRefund()
+        })
     },
 
     /****** 获取售后详情 *****/
     getRefund() {
-      this.$http.post('/orderReturnApply/detail').then(data => {
-        this.refundSpecObj = data.info
-      })
+      this.$http
+        .post('/orderReturnApply/detail', { returnId: this.$route.params.id })
+        .then(data => {
+          this.refundSpecObj = data.info
+          this.isShowSumbit =
+            !this.refundSpecObj.deliveryCompany &&
+            !this.refundSpecObj.deliverySn &&
+            this.refundSpecObj.receiveStatus == 1
+          this.$nextTick(() => {
+            this.isShow = true
+          })
+        })
+    },
+    formatTime(time) {
+      return format(time, 'yyyy-MM-dd')
     }
   }
 }

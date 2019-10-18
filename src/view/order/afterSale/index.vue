@@ -39,18 +39,8 @@
               <p>{{afterSaleStatus[product.status]}}</p>
             </div>
             <div slot="footer">
-              <van-button
-                size="small"
-                plain
-                type="info"
-                @click.stop="toRefundInfo(product.pid)"
-              >查看详情</van-button>
-              <van-button
-                size="small"
-                plain
-                type="danger"
-                @click.stop="cancelRefund(product.pid)"
-              >取消售后</van-button>
+              <van-button size="small" plain type="info" @click.stop="toRefundInfo(product)">查看详情</van-button>
+              <van-button size="small" plain type="danger" @click.stop="cancelRefund(product)">取消售后</van-button>
             </div>
           </van-card>
         </div>
@@ -189,12 +179,11 @@ export default {
     },
 
     /************点击查看详情事件*********/
-    toRefundInfo(id) {
-      console.log('查看详情', id)
+    toRefundInfo(p) {
       this.$router.push({
         name: 'refundInfo',
         params: {
-          id
+          id: p.id
         }
       })
     },
@@ -233,10 +222,11 @@ export default {
     },
 
     /********取消售后******** */
-    cancelRefund(id) {
+    cancelRefund(p) {
+      debugger
       const params = {
-        returnId: id,
-        orderItemId: id
+        returnId: p.orderId,
+        orderItemId: p.productId
       }
       Dialog.confirm({
         title: '取消售后',

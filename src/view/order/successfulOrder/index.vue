@@ -9,7 +9,7 @@
       <div class="tipinfo">{{tipinfo}}</div>
       <div class="tipBtn">
         <van-button color="#ff4444" plain @click="toHome">返回首页</van-button>
-        <van-button color="#ff4444" plain @click="toAssess">立即评价</van-button>
+        <!-- <van-button color="#ff4444" plain @click="toAssess">立即评价</van-button> -->
       </div>
     </div>
     <div class="content-container">

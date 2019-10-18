@@ -29,10 +29,10 @@ const Service = {
             ]),
             level: amsAccount.id,
             success: function(){
-                console.log("用户信息配置成功")
+                console.log("客服系统用户信息配置成功")
             },
             error: function(){
-                console.log("用户信息配置失败")
+                console.log("客服系统用户信息配置失败")
             }
         });
 

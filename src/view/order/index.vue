@@ -81,7 +81,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import storeScroller from '@/components/store-scroller'
 import storeCard from '@/components/store-card'
 import storePayDialog from '@/components/store-pay-dialog'
@@ -239,6 +239,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions('user', ['getUserInfo']),
     /*************返回点击事件***************/
     onClickLeft() {
       this.$router.push('/main/user')
@@ -326,6 +327,7 @@ export default {
           }
           break
         case '确认收货':
+          this.$store.commit('order/SET_CHECK_INFO_LIST', product)
           this.confirmOrder(product)
           break
       }
@@ -458,6 +460,7 @@ export default {
           this.showPayDialog = false
           Toast.success('支付成功')
           this.initData()
+          this.getUserInfo()
           return
         }
         let temPrams = data.info

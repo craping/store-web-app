@@ -251,7 +251,7 @@ export default {
         orderItemId: checkInfoList.id,
         quantity,
         receiveStatus: checkInfoList.confirmStatus,
-        reason_id: this.reasonId,
+        reasonId: this.reasonId,
         reason: this.selectedReason,
         description: this.refundSpec,
         proofPics: this.fileList

@@ -3,7 +3,7 @@
  -->
 <template>
   <div class="vip-grade-page">
-    <van-nav-bar title="会员等级" left-arrow @click-left="onClickLeft" fixed />
+    <!-- <van-nav-bar title="会员等级" left-arrow @click-left="onClickLeft" fixed />
     <div class="title">钻石会员等级</div>
     <div class="subtitle">规则大解析</div>
     <div class="rule-table">
@@ -28,7 +28,7 @@
     </div>
     <div class="rule-item">
       <i>3</i> 购买礼包注册成功即为新人，V1-V6会员按照最近90天内购物产生的订单数升降级。
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
