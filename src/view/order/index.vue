@@ -12,7 +12,7 @@
       <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad">
         <van-tab v-for="(item,index) in productStatus" :key="item.id" :title="item.title">
           <div v-for="product in showProductList" :key="product.id" class="pro-container">
-            <div class="status">{{proStatus[product.confirmStatus]}}</div>
+            <div class="status">{{proStatus[product.status]}}</div>
             <div>
               <van-card
                 v-for="(item,index) in product.orderItemList"
@@ -21,7 +21,7 @@
                 :title="item.productName"
                 :price="item.productPrice"
                 :thumb="item.productPic"
-                @click="checkInfo(item.productId)"
+                @click="checkInfo(product)"
               >
                 <div slot="tags">
                   <van-tag
@@ -30,6 +30,10 @@
                     v-for="(item,index) in JSON.parse(item.productAttr)"
                     :key="index"
                   >{{item.key}}:{{item.value}}</van-tag>
+                </div>
+                <div slot="footer" v-show="(product.status == 3 || product.status == 5)">
+                  <div class="status" v-if="item.commentStatus == 1">已评论</div>
+                  <van-button v-else size="mini" @click.stop="proEventClick(item,'评价商品')">评价商品</van-button>
                 </div>
                 <div
                   v-show="index == product.orderItemList.length-1"
@@ -43,13 +47,17 @@
                     (含运费￥{{product.freightAmount}})
                   </div>
                 </div>
+
                 <div slot="footer" v-show="index == product.orderItemList.length-1">
+                  <div
+                    class="status"
+                  >售后状态：{{afterSaleStatus[product.orderItemList[0].serviceStatus + 1]}}</div>
                   <van-button
-                    v-for="(item,index) in proEventList[`event${product.confirmStatus}`]"
+                    v-for="(item,index) in proEventList[`event${product.status}`]"
                     :key="index"
                     size="mini"
                     :class="item == '立即付款' ? 'tored' : ''"
-                    @click.stop="proEventClick(product.id,item)"
+                    @click.stop="proEventClick(product,item)"
                   >{{item}}</van-button>
                 </div>
               </van-card>
@@ -68,14 +76,16 @@
       </store-scroller>
     </van-tabs>
     <store-pay-dialog @closeDialog="closeDialog" @toPay="toPay" :show="showPayDialog"></store-pay-dialog>
+    <store-loding v-show="loding"></store-loding>
   </van-row>
 </template>
 <script>
 import Vue from 'vue'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import storeScroller from '@/components/store-scroller'
 import storeCard from '@/components/store-card'
 import storePayDialog from '@/components/store-pay-dialog'
+import storeLoding from '@/components/store-loding'
 import {
   Tab,
   Tabs,
@@ -103,11 +113,13 @@ export default {
   components: {
     storeScroller,
     storeCard,
-    storePayDialog
+    storePayDialog,
+    storeLoding
   },
   data() {
     return {
       active: 0, //默认为1
+      loding: false,
       productStatus: [
         { id: '1', title: '全部' },
         { id: '2', title: '待付款' },
@@ -177,57 +189,85 @@ export default {
           freight: '0.00'
         }
       ],
-      proStatus: ['待付款', '待发货', '已发货', '已收货', '已关闭', '已完成'],
       // 0->待付款；1->待发货；2->已发货；3->已收货；4->已关闭；5->已完成
+      proStatus: ['待付款', '待发货', '已发货', '已收货', '已关闭', '已完成'],
+      //售后状态
+      afterSaleStatus: [
+        '无售后',
+        '待处理',
+        '退货中',
+        '已完成',
+        '已拒绝',
+        '已取消'
+      ],
       showProductList: [],
       proEventList: {
         event0: ['立即付款', '取消订单'],
         event1: ['取消订单'],
         event2: ['确认收货', '查看物流', '退款'],
-        event3: ['评价商品', '退货退款', '删除订单']
+        event3: ['退货退款'],
+        event4: ['删除订单'],
+        event5: ['删除订单']
       },
       showPayDialog: false, //支付弹框默认隐藏
       patyType: '', //获取支付方式
 
       /***********联调用的的数据************* */
-      pageNums: 1 //请求数据的页数
+      pageNums: 1, //请求数据的页数
+      channel: null,
+      aliChannel: null,
+      wxChannel: null,
+      payParamsObj: {},
+      isBalanceEnough: true
     }
   },
   created() {
     this.initData()
     this.active = this.$route.query.tabId
   },
+  mounted() {
+    this.onPlusReady(() => {
+      this.getPayChannel()
+    })
+  },
   computed: {
     ...mapState({
-      orderList: state => state.order.orderList
+      orderList: state => state.order.orderList,
+      totalnum: state => state.order.totalNum,
+      platform: state => state.sys.client,
+      userInfo: state => state.user.userInfo
     })
   },
   methods: {
+    ...mapActions('user', ['getUserInfo']),
     /*************返回点击事件***************/
     onClickLeft() {
-      this.$router.go(-1)
+      this.$router.push('/main/user')
     },
 
     /*************初始化数据************ */
     initData() {
+      this.loding = true
+      this.$store.commit('order/SET_ORDER_LIST_INIT')
       this.$store
         .dispatch('order/getOrderList', {
-          pageNum: 1,
+          pageNum: this.pageNums,
           pageSize: 10
         })
         .then(data => {
           this.showProductList = this.orderList
         })
+        .finally(() => {
+          this.loding = false
+        })
     },
 
     /*************点击查看详情事件***************/
-    checkInfo(id) {
+    checkInfo(item) {
       this.$router.push({
-        name: 'orderinfo',
-        params: {
-          id
-        }
+        name: 'orderinfo'
       })
+      this.$store.commit('order/SET_CHECK_INFO_LIST', item)
     },
 
     /*************tab切换标签点击事件*********/
@@ -235,7 +275,7 @@ export default {
       // 0->待付款；1->待发货；2->已发货；3->已收货；4->已关闭；5->已完成
       if (name != 0) {
         this.showProductList = this.orderList.filter(item => {
-          return item.confirmStatus == name - 1
+          return item.status == name - 1
         })
       } else {
         this.showProductList = this.orderList
@@ -243,57 +283,72 @@ export default {
     },
 
     /************产品按钮点击点击事件*********/
-    proEventClick(pid, event) {
+    proEventClick(product, event) {
       switch (event) {
         case '取消订单':
-          this.confirmDialog('cancel', pid)
+          this.confirmDialog('cancel', product.orderItemList)
           break
         case '删除订单':
-          this.confirmDialog('delete', pid)
+          this.confirmDialog('delete', product.orderItemList)
           break
         case '查看物流':
+          this.$store.commit('order/SET_CHECK_INFO_LIST', product)
           this.$router.push({
             name: 'productExpress',
             params: {
-              pid
+              id: product.id
             }
           })
           break
         case '评价商品':
+          this.$store.commit('order/SET_CHECK_INFO_LIST', product)
           this.$router.push({
             name: 'comment',
             params: {
-              pid
+              id: product.id
             }
           })
           break
         case '退款':
-          this.$router.push({
-            name: 'refund',
-            params: {
-              pid
-            }
-          })
+          this.refundEvent(product)
           break
         case '退货退款':
-          this.$router.push({
-            name: 'refund',
-            params: {
-              pid
-            }
-          })
+          this.refundEvent(product)
           break
         case '立即付款':
-          this.showPayDialog = true
+          this.$store.dispatch('payChannel/getPayChannel').then(data => {
+            this.showPayDialog = true
+            this.isBalanceEnough =
+              this.userInfo.amsAccount.balance >= product.payAmount
+          })
+          this.payParamsObj = {
+            orderIds: product.orderItemList.map(item => item.orderId),
+            sourceType: this.platform
+          }
           break
         case '确认收货':
-          this.confirmOrder(pid)
+          this.$store.commit('order/SET_CHECK_INFO_LIST', product)
+          this.confirmOrder(product)
           break
       }
     },
 
+    /*******退款事件***** */
+    refundEvent(p) {
+      if (p.orderItemList[0].serviceStatus > -1) {
+        Toast.fail('该产品已有售后处理中')
+        return
+      }
+      this.$store.commit('order/SET_CHECK_INFO_LIST', p)
+      this.$router.push({
+        name: 'refund',
+        params: {
+          id: p.id
+        }
+      })
+    },
     /***********点击取消订单和删除订单弹窗事件*********/
-    confirmDialog(type, pid) {
+    confirmDialog(type, pArr) {
       let title = ''
       let message = ''
       if (type == 'cancel') {
@@ -303,13 +358,14 @@ export default {
         title = '删除订单'
         message = '确定删除这个订单吗？'
       }
+      const id = pArr[0].orderId
       Dialog.confirm({
         title,
         message
       })
         .then(() => {
           // on confirm
-          type == 'cancel' ? this.cancelOrder(pid) : this.deleteOrder(pid)
+          type == 'cancel' ? this.cancelOrder(id) : this.deleteOrder(id)
         })
         .catch(() => {
           // on cancel
@@ -317,9 +373,10 @@ export default {
     },
 
     /***********取消订单事件*********/
-    cancelOrder(pid) {
+    cancelOrder(orderId) {
+      this.loding = true
       const params = {
-        orderId: pid
+        orderId
       }
       this.$http
         .post('/order/cancelOrder', params)
@@ -333,6 +390,7 @@ export default {
 
     /***********删除订单事件*********/
     deleteOrder(pid) {
+      this.loding = true
       const params = {
         orderId: pid
       }
@@ -343,13 +401,15 @@ export default {
         })
         .catch(error => {
           console.log(error)
+          this.loding = false
         })
     },
 
     /*********确认收货事件******** */
-    confirmOrder(pid) {
+    confirmOrder(p) {
+      this.loding = true
       const params = {
-        orderId: pid
+        orderId: p.orderItemList[0].orderId
       }
       this.$http
         .post('/order/confirmOrder', params)
@@ -357,12 +417,13 @@ export default {
           this.$router.push({
             name: 'successfulOrder',
             params: {
-              pid
+              pid: p.id
             }
           })
         })
         .catch(error => {
           console.log(error)
+          this.loding = false
         })
     },
 
@@ -373,22 +434,95 @@ export default {
     },
     /***********点击支付按钮事件并获取支付方式*********/
     toPay(type) {
-      Toast.success('去支付页面')
-      this.patyType = type
-      console.log('sfsdf', this.patyType)
+      this.payType = type
+      console.log('sfsdf', this.payType)
+      var requestUrl = null
+      if (this.payType == 'WXPAY') {
+        requestUrl = '/trade/pay'
+        this.channel = this.wxChannel
+        this.payParamsObj.channelId = 2
+      } else if (this.payType == 'ALIPAYPAYS') {
+        requestUrl = '/ali/pay'
+        this.channel = this.aliChannel
+        this.payParamsObj.channelId = 4
+      } else {
+        requestUrl = '/trade/pay'
+        this.channel = this.wxChannel
+        this.payParamsObj.channelId = 1
+        if (!this.isBalanceEnough) {
+          Toast.fail('余额不足以支付该产品')
+          return
+        }
+      }
+
+      this.$http.post(requestUrl, this.payParamsObj).then(data => {
+        if (this.payType == 'BALANCE') {
+          this.showPayDialog = false
+          Toast.success('支付成功')
+          this.initData()
+          this.getUserInfo()
+          return
+        }
+        let temPrams = data.info
+        temPrams.timestamp = parseInt(data.info.timestamp)
+        console.log(temPrams)
+        console.log('获取的通道', this.channel)
+        plus.payment.request(
+          this.channel,
+          temPrams,
+          res => {
+            this.$http
+              .post('trade/tradeDetail', { tradeNo: temPrams.tradeNo })
+              .then(data => {
+                plus.nativeUI.alert('支付成功！', function() {
+                  this.$router.push('/order')
+                })
+              })
+          },
+          error => {
+            plus.nativeUI.alert('支付失败：' + error.code)
+          }
+        )
+      })
+    },
+    /*******调用5+支付功能********** */
+    getPayChannel() {
+      // 获取支付通道
+      plus.payment.getChannels(
+        channels => {
+          for (var i = 0; i < channels.length; i++) {
+            if (channels[i].id == 'alipay') {
+              this.aliChannel = channels[i]
+            } else if (channels[i].id == 'wxpay') {
+              this.wxChannel = channels[i]
+            }
+          }
+        },
+        function(e) {
+          plus.nativeUI.alert('获取支付通道失败：' + e.message)
+        }
+      )
     },
     /*************支付弹框事件群end******/
 
     /***********下拉刷新事件*********/
     onRefresh(done) {
+      if (this.showProductList.length >= this.totalnum) {
+        if (done) done(true)
+        return
+      }
       this.pageNums += 1
       this.$store
         .dispatch('order/getOrderList', {
           pageNum: this.pageNums,
           pageSize: 10
         })
+        .then(data => {
+          this.showProductList = this.orderList
+          console.log('this.showProductList', this.showProductList)
+          this.onClick(this.active)
+        })
         .finally(() => {
-          this.isLoading = false
           if (done) done()
         })
     },
@@ -400,6 +534,7 @@ export default {
   },
   watch: {
     active(newValue, oldValue) {
+      this.pageNums = 1
       this.onClick(newValue)
     }
   }

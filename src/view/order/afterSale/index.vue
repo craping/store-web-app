@@ -10,35 +10,37 @@
     />
     <div class="content">
       <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad">
-        <div v-for="product in productList" :key="product.id" class="pro-container">
+        <div v-for="product in listContainer" :key="product.id" class="pro-container">
           <van-card
-            :num="product.nums"
-            :title="product.title"
-            :desc="product.desc"
-            :price="product.price"
-            thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"
+            :num="product.productCount"
+            :title="product.productName"
+            :price="product.productPrice"
+            :thumb="product.productPic"
           >
             <div slot="tags">
-              <van-tag plain type="danger">{{product.tag}}</van-tag>
+              <van-tag
+                plain
+                type="danger"
+                v-for="(item,index) in JSON.parse(product.productAttr)"
+                :key="index"
+              >{{item.key}}:{{item.value}}</van-tag>
+            </div>
+            <div slot="footer" class="refundStatus">
+              <p>退款金额:</p>
+              <p>{{product.returnAmount}}元</p>
+            </div>
+            <div slot="footer" class="refundStatus">
+              <p>退款原因:</p>
+              <p>{{product.reason}}</p>
             </div>
             <div slot="footer" class="refundStatus">
               <van-icon name="cash-back-record"/>
-              <p>{{asStatus[product.refundType]}}</p>
-              <p>{{asStatusCon[product.status]}}</p>
+              <p>{{asStatus[product. receiveStatus]}}</p>
+              <p>{{afterSaleStatus[product.status]}}</p>
             </div>
             <div slot="footer">
-              <van-button
-                size="small"
-                plain
-                type="info"
-                @click.stop="toRefundInfo(product.pid)"
-              >查看详情</van-button>
-              <van-button
-                size="small"
-                plain
-                type="danger"
-                @click.stop="cancelRefund(product.pid)"
-              >取消售后</van-button>
+              <van-button size="small" plain type="info" @click.stop="toRefundInfo(product)">查看详情</van-button>
+              <van-button size="small" plain type="danger" @click.stop="cancelRefund(product)">取消售后</van-button>
             </div>
           </van-card>
         </div>
@@ -82,6 +84,7 @@ export default {
   data() {
     return {
       //status 0 退款成功，1，退款失败
+      // `status` int(1) DEFAULT NULL COMMENT '申请状态：0->待处理；1->退货中；2->已完成；3->已拒绝；4->已取消',
       //refundType 0 仅退款，1，退货退款
       productList: [
         {
@@ -146,7 +149,15 @@ export default {
         }
       ],
       asStatus: ['仅退款', '仅退款退货'],
-      asStatusCon: ['退款成功', '退款失败'],
+      // 0->待处理；1->退货中；2->已完成；3->已拒绝；4->已取消
+      afterSaleStatus: [
+        '无售后',
+        '待处理',
+        '退货中',
+        '已完成',
+        '已拒绝',
+        '已取消'
+      ],
 
       /***联调后的数据***/
       listContainer: [], //用来放获取的数据列表数据
@@ -168,12 +179,11 @@ export default {
     },
 
     /************点击查看详情事件*********/
-    toRefundInfo(id) {
-      console.log('查看详情', id)
+    toRefundInfo(p) {
       this.$router.push({
         name: 'refundInfo',
         params: {
-          id
+          id: p.id
         }
       })
     },
@@ -187,7 +197,7 @@ export default {
           pageSize: 10
         })
         .then(() => {
-          this.listContainer = [...this.listContainer, ...this.afterSaleList]
+          this.listContainer = [...this.afterSaleList, ...this.listContainer]
         })
         .finally(() => {
           this.isLoading = false
@@ -212,10 +222,11 @@ export default {
     },
 
     /********取消售后******** */
-    cancelRefund(id) {
+    cancelRefund(p) {
+      debugger
       const params = {
-        returnId: id,
-        orderItemId: id
+        returnId: p.orderId,
+        orderItemId: p.productId
       }
       Dialog.confirm({
         title: '取消售后',

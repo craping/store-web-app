@@ -35,7 +35,7 @@ import Vue from "vue";
 import { setToken } from "@/utils/auth";
 import md5 from "js-md5";
 import { NavBar, CellGroup, Field, Toast } from "vant";
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 Vue.use(Field)
   .use(CellGroup)
   .use(Toast)
@@ -54,6 +54,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions('user',['getUserInfo']),
     onClickLeft() {
       this.$router.go(-1);
     },
@@ -67,7 +68,7 @@ export default {
         .post("/login/passwrodLogin", params)
         .then(res => {
           setToken(res.info.token);
-          this.$store.commit('user/SET_USERINFO',res.info)
+          this.getUserInfo()
           this.$router.push(this.beforePath);
         })
         .catch(error => {

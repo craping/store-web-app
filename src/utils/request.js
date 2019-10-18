@@ -13,17 +13,37 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(
   config => {
+    const isNeedAsync =
+      config.url == '/order/create' || config.url == '/order/cancelOrder'
     if (!config.params) {
-      config.params = { format: 'json', token: getToken() }
+      config.params = {
+        format: isNeedAsync ? 'async' : 'json',
+        token: getToken()
+      }
     } else {
-      config.params = { ...{ format: 'json', token: getToken() }, ...config.params }
+      config.params = {
+        ...{
+          format: isNeedAsync ? 'async' : 'json',
+          token: getToken()
+        },
+        ...config.params
+      }
     }
 
     if (config.headers['Content-Type'].includes('application/json')) {
       if (!config.data) {
-        config.data = { format: 'json', token: getToken() }
+        config.data = {
+          format: isNeedAsync ? 'async' : 'json',
+          token: getToken()
+        }
       } else {
-        config.data = { ...{ format: 'json', token: getToken() }, ...config.data }
+        config.data = {
+          ...{
+            format: isNeedAsync ? 'async' : 'json',
+            token: getToken()
+          },
+          ...config.data
+        }
       }
     }
 

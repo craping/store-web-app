@@ -66,10 +66,12 @@
       <van-cell class="goods-price" :border="false" :center="true">
         <div class="price">{{ formatPrice(goods.price, goods.maxPrice) }}</div>
         <div v-if="vipEnable" class="commission">
-          赚 <span>{{ commission }}</span>
+          赚
+          <span>{{ commission }}</span>
         </div>
         <div v-else class="originalPrice">
-          价格 <span class="line-through">{{ formatPrice(goods.originalPrice) }}</span>
+          价格
+          <span class="line-through">{{ formatPrice(goods.originalPrice) }}</span>
         </div>
       </van-cell>
       <van-cell :title="goods.title" title-style="font-size:1rem;" :label="goods.subTitle"/>
@@ -108,7 +110,7 @@
       </van-cell>
     </van-cell-group>
 
-    <van-cell-group  class="goods-cell-group" ref="comment" >
+    <van-cell-group class="goods-cell-group" ref="comment">
       <div class="comments-top van-hairline--bottom" @click="showCommentsHandle">
         <div>商品评价({{commentsTotalnum}})</div>
         <div class="right" v-if="comments.length">
@@ -116,7 +118,7 @@
           <van-icon name="arrow" color="#f44"/>
         </div>
       </div>
-      <div class="no-comments-area" v-if='comments.length == 0'>暂无评价</div>
+      <div class="no-comments-area" v-if="comments.length == 0">暂无评价</div>
       <div v-else class="comments-area" v-for="item in comments" :key="item.id">
         <div class="row-1">
           <img class="head-img" :src="item.memberIcon">
@@ -124,20 +126,29 @@
         </div>
         <div class="row-2">
           <div class="overhide">{{item.content}}</div>
-          <div class="pic-area" >
-            <img v-for="(pic,index) in JSON.parse(item.pics)" :key="index" :src="pic.url" @click="showPre(JSON.parse(item.pics))" />
+          <div class="pic-area">
+            <img
+              v-for="(pic,index) in JSON.parse(item.pics)"
+              :key="index"
+              :src="pic.url"
+              @click="showPre(JSON.parse(item.pics))"
+            >
           </div>
         </div>
         <div class="row-3">{{formatTime(item.createTime)}} 规格:{{formatAttr(item.productAttribute)}}</div>
       </div>
-
     </van-cell-group>
     <van-cell-group class="goods-cell-group" ref="detail">
       <van-cell title="图文详细" @click="sorry"/>
       <div class="goods-detail" v-html="goods.detailHtml" @click="showHTMLPre($event)"></div>
     </van-cell-group>
 
-    <store-share v-if="shareEnable" v-model="share.msg" :show="share.show" @cancel="share.show=false"></store-share>
+    <store-share
+      v-if="shareEnable"
+      v-model="share.msg"
+      :show="share.show"
+      @cancel="share.show=false"
+    ></store-share>
     <van-sku
       ref="sku"
       v-model="sku.show"
@@ -165,12 +176,7 @@
             </div>
           </van-button>
           <!-- 直接触发 sku 内部事件，通过内部事件执行 buy 回调 -->
-          <van-button
-            square
-            size="large"
-            type="danger"
-            @click="props.skuEventBus.$emit('sku:buy')"
-          >
+          <van-button square size="large" type="danger" @click="props.skuEventBus.$emit('sku:buy')">
             <div style="line-height:normal">
               <div>立即购买</div>
               <div v-if="vipEnable" class="commission">省 {{ skuCommission }}</div>
@@ -228,7 +234,11 @@
       <div class="params-content popup-content">
         <div class="title">产品参数</div>
         <div class="item-wrapper">
-          <div class="item van-hairline--bottom" v-for="(item,index) in paramsSheet.list" :key="index">
+          <div
+            class="item van-hairline--bottom"
+            v-for="(item,index) in paramsSheet.list"
+            :key="index"
+          >
             <div class="left">{{item.name}}</div>
             <div class="right">{{item.inputList}}</div>
           </div>
@@ -266,12 +276,12 @@ import storeShare from '@/components/store-share'
 import storeService from '@/components/store-service'
 import comments from './comments'
 import { PrefixInteger } from '@/utils/util'
-import service from "@/utils/service";
+import service from '@/utils/service'
 import Big from 'big.js'
 import Vue from 'vue'
 import { mapState, mapGetters, mapActions } from 'vuex'
-import sync from "@/utils/sync";
-import { format } from "@/utils/util";
+import sync from '@/utils/sync'
+import { format } from '@/utils/util'
 
 Vue.use(ImagePreview)
 const serviceItems = [
@@ -321,16 +331,18 @@ export default {
       commentsTotalnum: state => state.comments.commentsTotalnum,
       unread: state => state.sys.unread
     }),
-    ...mapGetters("cart", ["cartNum"]),
-    ...mapGetters("sys", ["shareEnable", "vipEnable"]),
-    commission: function(){
-      return this.formatPrice(this.goods.commission, this.goods.maxCommission);
+    ...mapGetters('cart', ['cartNum']),
+    ...mapGetters('sys', ['shareEnable', 'vipEnable']),
+    commission: function() {
+      return this.formatPrice(this.goods.commission, this.goods.maxCommission)
     },
-    skuCommission: function(){
-      return this.formatPrice(this.sku.commission, this.sku.maxCommission);
+    skuCommission: function() {
+      return this.formatPrice(this.sku.commission, this.sku.maxCommission)
     },
-    recommenderId: function(){
-      return this.goods.id == this.$route.query.shopId?this.$route.query.recommenderId:null;
+    recommenderId: function() {
+      return this.goods.id == this.$route.query.shopId
+        ? this.$route.query.recommenderId
+        : null
     }
   },
   data() {
@@ -349,10 +361,10 @@ export default {
       share: {
         show: false,
         msg: {
-          title:null,
-          content:null,
-          thumbs:[],
-          href:null
+          title: null,
+          content: null,
+          thumbs: [],
+          href: null
         }
       },
       goods: {
@@ -375,8 +387,8 @@ export default {
         none_sku: false, // 是否无规格商品
         messages: [],
         hide_stock: true, // 是否隐藏剩余库存
-        commission:0,
-        maxCommission:0
+        commission: 0,
+        maxCommission: 0
       },
       paramsSheet: {
         list: [],
@@ -387,10 +399,10 @@ export default {
         show: false
       },
       comments: [],
-      showService:false,
+      showService: false,
       showCommentsSheet: false,
       prePicShow: false,
-      preImage: [],
+      preImage: []
     }
   },
   created() {
@@ -400,9 +412,10 @@ export default {
       })
       .then(data => {
         //goods初始化
-        let { product, skus, specifications, comments } = data.info;
+        let { product, skus, specifications, comments } = data.info
         product.title = product.name
-        product.thumb = product.albumPics == '' ? [] : product.albumPics.split(',')
+        product.thumb =
+          product.albumPics == '' ? [] : product.albumPics.split(',')
         product.thumb.unshift(product.pic)
         const index = product.thumb.findIndex(e => {
           if (e.includes('.mp4')) {
@@ -426,8 +439,10 @@ export default {
           product.maxPrice = skus[skus.length - 1].price
         }
         //服务初始化
-        this.serviceSheet.list = serviceItems.filter(ele=> product.serviceIds.split(',').includes(ele.key))
-        console.log('this.serviceSheet.list',this.serviceSheet.list)
+        this.serviceSheet.list = serviceItems.filter(ele =>
+          product.serviceIds.split(',').includes(ele.key)
+        )
+        console.log('this.serviceSheet.list', this.serviceSheet.list)
         this.serviceSheet.list.forEach(e => {
           product.service += e.value + ' '
         })
@@ -457,34 +472,34 @@ export default {
           this.sku.tree.push(sp)
         }
         skus.forEach(e => {
-          e.stock_num = 9999;
-          e.price *= 100;
-          e.title = product.title;
-          e.subTitle = product.subTitle;
-          e.supId = product.supId;
-          e.pic = product.pic;
-          e.productAttr = [];
+          e.stock_num = 9999
+          e.price *= 100
+          e.title = product.title
+          e.subTitle = product.subTitle
+          e.supId = product.supId
+          e.pic = product.pic
+          e.productAttr = []
           for (let i = 1; i <= 3; i++) {
-            const value = e["sp"+i];
-            if(value)
+            const value = e['sp' + i]
+            if (value)
               e.productAttr.push({
-                key:specifications[i-1].name,
-                value:value
-              });
+                key: specifications[i - 1].name,
+                value: value
+              })
           }
         })
         this.sku.list = skus
-        this.sku.commission = product.commission;
-        this.sku.maxCommission = product.maxCommission;
+        this.sku.commission = product.commission
+        this.sku.maxCommission = product.maxCommission
         //分享组件初始化
         this.share.msg = {
-          title:product.title,
-          content:product.subTitle,
-          thumbs:[product.pic],
-          href:process.env.VUE_APP_SHARE+product.id+"?shopId="+product.id
+          title: product.title,
+          content: product.subTitle,
+          thumbs: [product.pic],
+          href: process.env.VUE_APP_SHARE + product.id + '?shopId=' + product.id
         }
         //初始化客服商品内容
-        service.product(product);
+        service.product(product)
         this.comments = comments
       })
 
@@ -501,7 +516,7 @@ export default {
     window.removeEventListener('scroll', this.handleScroll, true)
   },
   methods: {
-    ...mapActions('comments',['queryComments']),
+    ...mapActions('comments', ['queryComments']),
     handleScroll(e) {
       const scrollTop =
         window.pageYOffset ||
@@ -554,10 +569,8 @@ export default {
           document.body.scrollTop
         this.opacityIn = scrollTop / (this.$refs.product.offsetTop - 66)
       } else {
-        if(window.history.length <= 1)
-          this.$router.push("/main/home")
-        else
-          this.$router.go(-1)
+        if (window.history.length <= 1) this.$router.push('/main/home')
+        else this.$router.go(-1)
       }
     },
     displayVideo() {
@@ -605,7 +618,7 @@ export default {
       Toast('暂无后续逻辑~')
     },
     showCommentsHandle() {
-        this.showCommentsSheet = true
+      this.showCommentsSheet = true
 
       if (this.comments.length) {
         this.opacityIn = 1
@@ -622,14 +635,14 @@ export default {
       this.preImage = picArray.map(ele => ele.url)
       this.prePicShow = true
     },
-    showSku(){
-      if(!this.isLogin){
-        this.$router.push("/login")
-        this.$store.commit("user/SET_BEFOREPATH", this.$route.path);
+    showSku() {
+      if (!this.isLogin) {
+        this.$router.push('/login')
+        this.$store.commit('user/SET_BEFOREPATH', this.$route.path)
         // Toast('用户未登录')
-        return;
+        return
       }
-      this.sku.show = true;
+      this.sku.show = true
     },
     /********点击立即购买去到确认订单中心******/
     buy(skuData) {
@@ -640,7 +653,7 @@ export default {
       };
       sku.price /= 100; 
       // console.log(sku);
-      this.$store.commit("order/SET_CONFIRM_ORDER_LIST", [sku]);
+      this.$store.commit('order/SET_CONFIRM_ORDER_LIST', [sku])
       this.$router.push({
         name: 'confirmOrder',
         query: {
@@ -648,7 +661,7 @@ export default {
         }
       })
     },
-    addCart(skuData){
+    addCart(skuData) {
       const sku = {
         ...skuData.selectedSkuComb, 
         quantity:skuData.selectedNum,
@@ -656,50 +669,56 @@ export default {
       };
       sku.price /= 100; 
       // console.log(sku)
-      this.$http.post("cartItem/addCart", {
-        productSkuId:sku.id,
-        quantity:sku.num,
-        productAttr:JSON.stringify(sku.productAttr),
-        recommenderId:this.recommenderId
-      }).then(data => {
-        Toast.success('添加成功');
-        this.sku.show = false;
-        this.$store.dispatch("cart/getCartList");
-      }).catch(error => {
-        Toast(error.message);
-      });
+      this.$http
+        .post('cartItem/addCart', {
+          productSkuId: sku.id,
+          quantity: sku.num,
+          productAttr: JSON.stringify(sku.productAttr),
+          recommenderId: this.recommenderId
+        })
+        .then(data => {
+          Toast.success('添加成功')
+          this.sku.show = false
+          this.$store.dispatch('cart/getCartList')
+        })
+        .catch(error => {
+          Toast(error.message)
+        })
     },
-    skuSelected({skuValue, selectedSku, selectedSkuComb}){
+    skuSelected({ skuValue, selectedSku, selectedSkuComb }) {
       // console.log(skuValue)
       // console.log(selectedSku)
-      const { selectedNum } = this.$refs.sku.getSkuData();
+      const { selectedNum } = this.$refs.sku.getSkuData()
       this.commissionChange(selectedSkuComb, selectedNum)
     },
-    stepperChange(num){
-      const { selectedSkuComb } = this.$refs.sku.getSkuData();
-      this.commissionChange(selectedSkuComb, num);
+    stepperChange(num) {
+      const { selectedSkuComb } = this.$refs.sku.getSkuData()
+      this.commissionChange(selectedSkuComb, num)
     },
-    commissionChange(selectedSkuComb, num){
-      if(selectedSkuComb){
-        this.sku.commission = new Big(selectedSkuComb.commission).mul(num).toFixed(2);
-        this.sku.maxCommission = null;
-      } else{
-        this.sku.commission = new Big(this.goods.commission).mul(num).toFixed(2);
-        if(this.goods.maxCommission)
-          this.sku.maxCommission = new Big(this.goods.maxCommission).mul(num).toFixed(2);
-        else
-          this.sku.maxCommission = null;
+    commissionChange(selectedSkuComb, num) {
+      if (selectedSkuComb) {
+        this.sku.commission = new Big(selectedSkuComb.commission)
+          .mul(num)
+          .toFixed(2)
+        this.sku.maxCommission = null
+      } else {
+        this.sku.commission = new Big(this.goods.commission).mul(num).toFixed(2)
+        if (this.goods.maxCommission)
+          this.sku.maxCommission = new Big(this.goods.maxCommission)
+            .mul(num)
+            .toFixed(2)
+        else this.sku.maxCommission = null
       }
     },
-    openService(){
-      let me = this;
-      if(!this.isLogin){
-        this.$router.push("/login")
-        this.$store.commit("user/SET_BEFOREPATH", this.$route.path);
+    openService() {
+      let me = this
+      if (!this.isLogin) {
+        this.$router.push('/login')
+        this.$store.commit('user/SET_BEFOREPATH', this.$route.path)
         // Toast('用户未登录')
-        return;
+        return
       }
-      const { umsMember} = this.userInfo;
+      const { umsMember } = this.userInfo
       // ysf('product', {
       //     show: 1,
       //     title: me.goods.title,
@@ -710,15 +729,15 @@ export default {
       //     sendByUser: umsMember.id
       // });
       // ysf('open');
-      this.showService = true;
+      this.showService = true
     },
     formatTime(time) {
-      return format(time, "yyyy-MM-dd");
+      return format(time, 'yyyy-MM-dd')
     },
     formatAttr(data) {
       const attrArray = JSON.parse(data)
-      return attrArray.map(ele => ele.value).join(",") || '';
-    },
+      return attrArray.map(ele => ele.value).join(',') || ''
+    }
   }
 }
 </script>
@@ -823,9 +842,9 @@ export default {
   }
 
   .commission {
-      color: #fff;
-      font-size: 12px;
-    }
+    color: #fff;
+    font-size: 12px;
+  }
 
   .title {
     font-size: 0.8rem;
@@ -865,7 +884,7 @@ export default {
       font-size: 12px;
     }
   }
-  .no-comments-area{
+  .no-comments-area {
     height: 60px;
     line-height: 60px;
     text-align: center;

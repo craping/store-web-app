@@ -11,6 +11,7 @@ import cart from './modules/cart'
 import comments from './modules/comments'
 import message from './modules/comments'
 import sys from './modules/sys'
+import payChannel from './modules/payChannel'
 
 Vue.use(Vuex)
 
@@ -26,6 +27,7 @@ export default new Vuex.Store({
     cart,
     comments,
     message,
-    sys
+    sys,
+    payChannel
   }
 })

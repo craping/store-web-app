@@ -17,9 +17,9 @@
 
     <van-nav-bar :fixed="true" style="backgroundColor: #ff4444">
       <template slot="title">
-        <van-search placeholder="请输入搜索关键词" disabled background="$red" @click="toSearch" />
+        <van-search placeholder="请输入搜索关键词" disabled background="$red" @click="toSearch"/>
       </template>
-      <van-icon name="chat-o" slot="right" color="#fff" size="28" />
+      <van-icon name="chat-o" slot="right" color="#fff" size="28"/>
     </van-nav-bar>
 
     <div class="content">
@@ -31,11 +31,11 @@
         <van-swipe :autoplay="3000" :height="130" class="round">
           <van-swipe-item v-for="(ad, index) in content.advertiseList" :key="index">
             <router-link :to="ad.url">
-              <img v-lazy="ad.pic" height="130" width="100%" />
+              <img v-lazy="ad.pic" height="130" width="100%">
             </router-link>
           </van-swipe-item>
         </van-swipe>
-        <br />
+        <br>
         <router-link
           v-for="(item) in content.hotProductList"
           :key="item.id"
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 import {
   Icon,
   Search,
@@ -74,11 +74,11 @@ import {
   Card,
   Button,
   NavBar
-} from "vant";
-import Arrow from "@/components/vue-scroller/components/Arrow.vue";
-import storeNavBar from "@/components/store-nav-bar";
-import storeScroller from "@/components/store-scroller";
-import { isIOS } from "mobile-device-detect";
+} from 'vant'
+import Arrow from '@/components/vue-scroller/components/Arrow.vue'
+import storeNavBar from '@/components/store-nav-bar'
+import storeScroller from '@/components/store-scroller'
+import { isIOS } from 'mobile-device-detect'
 
 export default {
   components: {
@@ -106,37 +106,37 @@ export default {
   data() {
     return {
       isIOS: isIOS,
-      images: ["", "", "", ""],
+      images: ['', '', '', ''],
       list: []
-    };
+    }
   },
   created() {
-    this.$store.dispatch("home/content");
+    this.$store.dispatch('home/content')
   },
   mounted() {
     this.onPlusReady(() => {
-      Toast.success("plus加载成功");
-    });
+      Toast.success('plus加载成功')
+    })
   },
   methods: {
     onRefresh(done) {
-      this.$store.dispatch("home/content").finally(() => {
-        if (done) done();
-      });
+      this.$store.dispatch('home/content').finally(() => {
+        if (done) done()
+      })
     },
     onScroll(top) {
       if (top > 0)
         this.$refs.curtain.style.transform =
-          "translate(0px," + -(top / 3) + "px) scale(1)";
+          'translate(0px,' + -(top / 3) + 'px) scale(1)'
     },
     onLoad(done) {
-      if (done) done(true);
+      if (done) done(true)
     },
     toSearch() {
-      this.$router.push("/search");
+      this.$router.push('/search')
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scope>

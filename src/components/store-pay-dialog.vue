@@ -8,7 +8,7 @@
     >
       <van-radio-group v-model="radio">
         <van-cell-group>
-          <van-cell title="微信支付" icon="wechat" clickable @click="wxClick">
+          <!-- <van-cell title="微信支付" icon="wechat" clickable @click="wxClick">
             <van-radio slot="right-icon" name="wx"/>
           </van-cell>
           <van-cell title="支付宝支付" icon="alipay" clickable @click="aliClick">
@@ -16,6 +16,16 @@
           </van-cell>
           <van-cell title="钱包-余额支付" icon="gold-coin" clickable @click="balanceClick">
             <van-radio slot="right-icon" name="balance"/>
+          </van-cell>-->
+          <van-cell
+            v-for="item in payChannels"
+            :key="item.id"
+            :title="item.name"
+            :icon="icons[item.id]"
+            clickable
+            @click="getChannelClick(item.abbr)"
+          >
+            <van-radio slot="right-icon" :name="item.abbr"/>
           </van-cell>
         </van-cell-group>
       </van-radio-group>
@@ -29,6 +39,7 @@
 
 <script>
 import Vue from 'vue'
+import { mapState } from 'vuex'
 import {
   ActionSheet,
   CellGroup,
@@ -51,7 +62,12 @@ export default {
   data() {
     return {
       showDialog: this.show,
-      radio: 'wx'
+      radio: '',
+      icons: {
+        '1': 'gold-coin',
+        '2': 'wechat',
+        '4': 'alipay'
+      }
     }
   },
   props: {
@@ -60,19 +76,26 @@ export default {
       default: true
     }
   },
-
+  computed: {
+    ...mapState({
+      payChannels: state => state.payChannel.payChannel
+    })
+  },
   methods: {
     cancelDialog() {
       this.$emit('closeDialog', false)
     },
-    wxClick() {
-      this.radio = 'wx'
-    },
-    aliClick() {
-      this.radio = 'ali'
-    },
-    balanceClick() {
-      this.radio = 'balance'
+    // wxClick() {
+    //   this.radio = 'wx'
+    // },
+    // aliClick() {
+    //   this.radio = 'ali'
+    // },
+    // balanceClick() {
+    //   this.radio = 'balance'
+    // },
+    getChannelClick(c) {
+      this.radio = c
     },
     payClick() {
       this.$emit('toPay', this.radio)
