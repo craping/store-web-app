@@ -31,6 +31,10 @@
                     :key="index"
                   >{{item.key}}:{{item.value}}</van-tag>
                 </div>
+                <div slot="footer" v-show="(product.status == 3 || product.status == 5)">
+                  <div class="status" v-if="item.commentStatus == 1">已评论</div>
+                  <van-button v-else size="mini" @click.stop="proEventClick(item,'评价商品')">评价商品</van-button>
+                </div>
                 <div
                   v-show="index == product.orderItemList.length-1"
                   slot="footer"
@@ -43,7 +47,11 @@
                     (含运费￥{{product.freightAmount}})
                   </div>
                 </div>
+
                 <div slot="footer" v-show="index == product.orderItemList.length-1">
+                  <div
+                    class="status"
+                  >售后状态：{{afterSaleStatus[product.orderItemList[0].serviceStatus + 1]}}</div>
                   <van-button
                     v-for="(item,index) in proEventList[`event${product.status}`]"
                     :key="index"
@@ -181,16 +189,25 @@ export default {
           freight: '0.00'
         }
       ],
-      proStatus: ['待付款', '待发货', '已发货', '已收货', '已关闭', '已完成'],
       // 0->待付款；1->待发货；2->已发货；3->已收货；4->已关闭；5->已完成
+      proStatus: ['待付款', '待发货', '已发货', '已收货', '已关闭', '已完成'],
+      //售后状态
+      afterSaleStatus: [
+        '无售后',
+        '待处理',
+        '退货中',
+        '已完成',
+        '已拒绝',
+        '已取消'
+      ],
       showProductList: [],
       proEventList: {
         event0: ['立即付款', '取消订单'],
         event1: ['取消订单'],
         event2: ['确认收货', '查看物流', '退款'],
-        event3: ['评价商品', '退货退款'],
+        event3: ['退货退款'],
         event4: ['删除订单'],
-        event5: ['评价商品', '删除订单']
+        event5: ['删除订单']
       },
       showPayDialog: false, //支付弹框默认隐藏
       patyType: '', //获取支付方式
@@ -214,13 +231,14 @@ export default {
   },
   computed: {
     ...mapState({
-      orderList: state => state.order.orderList
+      orderList: state => state.order.orderList,
+      totalnum: state => state.order.totalNum
     })
   },
   methods: {
     /*************返回点击事件***************/
     onClickLeft() {
-      this.$router.go(-1)
+      this.$router.push('/main/user')
     },
 
     /*************初始化数据************ */
@@ -270,6 +288,7 @@ export default {
           this.confirmDialog('delete', product.orderItemList)
           break
         case '查看物流':
+          this.$store.commit('order/SET_CHECK_INFO_LIST', product)
           this.$router.push({
             name: 'productExpress',
             params: {
@@ -278,6 +297,7 @@ export default {
           })
           break
         case '评价商品':
+          this.$store.commit('order/SET_CHECK_INFO_LIST', product)
           this.$router.push({
             name: 'comment',
             params: {
@@ -286,22 +306,10 @@ export default {
           })
           break
         case '退款':
-          this.$store.commit('order/SET_CHECK_INFO_LIST', product)
-          this.$router.push({
-            name: 'refund',
-            params: {
-              id: product.id
-            }
-          })
+          this.refundEvent(product)
           break
         case '退货退款':
-          this.$store.commit('order/SET_CHECK_INFO_LIST', product)
-          this.$router.push({
-            name: 'refund',
-            params: {
-              id: product.id
-            }
-          })
+          this.refundEvent(product)
           break
         case '立即付款':
           this.showPayDialog = true
@@ -316,6 +324,20 @@ export default {
       }
     },
 
+    /*******退款事件***** */
+    refundEvent(p) {
+      if (p.orderItemList[0].serviceStatus > -1) {
+        Toast.fail('该产品已有售后处理中')
+        return
+      }
+      this.$store.commit('order/SET_CHECK_INFO_LIST', p)
+      this.$router.push({
+        name: 'refund',
+        params: {
+          id: p.id
+        }
+      })
+    },
     /***********点击取消订单和删除订单弹窗事件*********/
     confirmDialog(type, pArr) {
       let title = ''
@@ -464,6 +486,10 @@ export default {
 
     /***********下拉刷新事件*********/
     onRefresh(done) {
+      if (this.showProductList.length >= this.totalnum) {
+        if (done) done(true)
+        return
+      }
       this.pageNums += 1
       this.$store
         .dispatch('order/getOrderList', {

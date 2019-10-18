@@ -27,18 +27,35 @@ export default {
   data() {
     return {
       title: this.$route.query.title,
-      id:1
+      id: 1,
+      list: [],
     };
   },
 
   components: {
     storeScroller
   },
+  mounted() {
+    this.getMessageList()
+  },
   methods: {
     onClickLeft() {
       this.$router.go(-1);
     },
-
+    getMessageList() {
+      return new Promise((resolve, reject) => {
+        this.$http
+          .post("/config/getSystemMessages", {})
+          .then(res => {
+            this.list = res.info || [];
+            resolve();
+          })
+          .catch(error => {
+            Toast(error.message);
+            reject();
+          });
+      });
+    },
     jumpLink(path, query) {
       this.$router.push({ path, query });
     },
@@ -49,7 +66,8 @@ export default {
     },
     onLoad(done) {
       if (done) done();
-    }
+    },
+
   }
 };
 </script>

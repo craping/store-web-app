@@ -203,7 +203,7 @@
       </template>
     </van-goods-action>
 
-    <van-popup class="comments-popup" :zIndex="2000" v-model="showCommentsSheet" position="right">
+    <van-popup class="comments-popup" :zIndex="500" v-model="showCommentsSheet" position="right">
       <comments @showPre="showPre"></comments>
     </van-popup>
 
@@ -717,7 +717,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .goods {
   margin-bottom: 50px;
 

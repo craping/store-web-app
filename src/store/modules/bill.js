@@ -10,7 +10,7 @@ export default {
 			date: format(new Date(), "yyyy-MM"),// 搜索月份 格式：yyyy-MM
 			beginDate: new Date(),// 搜索月份 格式 yyyy-MM-dd
 			endDate: new Date(),// 搜索月份 格式：yyyy-MM-dd
-			pageNum: 0,
+			pageNum: 1,
 			pageSize: 10
 		},
 		bills: []
@@ -48,7 +48,6 @@ export default {
 		},
 
 		queryBill({ commit, state }) {
-			console.log('st', state)
 			return new Promise((resolve, reject) => {
 				request.post("/account/bill/list", state.queryParams).then(data => {
 					commit('SET_BILLS', data.info)

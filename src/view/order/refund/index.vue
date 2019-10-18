@@ -28,8 +28,8 @@
     </div>
     <div class="refundStatus">
       <van-cell-group>
-        <van-cell title="我要退款(无需退货)" :label="selectedReason" is-link @click="noproduct"/>
-        <van-cell title="我要退款退货" :label="selectedReason2" is-link @click="hasproduct"/>
+        <van-cell title="我要退款(无需退货)" :label="selectedReason" is-link @click="toRefund"/>
+        <van-cell title="我要退款退货" :label="selectedReason2" is-link @click="toRefund"/>
       </van-cell-group>
     </div>
   </van-row>
@@ -109,19 +109,12 @@ export default {
     onClickLeft() {
       this.$router.go(-1)
     },
-    noproduct() {
-      this.toRefund('0')
-    },
-    hasproduct() {
-      this.toRefund('1')
-    },
     /************跳转到申请退款页面事件*********/
-    toRefund(status) {
+    toRefund() {
       this.$router.push({
         name: 'applyrefund',
         query: {
-          pid: this.$route.params.pid,
-          receiveStatus: status
+          pid: this.$route.params.id
         }
       })
     }

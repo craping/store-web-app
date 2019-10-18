@@ -5,15 +5,16 @@ function resolve(dir) {
 }
 
 module.exports = {
-  publicPath: './',
+  // publicPath: './',
   assetsDir: './',
   devServer: {
     port: 9090,
     open: false,
     proxy: {
       [process.env.VUE_APP_BASE_API]: {
-        // target: 'http://45.15.11.187',
-        target: 'http://20g5198x42.imwork.net:20428',
+        // target: 'http://m.5gyungou.com',
+        // target: 'http://localhost',
+        target: 'http://20g5198x42.imwork.net:13916',
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''

@@ -30,7 +30,7 @@
       <van-cell-group>
         <van-cell
           title="物流状态"
-          :value="$route.params.refund == 'hasPro'?refundStatusName[0]:refundStatusName[1]"
+          :value="checkInfoList.confirmStatus == '1'? refundStatusName[0]: refundStatusName[1]"
         />
         <van-cell title="退款原因" value="请选择" :label="selectedReason" is-link @click="selectReason"/>
       </van-cell-group>
@@ -39,6 +39,18 @@
       <van-cell-group>
         <van-field error label="退款金额" :placeholder="`￥${proMoney}`" disabled/>
         <van-field v-model="refundSpec" label="退款说明" placeholder="选填"/>
+        <!-- <van-field
+          v-show="checkInfoList.confirmStatus == '1'"
+          label="物流公司"
+          v-model="express.company"
+          placeholder="请输入物流公司(必填)"
+        />
+        <van-field
+          v-show="checkInfoList.confirmStatus == '1'"
+          label="物流单号"
+          v-model="express.expressNo"
+          placeholder="请输入物流单号(必填)"
+        />-->
       </van-cell-group>
     </div>
     <div class="refundStatus">
@@ -108,11 +120,7 @@ export default {
   data() {
     return {
       refundStatusName: ['已收到货', '未收到货'],
-      actions: [
-        // { name: '颜色不好看' },
-        // { name: '衣服尺寸太小了' },
-        // { name: '没钱了' }
-      ],
+      actions: [],
       showReason: false,
       showExpressInfo: [],
       toggleShowName: '展开',
@@ -122,6 +130,10 @@ export default {
       proMoney: 100,
       refundSpec: '',
       fileList: []
+      // express: {
+      //   company: '',
+      //   expressNo: ''
+      // }
     }
   },
   computed: {
@@ -205,16 +217,40 @@ export default {
         Toast.success('请选择退款原因')
         return
       }
+
       const { orderInfo, checkInfoList } = this
+
+      // if (
+      //   checkInfoList.confirmStatus == 1 &&
+      //   !this.express.expressNo &&
+      //   !this.express.company
+      // ) {
+      //   Toast.success('请填写物流信息')
+      //   return
+      // }
       const quantity = orderInfo.reduce((pre, next) => {
         return pre + next.productQuantity
       }, 0)
+
+      // if (checkInfoList.confirmStatus == 1) {
+      //   const expressParams = {
+      //     returnId: orderInfo[0].orderId,
+      //     deliverySn: this.express.expressNo,
+      //     deliveryCompany: this.express.company
+      //   }
+      //   this.$http
+      //     .post('/orderReturnApply/insertDeliveryInfo', expressParams)
+      //     .catch(error => {
+      //       console.log(error)
+      //     })
+      // }
+
       const params = {
         orderId: orderInfo[0].orderId,
         orderSn: checkInfoList.orderSn,
         orderItemId: checkInfoList.id,
         quantity,
-        receiveStatus: this.$route.query.receiveStatus,
+        receiveStatus: checkInfoList.confirmStatus,
         reason_id: this.reasonId,
         reason: this.selectedReason,
         description: this.refundSpec,

@@ -10,7 +10,21 @@
       @click-left="onClickLeft"
     />
     <div class="proInfo">
-      <van-card desc="描述信息" title="商品标题" thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"/>
+      <van-card
+        :num="checkInfoList.productQuantity"
+        :price="checkInfoList.productPrice"
+        :title="checkInfoList.productName"
+        :thumb="checkInfoList.productPic"
+      >
+        <div slot="tags">
+          <van-tag
+            plain
+            type="danger"
+            v-for="(item,index) in JSON.parse(checkInfoList.productAttr)"
+            :key="index"
+          >{{item.key}}:{{item.value}}</van-tag>
+        </div>
+      </van-card>
     </div>
     <div class="commentStar" style="background:#fff">
       <div class="item">
@@ -40,8 +54,19 @@
 </template>
 <script>
 import Vue from 'vue'
+import { mapState } from 'vuex'
 import { UUID } from '@/utils/util'
-import { NavBar, Rate, Button, Card, Row, Field, Uploader } from 'vant'
+import {
+  NavBar,
+  Rate,
+  Button,
+  Card,
+  Row,
+  Field,
+  Uploader,
+  RadioGroup,
+  Radio
+} from 'vant'
 Vue.use(NavBar)
   .use(Rate)
   .use(Button)
@@ -49,6 +74,8 @@ Vue.use(NavBar)
   .use(Row)
   .use(Field)
   .use(Uploader)
+  .use(RadioGroup)
+  .use(Radio)
 export default {
   name: 'comment',
   components: {},
@@ -62,6 +89,11 @@ export default {
       commentStyle: { maxHeight: 150, minHeight: 100 },
       fileList: []
     }
+  },
+  computed: {
+    ...mapState({
+      checkInfoList: state => state.order.checkInfoList
+    })
   },
   created() {
     console.log('dd', this.$route)
@@ -115,13 +147,13 @@ export default {
 
     /***********将base64转换为文件*********/
     doSubmit() {
-      const { commentWord, starts, fileList } = this
-      const pid = this.$route.params.pid
+      const { commentWord, starts, fileList, checkInfoList } = this
       const params = {
-        productId: pid,
-        productName: 'xx',
-        star: starts.initStar,
-        productAttribute: 'cccc',
+        orderItemId: checkInfoList.id,
+        productId: checkInfoList.productId,
+        productName: checkInfoList.productName,
+        star: `${starts.initStar}`,
+        productAttribute: checkInfoList.productAttr,
         content: commentWord,
         pics: fileList
       }
@@ -129,7 +161,7 @@ export default {
       this.$http
         .post('/orderItem/releaseComment', params)
         .then(data => {
-          console.log(data)
+          this.$router.push('/order')
         })
         .catch(error => {
           console.log(error)

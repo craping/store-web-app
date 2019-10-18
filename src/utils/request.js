@@ -53,6 +53,7 @@ service.interceptors.request.use(
     // Do something with request error
     console.log(error) // for debug
     Promise.reject(error)
+    Toast.fail(error.message)
   }
 )
 
