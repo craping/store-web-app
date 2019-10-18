@@ -4,61 +4,84 @@
     <van-nav-bar :title="title" left-arrow @click-left="onClickLeft" fixed />
     <div class="page-content">
       <store-scroller class="scoll-s" @onRefresh="onRefresh" @onInfinite="onLoad">
-        <div class="item-bar van-hairline--bottom" v-for="i in 5" @click="jumpLink('messageDetail',{id:id})">
-          <div class="left-col">
-            <img src />
-          </div>
+        <div
+          class="item-bar van-hairline--bottom"
+          v-for="(msg, index) in messageList"
+          :key="index"
+          @click="showDetail(msg.content)"
+        >
           <div class="right-col">
-            <div class="title">消息标题</div>
-            <div class="info">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</div>
+            <div class="title">
+              <span>{{msg.title}}</span>
+              <span>{{formatTime(msg.sendTime)}}</span>
+            </div>
+            <div class="info">{{msg.content}}</div>
           </div>
         </div>
       </store-scroller>
     </div>
+    <van-popup
+      v-model="show"
+      closeable
+      position="bottom"
+      :style="{ height: '90%' }"
+    >
+      <div class="content" style="padding:30px 10px 10px;" v-html="content"></div>
+    </van-popup>
   </div>
 </template>
 <script>
 import Vue from "vue";
-import { NavBar } from "vant";
-Vue.use(NavBar);
+import { NavBar, Popup } from "vant";
+Vue.use(NavBar)
+.use(Popup);
 import storeScroller from "@/components/store-scroller";
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState } from "vuex";
+import { format } from "@/utils/util";
 
 export default {
   data() {
     return {
       title: this.$route.query.title,
-      id: 1,
+      show:false,
+      content:""
     };
   },
 
   components: {
     storeScroller
   },
-  computed:{
-    ...mapState('message',{
-      messageList: state => state.messageList,
+  computed: {
+    ...mapState("message", {
+      messageList: state => state.messageList
     })
   },
   mounted() {
-    this.getMessageList()
+    this.getMessageList();
   },
   methods: {
-    ...mapActions('message',['getMessageList']),
+    ...mapActions("message", ["getMessageList"]),
     onClickLeft() {
       this.$router.go(-1);
     },
     jumpLink(path, query) {
       this.$router.push({ path, query });
     },
+    showDetail(content){
+      this.show = true;
+      this.content = content;
+    },
     onRefresh(done) {
       this.getMessageList().finally(() => {
-        if (done) done()
-      })
+        if (done) done();
+      });
     },
     onLoad(done) {
+      if (done) done();
     },
-
+    formatTime(time) {
+      return format(time, "yyyy-MM-dd");
+    }
   }
 };
 </script>
@@ -92,6 +115,8 @@ export default {
         flex-direction: column;
         justify-content: space-around;
         .title {
+          display: flex;
+          justify-content: space-between;
           font-size: 14px;
           overflow: hidden;
           text-overflow: ellipsis;

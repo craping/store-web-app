@@ -129,7 +129,7 @@ export default {
     }
     .main-btn {
       margin: 100px auto 60px;
-      width: 86%;
+      // width: 86%;
       height: 40px;
       color: #fff;
       background: $red;

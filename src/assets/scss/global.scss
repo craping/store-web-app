@@ -93,6 +93,13 @@ textarea {
     margin-bottom: -10px;
   }
 }
+.message-list-page{
+  .content{
+    img {
+      width: 100%;
+    }
+  }
+}
 
 .text-ellipsis{
   overflow:hidden;

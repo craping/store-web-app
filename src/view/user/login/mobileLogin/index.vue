@@ -2,26 +2,24 @@
   <div class="register-login">
     <van-nav-bar left-arrow @click-left="onClickLeft" :border="false" />
     <div class="login-body">
-      <van-cell-group>
-        <van-field
-          v-model="mobile"
-          clearable
-          type="tel"
-          label="手机号"
-          placeholder="请输入手机号码"
-          left-icon="phone"
-        />
-        <van-field
-          v-model="password"
-          clearable
-          label="密码"
-          placeholder="请输入密码"
-          left-icon="lock"
-          :type="isEyeClose ? 'password' : 'text'"
-          :right-icon="isEyeClose ? 'closed-eye' : 'eye-o'"
-          @click-right-icon="changeShow"
-        />
-      </van-cell-group>
+      <van-field
+        v-model="mobile"
+        clearable
+        type="tel"
+        label="手机号"
+        placeholder="请输入手机号码"
+        left-icon="phone"
+      />
+      <van-field
+        v-model="password"
+        clearable
+        label="密码"
+        placeholder="请输入密码"
+        left-icon="lock"
+        :type="isEyeClose ? 'password' : 'text'"
+        :right-icon="isEyeClose ? 'closed-eye' : 'eye-o'"
+        @click-right-icon="changeShow"
+      />
       <div class="bottom-btn-wrapper">
         <div @click="jumpLink('forgetPass')">忘记密码</div>
         <div @click="jumpLink('inputMobile')">短信验证码登录</div>
@@ -88,6 +86,18 @@ export default {
 </script>
 <style lang="scss" scoped>
 .register-login {
+  .van-cell::after {
+    position: absolute;
+    box-sizing: border-box;
+    content: ' ';
+    pointer-events: none;
+    right: 0;
+    bottom: 0;
+    left: 16px;
+    border-bottom: 1px solid #ebedf0;
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+  }
   position: absolute;
   top: 0;
   left: 0;
@@ -113,6 +123,7 @@ export default {
       display: flex;
       justify-content: space-between;
       color: $red;
+      padding:0 15px;
     }
   }
   .main-btn {

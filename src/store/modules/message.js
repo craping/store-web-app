@@ -13,15 +13,15 @@ export default {
 	actions: {
 		getMessageList({ commit }) {
 			return new Promise((resolve, reject) => {
-				request.post("/config/getSystemMessages", {})
-					.then(data => {
-						const result = data.info || []
-						commit('SET_MESSAGELIST', result)
-						resolve(data);
-					})
-					.catch(error => {
-						reject(error);
-					});
+				request.post("/config/getSystemMessages")
+				.then(data => {
+					const result = data.info || []
+					commit('SET_MESSAGELIST', result)
+					resolve(data);
+				})
+				.catch(error => {
+					reject(error);
+				});
 			});
 		},
 	}
