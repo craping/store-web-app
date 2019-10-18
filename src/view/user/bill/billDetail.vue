@@ -124,11 +124,7 @@ export default {
       this.$http
         .post("/account/bill/detail", {id:this.id})
         .then(res => {
-          let temList = res.info || [];
-          this.list = this.list.concat(temList);
-          if (this.list.length == res.totalnum) {
-            this.finished = true;
-          }
+            
         })
         .catch(error => {
           Toast(error.message);

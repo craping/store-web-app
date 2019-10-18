@@ -125,7 +125,7 @@
         <div class="row-2">
           <div class="overhide">{{item.content}}</div>
           <div class="pic-area" >
-            <img v-for="(pic,index) in (item.pics.split(','))" :key="index" :src="pic" @click="showPre(index+1)" />
+            <img v-for="(pic,index) in JSON.parse(item.pics)" :key="index" :src="pic.url" @click="showPre(JSON.parse(item.pics))" />
           </div>
         </div>
         <div class="row-3">{{formatTime(item.createTime)}} 规格:{{formatAttr(item.productAttribute)}}</div>
@@ -618,8 +618,8 @@ export default {
         this.prePicShow = true
       }
     },
-    showPre(img) {
-      this.preImage = ['https://img.yzcdn.cn/vant/apple-1.jpg']
+    showPre(picArray) {
+      this.preImage = picArray.map(ele => ele.url)
       this.prePicShow = true
     },
     showSku(){
