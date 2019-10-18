@@ -25,7 +25,7 @@
 </template>
 <script>
 import Vue from "vue";
-import { NavBar, Icon, Card, Button } from "vant";
+import { NavBar, Icon, Card, Button, Toast } from "vant";
 Vue.use(Card)
   .use(NavBar)
   .use(Button)

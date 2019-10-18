@@ -18,7 +18,7 @@ import Vue from "vue";
 import { NavBar, Icon } from "vant";
 import { setToken } from "@/utils/auth";
 import { CellGroup, Field, Toast } from "vant";
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
@@ -43,6 +43,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions('user',['getUserInfo']),
     onClickLeft() {
       this.$router.go(-1);
     },
@@ -63,6 +64,7 @@ export default {
         .post("/login/verCodeLogin", params)
         .then(res => {
           setToken(res.info.token);
+          this.getUserInfo()
           this.$store.commit('user/SET_USERINFO',res.info)
           this.$router.push(this.beforePath);
         })

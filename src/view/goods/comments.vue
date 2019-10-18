@@ -49,12 +49,11 @@ export default {
         pageSize: 10
       }
       this.loading = true
-      debugger
       this.queryComments(params).then((data)=>{
         this.pageNum++
         if ( data.page >= data.totalpage) {
           this.finished = true
-          this.loading = true
+          this.loading = false
         } else {
           this.loading = false
         }

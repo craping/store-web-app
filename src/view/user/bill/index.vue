@@ -21,12 +21,12 @@
           </div>
         </div>
       </van-sticky>
-      <van-list v-model="loading" :finished="finished" :error.sync="error" error-text="请求失败，点击重新加载"  finished-text="没有更多了" @load="onLoad">
-        <div class="month-item" ref="monthItem" v-for="i in 2">
-          <van-sticky :offset-top="96" :container="container1[i-1]">
+      <van-list v-model="loading" :finished="finished" :immediate-check="false" finished-text="没有更多了" @load="onLoad">
+        <div class="month-item" ref="monthItem" v-for="(monthItem,index) in billByMonth" :key="index">
+          <van-sticky :offset-top="96" :container="container1[index]">
             <div class="info-bar">
-              <div class="time" @click="dateSelectshow = true">
-                2019年{{i}}月
+              <div class="time" @click="handleDateSelectshow(monthItem.monthStr)">
+                {{monthItem.monthStr}}
                 <van-icon name="arrow-down" />
               </div>
               <div class="all-money">
@@ -36,7 +36,7 @@
             </div>
           </van-sticky>
           <div class="bill-list">
-            <div class="bill-item" @click="jumpLink('/billDetail',{id:i})" v-for="i in 8">
+            <div class="bill-item" @click="jumpLink('/billDetail',{id:item.id,srcType:item.srcType,recordSn:item.recordSn})" v-for="item in monthItem.list" :key="item.id">
               <div class="col-1">
                 <van-icon name="cart" size="35" color="#fcc" />
               </div>
@@ -84,34 +84,49 @@
             </div>
           </div>
       </van-popup>
-      <van-popup v-model="dateSelectshow" position="bottom" :style="{ height: '50%' }">
+      <van-popup v-model="dateSelectshow" position="bottom" :style="{ height: '60%' }">
         <div class="tool-bar">
           <div class="cancel" @click="dateSelectshow=false">取消</div>
-          <div class="sure" @click="queryHandle">确定</div>
+          <div class="sure" @click="sureSetDate">确定</div>
         </div>
         <van-tabs v-model="dateType" color="#ff4444" @change="changeDateType">
           <van-tab title="按月选择">
-            <van-datetime-picker v-model="currentMonth" type="year-month" :show-toolbar="false" />
+             <div class="date-select-wrapper center">
+              <div
+                class="date-input"
+                :class="{active:monthInputType==1}"
+                @click="selectMonthInput"
+              >{{currentMonth || '选择月份'}}</div>
+            </div>
+            <div class="delete-date-bar">
+              <van-icon @click="resetMonth" name="delete" />
+            </div>
+            <van-datetime-picker v-show="monthInputType" v-model="pickerMonthDate" type="year-month" :max-date="maxDate" :show-toolbar="false" @change="changePickerMonthDate"  />
           </van-tab>
           <van-tab title="按日选择">
             <div class="date-select-wrapper">
               <div
                 class="date-input"
-                :class="{active:dateInputType==0}"
-                @click="selectInput(0,'startDate')"
-              >{{startDate|| '开始日期'}}</div>
+                :class="{active:dayInputType==1}"
+                @click="selectDayInput(1,'startDate')"
+              >{{startDate || '开始日期'}}</div>
               <span>至</span>
               <div
                 class="date-input"
-                :class="{active:dateInputType==1}"
-                @click="selectInput(1,'endDate')"
+                :class="{active:dayInputType==2}"
+                @click="selectDayInput(2,'endDate')"
               >{{endDate|| '结束日期'}}</div>
             </div>
+            <div class="delete-date-bar">
+              <van-icon @click="resetDay" name="delete" />
+            </div>
             <van-datetime-picker
-              v-model="currentDate"
+              v-show="dayInputType"
+              v-model="pickerDayDate"
               type="date"
               :show-toolbar="false"
-              @change="changeCurrentDate"
+              :max-date="maxDate"
+              @change="changePickerDayDate"
             />
           </van-tab>
         </van-tabs>
@@ -123,7 +138,7 @@
 import Vue from "vue";
 import { format } from "@/utils/util";
 import { createNamespacedHelpers } from "vuex";
-const { mapState, mapActions } = createNamespacedHelpers("bill");
+const { mapState, mapActions, mapGetters } = createNamespacedHelpers("bill");
 import {
   NavBar,
   Overlay,
@@ -200,38 +215,43 @@ export default {
           id: "1_5"
         }
       ],
-      currentDate: new Date(),
-      startDate: "2019-09-02",
+      pickerMonthDate: new Date(),
+      pickerDayDate: new Date(),
+      currentMonth: "",
+      startDate: "",
       endDate: "",
       dateType: 0, // 0按月，1按日
-      dateInputType: 0, //0开始，1结束
+      monthInputType: 1, // 0未选择 1选择
+      dayInputType: 1, // 0未选择 1开始，2结束 
       loading: false,
       finished: false,
-      error: false,
+      maxDate: new Date(),
     };
   },
   mounted() {
     this.container1 = this.$refs.monthItem;
+    this.queryHandle()
   },
   computed: {
     ...mapState({
       queryParams: state => state.queryParams,
-      bills: state => state.bills
     }),
-    currentMonth: {
-      get() {
-        return new Date(this.$store.state.bill.queryParams.date);
-      },
-      set(val) {
-        this.$store.commit("bill/SET_DATE", val);
-      }
-    },
+    ...mapGetters(['billByMonth'])
   },
   methods: {
+    handleDateSelectshow(time) {
+      if (this.dateType) {
+        this.dayDate2View()
+      } else {
+        this.currentMonth = this.formatDate(new Date(time))
+        this.monthDate2View(time)
+      }
+      this.dateSelectshow = true
+    },
     getContainer() {
       return document.querySelector('.top-bar-wrapper');
     },
-    ...mapActions(["setQueryparams", "queryBill"]),
+    ...mapActions(["queryBill"]),
     onClickLeft() {
       this.$router.go(-1);
     },
@@ -248,34 +268,102 @@ export default {
       this.$store.commit("bill/SET_TYPE", null);
       this.$store.commit("bill/SET_SRCTYPE", null);
     },
-    changeDateType(val) {},
+    changeDateType(val) {
+      if (val) {
+        this.dayDate2View()
+      }
+    },
     queryHandle() {
+      this.loading = true
       this.$store.commit("bill/SET_PAGENUM", 1);
       this.queryBill()
-        .then(() => {
+        .then((data) => {
+          if (data.page >= data.totalpage) {
+            this.finished = true
+            this.loading = false
+          } else {
+            this.loading = false
+          }
           this.filterShow = false;
         })
         .catch(() => {});
     },
-    formatTime(time) {
+    formatDateTime(time) {
       return format(time, "yyyy-MM-dd");
     },
-    selectInput(type, name) {
-      this.dateInputType = type;
-      if (this[name]) {
-        this.currentDate = new Date(this[name]);
-      } else {
-        this.currentDate = new Date();
-        this[name] = this.formatTime(new Date());
-      }
+    formatDate(time) {
+      return format(time, "yyyy-MM");
     },
-    changeCurrentDate(picker) {
+    formatDate2(time) {
+      return format(time, "yyyy年MM月");
+    },
+    changePickerMonthDate(picker) {
+      this.currentMonth = picker.getValues().join("-");
+    },
+    changePickerDayDate(picker) {
       let currentVal = picker.getValues().join("-");
-      if (this.dateInputType) {
+      if (this.dayInputType) {
         this.endDate = currentVal;
       } else {
         this.startDate = currentVal;
       }
+    },
+    dayDate2View() {
+      let typeStr =  this.dayInputType == 1 ? 'startDate' : 'endDate'
+      if (this[typeStr]) {
+        this.pickerDayDate = new Date(this[typeStr]);
+      } else {
+        this.pickerDayDate = new Date();
+        this[typeStr] = this.formatDateTime(new Date());
+      }
+    },
+    monthDate2View(time) {
+      if (this.currentMonth) {
+        this.pickerMonthDate = new Date(this.currentMonth)
+      } else {
+        this.pickerMonthDate = time ? new Date(time) : new Date()
+        this.currentMonth = this.formatDate(this.pickerMonthDate)
+      }
+    },
+    selectMonthInput() {
+      this.monthInputType = 1
+      this.monthDate2View()
+    },  
+    selectDayInput(type) {
+      this.dayInputType = type;
+      this.dayDate2View()
+    },
+    resetMonth() {
+      this.monthInputType = 0
+      this.currentMonth = ''
+    },
+    resetDay() {
+      this.dayInputType = 0
+      this.startDate = ''
+      this.endDate = ''
+    },
+    sureSetDate() {
+      if (this.dateType) {
+        this.$store.commit("bill/SET_DATE", null);
+        this.$store.commit("bill/SET_BEGINDATE", this.startDate || null);
+        this.$store.commit("bill/SET_ENDDATE", this.endDate || null);
+      } else {
+        this.$store.commit("bill/SET_BEGINDATE", null);
+        this.$store.commit("bill/SET_ENDDATE", null);
+        this.$store.commit("bill/SET_DATE", this.currentMonth || null);
+      }
+      this.queryHandle()
+    }, 
+    onLoad() {
+      this.loading = true
+      this.queryBill().then((data)=>{
+        if (data.page >= data.totalpage) {
+          this.finished = true
+          this.loading = false
+        } else {
+          this.loading = false
+        }
+      })
     }
   }
 };
@@ -423,9 +511,11 @@ export default {
     align-items: center;
     padding: 0 20px;
     height: 50px;
+    &.center{
+      justify-content: center;
+    }
     .date-input {
       width: 40%;
-      flex: 1;
       text-align: center;
       border-bottom: 1px solid #333;
       padding-bottom: 4px;
@@ -437,6 +527,9 @@ export default {
     span {
       padding: 0 20px;
     }
+  }
+  .delete-date-bar{
+    text-align: right;
   }
 }
 </style>
