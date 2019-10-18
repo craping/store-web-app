@@ -120,7 +120,7 @@ export default {
   computed: {
     ...mapState({
       confirmOrderList: state => state.order.confirmOrderList,
-      platform: state => state.sys.client,
+      platform: state => state.sys.clientId,
       addressInfo: state => state.address.addressInfo,
       userInfo: state => state.user.userInfo
     }),

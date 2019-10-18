@@ -7,7 +7,7 @@
 import sync from "@/utils/sync";
 import service from "@/utils/service";
 import { mapActions } from 'vuex';
-import { getClient } from '@/utils/util'
+import { getClientId } from '@/utils/util'
 import { getToken } from '@/utils/auth'
 
 export default {
@@ -23,7 +23,7 @@ export default {
       service.init(data.info);
     }).catch(error => {
       console.log(error)
-      if(getClient() == 3 && !getToken()){
+      if(getClientId() == 3 && !getToken()){
           //微信中
           const appid = 'wx455d4595caac679c'
           const redirect_uri =  encodeURIComponent(`http://m.5gyungou.com/wx.html?returnUrl=${location.href}`) 

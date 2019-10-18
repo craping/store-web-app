@@ -234,7 +234,7 @@ export default {
     ...mapState({
       orderList: state => state.order.orderList,
       totalnum: state => state.order.totalNum,
-      platform: state => state.sys.client,
+      platform: state => state.sys.clientId,
       userInfo: state => state.user.userInfo
     })
   },

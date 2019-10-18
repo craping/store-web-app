@@ -1,6 +1,5 @@
 import request from '@/utils/request'
 import { getToken } from '@/utils/auth'
-import { getClient } from '@/utils/util'
 
 export default {
   namespaced: true,

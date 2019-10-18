@@ -36,6 +36,8 @@ import { setToken } from "@/utils/auth";
 import md5 from "js-md5";
 import { NavBar, CellGroup, Field, Toast } from "vant";
 import { mapState, mapActions } from 'vuex';
+import { getClient } from '@/utils/util'
+
 Vue.use(Field)
   .use(CellGroup)
   .use(Toast)
@@ -62,7 +64,7 @@ export default {
       const params = {
         mobile: this.mobile,
         password: md5(this.password),
-        clientId: "wap"
+        clientId: getClient()
       };
       this.$http
         .post("/login/passwrodLogin", params)

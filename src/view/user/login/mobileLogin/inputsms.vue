@@ -19,6 +19,8 @@ import { NavBar, Icon } from "vant";
 import { setToken } from "@/utils/auth";
 import { CellGroup, Field, Toast } from "vant";
 import { mapState, mapActions } from 'vuex';
+import { getClient } from '@/utils/util'
+
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
@@ -58,7 +60,7 @@ export default {
       const params = {
         mobile: this.mobile,
         verCode: this.verCode,
-        clientId: "wap"
+        clientId: getClient()
       };
       this.$http
         .post("/login/verCodeLogin", params)

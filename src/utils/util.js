@@ -51,10 +51,21 @@ export function PrefixInteger(num, n) {
 /**
  * 获取客户端类型 [APP:1, 网页:2, 微信:3]
  */
-export function getClient() {
+export function getClientId() {
   const agent = navigator.userAgent
   if (agent.includes('Html5Plus')) return 1
   else if (agent.toLowerCase().match(/MicroMessenger/i) == 'micromessenger')
     return 3
   else return 2
+}
+
+/**
+ * 获取客户端类型 [APP:APP, 网页:WAP, 微信:WX]
+ */
+export function getClient() {
+  const agent = navigator.userAgent
+  if (agent.includes('Html5Plus')) return "APP"
+  else if (agent.toLowerCase().match(/MicroMessenger/i) == 'micromessenger')
+    return "WX"
+  else return "WAP"
 }

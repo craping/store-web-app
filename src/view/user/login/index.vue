@@ -17,7 +17,7 @@
           <img src="./img/mobile.png" alt />
           <span>手机登录</span>
         </div>
-        <div class="way-item" v-if="client == 1" @click="wechatLogin">
+        <div class="way-item" v-if="clientId == 1" @click="wechatLogin">
           <img src="./img/wechat.png" alt />
           <span>微信登录</span>
         </div>
@@ -49,7 +49,7 @@ export default {
       beforePath: state => state.beforePath
     }),
     ...mapState('sys',{
-      client: state => state.client
+      clientId: state => state.clientId
     })
   },
   methods: {

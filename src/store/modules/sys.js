@@ -1,10 +1,11 @@
 import request from '@/utils/request'
 import { getToken } from '@/utils/auth'
-import { getClient } from '@/utils/util'
+import { getClientId, getClient } from '@/utils/util'
 
 export default {
   namespaced: true,
   state: {
+    clientId: getClientId(),
     client: getClient(),
     config: {
       //VIP启用状态
@@ -29,10 +30,10 @@ export default {
   },
   getters: {
     shareEnable: (state, getters, rootState) => {
-      return /* state.client == 1 &&  */rootState.user.isLogin;
+      return /* state.clientId == 1 &&  */rootState.user.isLogin;
     },
     vipEnable: (state, getters, rootState) => {
-      return /* state.client == 1 &&  */state.config.VIP_ENABLE && rootState.user.isVip;
+      return /* state.clientId == 1 &&  */state.config.VIP_ENABLE && rootState.user.isVip;
     }
   },
   mutations: {
