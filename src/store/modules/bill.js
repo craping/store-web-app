@@ -5,19 +5,45 @@ export default {
 	namespaced: true,
 	state: {
 		queryParams: {
-			type: null, // 收支类型
-			srcType: null, // 账单类型
-			date: format(new Date(), "yyyy-MM"),// 搜索月份 格式：yyyy-MM
-			beginDate: new Date(),// 搜索月份 格式 yyyy-MM-dd
-			endDate: new Date(),// 搜索月份 格式：yyyy-MM-dd
+			type: null, // 收支类型 0:支出,1:收入
+			srcType: null, // 账单类型 [1_1:购物返现,1_2:直推佣金,1_3:分销佣金,1_4:取消订单,1_5:售后退款,0_1:订单交易,0_2:提现申请]
+			date: null,// 搜索月份 格式：yyyy-MM
+			beginDate: null,// 搜索月份 格式 yyyy-MM-dd
+			endDate: null,// 搜索月份 格式：yyyy-MM-dd
 			pageNum: 1,
 			pageSize: 10
 		},
 		bills: []
 	},
+	getters: {
+		billByMonth: state => {
+			let monthObj = {}
+			let result = []
+			state.bills.forEach(element => {
+				let monthKey = format(element.createTime, 'yyyy年MM月')
+				if (monthObj.hasOwnProperty(monthKey)) {
+					this.monthObj[monthKey].push(element)
+				} else {
+					this.monthObj[monthKey] = []
+				}
+			});
+			Object.keys(monthObj).forEach((key) => {
+				result.push({ monthStr: key, list: monthObj[key] })
+			});
+			return result
+		}
+	},
 	mutations: {
-		SET_QUERYPARAMS(state, data) {
-			state.queryParams = data
+		RESET_QUERYPARAMS(state) {
+			state.queryParams = {
+				type: null, 
+				srcType: null, 
+				date: null,
+				beginDate: null, 
+				endDate: null, 
+				pageNum: 1,
+				pageSize: 10
+			}
 		},
 		SET_TYPE(state, data) {
 			state.queryParams.type = data
@@ -42,16 +68,12 @@ export default {
 		},
 	},
 	actions: {
-		setQueryparams({ commit, state }, data) {
-			const params = Object.assign({}, state.queryParams, data)
-			commit('SET_QUERYPARAMS', params)
-		},
-
 		queryBill({ commit, state }) {
 			return new Promise((resolve, reject) => {
 				request.post("/account/bill/list", state.queryParams).then(data => {
 					commit('SET_BILLS', data.info)
-					resolve()
+					commit('SET_PAGENUM', data.page + 1)
+					resolve(data)
 				}).catch(error => {
 					reject(error)
 				})

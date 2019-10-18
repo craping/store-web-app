@@ -2,7 +2,7 @@
   <div class="account-page">
     <van-nav-bar title="账户安全" left-arrow @click-left="onClickLeft" />
     <van-cell
-      v-if="1"
+      v-if="client == 1"
       title="微信绑定"
       :is-link="!umsMember.openId"
       :value="umsMember.openId ? '已绑定' : '未绑定'"
@@ -48,6 +48,9 @@ export default {
     ...mapState("user", {
       bindPhone: state => state.bindPhone,
       umsMember: state => state.userInfo.umsMember || {}
+    }),
+    ...mapState('sys',{
+      client: state => state.client
     })
   },
   methods: {

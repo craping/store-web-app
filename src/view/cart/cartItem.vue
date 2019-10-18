@@ -1,5 +1,5 @@
 <template>
-  <div class="cart-item">
+  <div class="cart-item" @click.stop="toDetail(item)">
     <div class="left-col">
       <img :src="item.pic" />
     </div>
@@ -28,6 +28,9 @@ export default {
     formatAttr(data) {
       const attrArray = JSON.parse(data)
       return attrArray.map(ele => ele.value).join(",") || '';
+    },
+    toDetail(item) {
+      this.$router.push({name:'goods',params:{id:item.productId}})
     },
     stop() {
       //防止冒泡

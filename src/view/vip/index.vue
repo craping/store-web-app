@@ -114,8 +114,8 @@
         <p class="look-detail" @click="jumpLink('/team',{parentId:amsAccount.parentId})">查看详情></p>
       </div>
       <div class="bottom-bar">
-        <van-cell title="提现记录" @click="toBill(2,4)" is-link />
-        <van-cell title="余额明细" @click="toBill()" is-link />
+        <van-cell title="提现记录" @click="toBill('0', '0_2')" is-link />
+        <van-cell title="余额明细" @click="toBill('1', null)" is-link />
       </div>
     </div>
   </div>
@@ -151,7 +151,7 @@ export default {
     this.getVipView();
   },
   methods: {
-    ...mapActions("bill", ["setQueryparams"]),
+    ...mapActions("bill", ["setQueryparams", "queryBill"]),
     onClickLeft() {
       this.$router.go(-1);
     },
@@ -174,9 +174,11 @@ export default {
      * @return:
      */
 
-    toBill(inExType, typeFilter) {
-      this.setQueryparams({ inExType, typeFilter });
-      this.jumpLink("/bill");
+    toBill(type, srcType) {
+      this.$store.commit("bill/RESET_QUERYPARAMS", type)
+      this.$store.commit("bill/SET_TYPE", type)
+      this.$store.commit("bill/SET_SRCTYPE", srcType)
+      this.jumpLink("/bill")
     },
     toUnliquidated(mode) {
       this.jumpLink("/unliquidated",{mode});
