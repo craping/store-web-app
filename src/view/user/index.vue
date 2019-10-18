@@ -34,7 +34,7 @@
           </div>
           <div class="gird-item">
             <span class="num">{{amsAccount.unreceivedIncome}}</span>
-            <span>未到账余额(元)</span>
+            <span>未结算收益(元)</span>
           </div>
           <div class="gird-item">
             <span class="num">{{amsAccount.directTeams}}</span>

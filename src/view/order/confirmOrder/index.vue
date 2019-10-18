@@ -58,9 +58,14 @@
         <van-cell title="实付款" :value="`￥${totalPrice.toFixed(2)}`"/>
       </div>
     </div>
-    <van-tabbar>
+    <van-submit-bar
+      :price="totalPrice*100"
+      button-text="去支付"
+      @submit="toSumbitOrder"
+    />
+    <!-- <van-tabbar>
       <van-button type="info" @click="toSumbitOrder">去支付</van-button>
-    </van-tabbar>
+    </van-tabbar> -->
     <store-pay-dialog @closeDialog="closeDialog" @toPay="toPay" :show="showPayDialog"></store-pay-dialog>
   </van-row>
 </template>
