@@ -189,8 +189,8 @@ export default {
         skuIds: temSkuids,
         addressId: this.addressInfo.id,
         type: this.$route.query.type,
-        // sourceType: this.platform,
-        sourceType: 1
+        sourceType: this.platform
+        // sourceType: 1
       }
       if (this.$route.query.type == 'dir') {
         params = {
@@ -199,10 +199,10 @@ export default {
           productAttr: confirmOrderList[0].productAttr,
           note: '备注'
         }
-        if (confirmOrderList[0].recommenderId) {
+        if (this.$route.query.recommenderId) {
           params = {
             ...params,
-            recommenderId: confirmOrderList[0].recommenderId
+            recommenderId: this.$route.query.recommenderId
           }
         }
       }
