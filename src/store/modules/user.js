@@ -28,7 +28,7 @@ export default {
       state.userInfo = userInfo
       state.bindPhone = userInfo.umsMember.phone || ''
       state.isLogin = true
-      state.isVip = userInfo.amsAccoun && userInfo.amsAccount.orders > 0
+      state.isVip = userInfo.amsAccount && userInfo.amsAccount.orders > 0
     },
     SET_BEFOREPATH(state, data) {
       state.beforePath = data

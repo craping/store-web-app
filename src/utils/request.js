@@ -54,8 +54,10 @@ service.interceptors.response.use(
       error.errcode = res.errcode
       return Promise.reject(error)
     } else {
-      if (res.hasOwnProperty('result')) return res.data
-      else return res
+      if (res.hasOwnProperty('result')) 
+        return res.data
+      else 
+        return res
     }
   },
   error => {

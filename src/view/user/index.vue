@@ -12,12 +12,14 @@
           <img :src="umsMember.icon">
         </div>
         <div class="base-info">
-          <div class="nick-phone" @click="jumpLink('/userInfo')">{{umsMember.nickname || bindPhoneStr}}</div>
-          <span class="vip-grade-bar" v-if="isVip" @click="jumpLink('/vipGrade')">V1会员</span>
-          <span class="vip-grade-bar" v-else @click="jumpLink('/vipGrade')">会员等级</span>
+          <div>
+            <span class="nick-phone" @click="jumpLink('/userInfo')">{{umsMember.nickname || bindPhoneStr}}</span>&nbsp;
+            <span class="vip-grade-bar" v-if="vipEnable">{{amsAccount.levelName}}</span>
+          </div>
+          <div class="vip-agentNo" v-if="vipEnable">邀请码 {{amsAccount.agentNo}} | <span class="copyAgentNo" :data-clipboard-text="amsAccount.agentNo" @click="copyAgentNo">复制</span></div>
         </div>
       </div>
-      <div v-if="isVip" class="vip-card"  @click="jumpLink('/vip')">
+      <div v-if="vipEnable" class="vip-card"  @click="jumpLink('/vip')">
         <div class="vip-row-1">
           <span class="word-text">
             <span>可提现余额(元)</span>
@@ -40,9 +42,8 @@
           </div>
         </div>
       </div>
-      <div v-else class="no-vip-card" @click="jumpLink('/vipGrade')">
-        升级
-        <span class="vip-grade-bar">会员等级</span>享受更多权益
+      <div v-else-if="!isVip && vipEnable" class="no-vip-card" @click="jumpLink('/vipGrade')">
+        成为<span class="vip-grade-bar">会员</span>享受更多优惠
       </div>
     </div>
     <div class="main-content">
@@ -85,7 +86,8 @@
 import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import storeNavBar from "@/components/store-nav-bar";
-import { Grid, GridItem, Icon } from "vant";
+import { Grid, GridItem, Icon, Toast } from "vant";
+import Clipboard from "clipboard";
 Vue.use(Grid).use(GridItem);
 
 
@@ -158,7 +160,11 @@ export default {
       amsAccount: state => state.userInfo.amsAccount || {},
       umsMember: state => state.userInfo.umsMember || {},
     }),
-    ...mapGetters('user',['bindPhoneStr'])
+    ...mapState('sys',{
+      VIP_ENABLE: state => state.config.VIP_ENABLE,
+    }),
+    ...mapGetters('user',['bindPhoneStr']),
+    ...mapGetters("sys", ["vipEnable"])
   },
   methods: {
     jumpLink(path, params) {
@@ -171,6 +177,20 @@ export default {
     },
     toOrderCenter() {
       this.$router.push("/order");
+    },
+    copyAgentNo(){
+      let clipboard = new Clipboard(".copyAgentNo");
+      clipboard.on("success", e => {
+        Toast.success("复制成功");
+        // 释放内存
+        clipboard.destroy();
+      });
+      clipboard.on("error", e => {
+        // 不支持复制
+        Toast.fail("该浏览器不支持自动复制");
+        // 释放内存
+        clipboard.destroy();
+      });
     }
   }
 };
@@ -206,7 +226,7 @@ export default {
     background: #fbe5ae;
   }
   .top-info {
-    min-height: 191px;
+    // min-height: 191px;
     position: relative;
     padding: 0 15px;
     .row-1 {
@@ -215,11 +235,14 @@ export default {
     }
     .row-2 {
       margin-top: 16px;
+      margin-bottom: 16px;
       display: flex;
       .head-img {
-        background: #eee;
+        background: #fff;
         border-radius: 50%;
         overflow: hidden;
+        width: 60px;
+        height: 60px;
         img{
           width: 60px;
           height: 60px;
@@ -227,16 +250,22 @@ export default {
       }
       .base-info {
         margin-left: 20px;
+        align-self: center;
         .nick-phone {
           font-size: 16px;
           margin: 5px 0;
           color: #fff;
           font-weight: bold;
         }
+        .vip-agentNo{
+          color:#fff;
+          margin-top: 5px;
+        }
       }
     }
     .no-vip-card {
       margin-top: 32px;
+      margin-bottom: 16px;
       height: 40px;
       background: #50545f;
       align-self: flex-end;
@@ -249,7 +278,7 @@ export default {
       }
     }
     .vip-card {
-      margin: 30px 0 20px;
+      margin: 0px 0 20px;
       border-radius: 5px;
       overflow: hidden;
       .vip-row-1 {
@@ -303,6 +332,7 @@ export default {
     }
   }
   .main-content {
+    position: relative;
     .grid-panel {
       background: #fff;
       padding: 0 15px;

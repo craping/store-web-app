@@ -16,9 +16,7 @@ export default {
   },
   created() {
     // 初始化APP配置信息
-    this.getSysConfig().then(data => {
-      console.log(data.info)
-    });
+    this.getSysConfig();
     // 初始化获取用户信息
     this.getUserInfo().then(data => {
       sync.connect();
