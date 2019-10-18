@@ -638,7 +638,8 @@ export default {
         num:skuData.selectedNum,
         recommenderId:this.recommenderId
       };
-      console.log(sku);
+      sku.price /= 100; 
+      // console.log(sku);
       this.$store.commit("order/SET_CONFIRM_ORDER_LIST", [sku]);
       this.$router.push({
         name: 'confirmOrder',
@@ -653,6 +654,7 @@ export default {
         num:skuData.selectedNum,
         recommenderId:this.recommenderId
       };
+      sku.price /= 100; 
       // console.log(sku)
       this.$http.post("cartItem/addCart", {
         productSkuId:sku.id,

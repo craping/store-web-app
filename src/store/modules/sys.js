@@ -29,10 +29,10 @@ export default {
   },
   getters: {
     shareEnable: (state, getters, rootState) => {
-      return state.client == 1 && rootState.user.isLogin;
+      return /* state.client == 1 &&  */rootState.user.isLogin;
     },
     vipEnable: (state, getters, rootState) => {
-      return state.client == 1 && state.config.VIP_ENABLE && rootState.user.isVip;
+      return /* state.client == 1 &&  */state.config.VIP_ENABLE && rootState.user.isVip;
     }
   },
   mutations: {
