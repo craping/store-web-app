@@ -635,7 +635,7 @@ export default {
     buy(skuData) {
       const sku = {
         ...skuData.selectedSkuComb, 
-        num:skuData.selectedNum,
+        quantity:skuData.selectedNum,
         recommenderId:this.recommenderId
       };
       sku.price /= 100; 
@@ -651,7 +651,7 @@ export default {
     addCart(skuData){
       const sku = {
         ...skuData.selectedSkuComb, 
-        num:skuData.selectedNum,
+        quantity:skuData.selectedNum,
         recommenderId:this.recommenderId
       };
       sku.price /= 100; 
