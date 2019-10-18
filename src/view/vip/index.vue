@@ -34,10 +34,10 @@
         </div>
       </div>
       <van-tabs v-model="active" color="#ff4444">
-        <van-tab title="今日收益">
+        <van-tab title="今日未结算收益">
           <div class="profit-card card round">
             <div style="margin-bottom:10px;">
-              <div class="row-title">我的订单收益</div>
+              <div class="row-title">我的未结算收益</div>
               <div class="row-data">
                 <div class="col-item">
                   <div class="title">订单数</div>
@@ -50,7 +50,7 @@
               </div>
             </div>
             <div>
-              <div class="row-title">团队订单收益</div>
+              <div class="row-title">团队未结算收益</div>
               <div class="row-data">
                 <div class="col-item">
                   <div class="title">订单数</div>
@@ -65,10 +65,10 @@
             <p class="look-detail" @click="toUnliquidated('d')">查看详情></p>
           </div>
         </van-tab>
-        <van-tab title="本月收益">
+        <van-tab title="本月未结算收益">
           <div class="profit-card card round">
             <div style="margin-bottom:10px;">
-              <div class="row-title">我的订单收益</div>
+              <div class="row-title">我的未结算收益</div>
               <div class="row-data">
                 <div class="col-item">
                   <div class="title">订单数</div>
@@ -81,7 +81,7 @@
               </div>
             </div>
             <div>
-              <div class="row-title">团队订单收益</div>
+              <div class="row-title">团队未结算收益</div>
               <div class="row-data">
                 <div class="col-item">
                   <div class="title">订单数</div>
