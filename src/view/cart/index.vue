@@ -1,15 +1,12 @@
 <template>
   <div class="cart-page">
-    <div class="curtain" ref="curtain">
-      <div class="cav"></div>
-    </div>
     <div class="top-bar">
       <div class="fix-bar">
         <span class="title">购物车</span>
         <span class="operate" @click="changeOperate">{{isOperate?'完成':'管理'}}</span>
       </div>
     </div>
-    <store-scroller class="scoll-s" @onRefresh="onRefresh">
+    <store-scroller @onRefresh="onRefresh">
       <div class="content">
         <van-checkbox-group class="card-goods" v-model="checkedGoods">
           <van-checkbox
@@ -118,7 +115,7 @@ export default {
             ? item.price * item.quantity
             : 0),
         0
-      )
+      ) * 100
     }
   },
 
@@ -137,7 +134,7 @@ export default {
       }
     },
     formatPrice(price) {
-      return (price / 100).toFixed(2)
+      return price.toFixed(2)
     },
     onChangeNum(val, item) {
       clearTimeout(this.timeout)
@@ -197,36 +194,16 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
 .cart-page {
-  .curtain {
-    display: flex;
-    justify-content: center;
-    overflow-x: hidden;
-    position: fixed;
-    width: 100vw;
-    .cav {
-      height: 191px;
-      border-bottom-right-radius: 50%;
-      border-bottom-left-radius: 50%;
-      background-color: $red;
-      flex: none;
-      width: 200vw;
-      display: flex;
-      justify-content: center;
-      overflow: hidden;
-    }
-  }
-  .top-bar{
-    padding-top: 86px;
-  }
+  padding-top: 76px;
   .fix-bar {
     position: fixed;
     width: 100vw;
     text-align: center;
     z-index: 10;
     background: $red;
-    height: 86px;
+    height: 66px;
     padding-top: 35px;
     top: 0;
     .title {
@@ -239,9 +216,16 @@ export default {
       right: 15px;
     }
   }
-  .scoll-s {
-    /deep/._v-container.scroll{
-      padding-top: 86px;
+
+  .store-scroller {
+    .van-pull-refresh {
+      padding-bottom: 100px;
+    }
+    .scroll {
+      padding-top: 76px;
+      ._v-content {
+        padding-bottom: 100px;
+      }
     }
   }
   .content {

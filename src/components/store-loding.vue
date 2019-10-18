@@ -1,6 +1,6 @@
 <template>
   <van-overlay :show="true">
-    <van-loading type="spinner" color="#1989fa" vertical>加载中...</van-loading>
+    <van-loading vertical>加载中...</van-loading>
   </van-overlay>
 </template>
 <script>

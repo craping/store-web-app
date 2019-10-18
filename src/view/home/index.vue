@@ -139,7 +139,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scope>
+<style lang="scss">
 .home {
   padding-top: 66px;
   .van-hairline--bottom::after {

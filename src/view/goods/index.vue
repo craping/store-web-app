@@ -672,7 +672,7 @@ export default {
       this.$http
         .post('cartItem/addCart', {
           productSkuId: sku.id,
-          quantity: sku.num,
+          quantity: sku.quantity,
           productAttr: JSON.stringify(sku.productAttr),
           recommenderId: this.recommenderId
         })

@@ -23,7 +23,7 @@ export default {
   },
   methods: {
     formatPrice(price) {
-      return (price / 100).toFixed(2);
+      return price.toFixed(2);
     },
     formatAttr(data) {
       const attrArray = JSON.parse(data)
