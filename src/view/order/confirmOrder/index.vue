@@ -58,14 +58,10 @@
         <van-cell title="实付款" :value="`￥${totalPrice.toFixed(2)}`"/>
       </div>
     </div>
-    <van-submit-bar
-      :price="totalPrice*100"
-      button-text="去支付"
-      @submit="toSumbitOrder"
-    />
+    <van-submit-bar :price="totalPrice*100" button-text="去支付" @submit="toSumbitOrder"/>
     <!-- <van-tabbar>
       <van-button type="info" @click="toSumbitOrder">去支付</van-button>
-    </van-tabbar> -->
+    </van-tabbar>-->
     <store-pay-dialog @closeDialog="closeDialog" @toPay="toPay" :show="showPayDialog"></store-pay-dialog>
   </van-row>
 </template>
@@ -85,7 +81,8 @@ import {
   CellGroup,
   Tabbar,
   TabbarItem,
-  Dialog
+  Dialog,
+  SubmitBar
 } from 'vant'
 Vue.use(NavBar)
   .use(Card)
@@ -99,6 +96,7 @@ Vue.use(NavBar)
   .use(Tabbar)
   .use(TabbarItem)
   .use(Dialog)
+  .use(SubmitBar)
 
 export default {
   name: 'confirmOrder',
@@ -200,7 +198,7 @@ export default {
       if (this.$route.query.type == 'dir') {
         params = {
           ...params,
-          quantity: confirmOrderList[0].num,
+          quantity: confirmOrderList[0].quantity,
           productAttr: confirmOrderList[0].productAttr,
           note: '备注'
         }
