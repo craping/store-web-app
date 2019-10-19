@@ -85,7 +85,8 @@ import {
   CellGroup,
   Tabbar,
   TabbarItem,
-  Dialog
+  Dialog,
+  SubmitBar
 } from 'vant'
 Vue.use(NavBar)
   .use(Card)
@@ -99,6 +100,7 @@ Vue.use(NavBar)
   .use(Tabbar)
   .use(TabbarItem)
   .use(Dialog)
+  .use(SubmitBar)
 
 export default {
   name: 'confirmOrder',

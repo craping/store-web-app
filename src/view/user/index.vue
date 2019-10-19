@@ -37,12 +37,16 @@
             <span>未结算收益(元)</span>
           </div>
           <div class="gird-item">
+            <span class="num">{{amsAccount.orders}}</span>
+            <span>总订单数</span>
+          </div>
+          <div class="gird-item">
             <span class="num">{{amsAccount.directTeams}}</span>
             <span>我的团队</span>
           </div>
         </div>
       </div>
-      <div v-else-if="!isVip && vipEnable" class="no-vip-card" @click="jumpLink('/vipGrade')">
+      <div v-else-if="!isVip && VIP_ENABLE" class="no-vip-card" @click="jumpLink('/vipGrade')">
         成为<span class="vip-grade-bar">会员</span>享受更多优惠
       </div>
     </div>
