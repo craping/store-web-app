@@ -12,7 +12,6 @@
 <script>
 import Vue from "vue";
 import { removeToken } from '@/utils/auth'
-
 import { NavBar, Cell, CellGroup, Toast } from "vant";
 Vue.use(Cell)
 	.use(CellGroup)
@@ -34,10 +33,9 @@ export default {
         .post("/login/loginOut", {})
         .then(res => {
           removeToken() 
-          if(window.aweixin){
-					  window.aweixin.authResult = null // 清空微信登录的认证
-          }
-      		this.$router.push("/login");
+          this.$store.commit('user/SET_LOGOUT')
+          this.$router.push("/login");
+          this.$store.commit("user/SET_BEFOREPATH", '/main/home');
         })
         .catch(error => {
           Toast(error.message);

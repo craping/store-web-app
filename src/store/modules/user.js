@@ -41,6 +41,10 @@ export default {
     SET_ICON(state, data) {
       state.userInfo.umsMember.icon = data
     },
+    SET_LOGOUT(state){
+      state.userInfo = {}
+      state.isLogin = false
+    }
   },
   actions: {
     getUserInfo({ commit }) {
