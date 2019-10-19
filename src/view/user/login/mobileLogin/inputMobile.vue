@@ -45,23 +45,15 @@ export default {
       this.isEyeClose = !this.isEyeClose;
     },
     checkMobile() {
-      if (this.isValidate()) {
-        const params = { mobile: this.mobile };
-        this.$http
-          .post("/authCode/getLoginCode", params)
-          .then(res => {
-            this.jumpLink("inputsms", { mobile: this.mobile });
-          })
-          .catch(error => {
-            Toast(error.message);
-          });
+      if (this.isValidateTel()) {
+        this.jumpLink("inputsms", { mobile: this.mobile });
       }
     },
 
     /**
      * 判断输入手机号
      */
-    isValidate() {
+    isValidateTel() {
       let flag = true;
       if (!new RegExp("^1[0-9]{10}$").test(this.mobile)) {
         flag = false;

@@ -61,7 +61,6 @@ export default {
         amount: this.amount,
         verCode: this.verCode
       };
-      debugger
       this.$http
         .post("/user/withdraw", params)
         .then(res => {
@@ -104,7 +103,7 @@ export default {
     getCodeReq() {
       const params = { mobile: this.bindPhone };
       this.$http
-        .post("/authCode/getUpdateCode", params)
+        .post("/authCode/getWithdrawCode", params)
         .then(res => {
           Toast("已发送");
         })

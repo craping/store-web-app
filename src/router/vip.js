@@ -8,8 +8,8 @@ export default [
         component: () => import('@/view/vip/withdraw/index.vue')
     },
     {
-        path: '/verCodeCheck',
-        component: () => import('@/view/vip/withdraw/verCodeCheck.vue')
+        path: '/withdrawCheck',
+        component: () => import('@/view/vip/withdraw/withdrawCheck.vue')
     },
     {
         path: '/team',
