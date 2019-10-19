@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import { getToken } from '@/utils/auth'
 import store from '@/store';
 
 import Router from 'vue-router';

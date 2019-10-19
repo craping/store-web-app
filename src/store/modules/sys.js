@@ -1,5 +1,4 @@
 import request from '@/utils/request'
-import { getToken } from '@/utils/auth'
 import { getClientId, getClient } from '@/utils/util'
 
 export default {
@@ -30,10 +29,10 @@ export default {
   },
   getters: {
     shareEnable: (state, getters, rootState) => {
-      return /* state.clientId == 1 &&  */rootState.user.isLogin;
+      return state.clientId == 1 && rootState.user.isLogin;
     },
     vipEnable: (state, getters, rootState) => {
-      return /* state.clientId == 1 &&  */state.config.VIP_ENABLE && rootState.user.isVip;
+      return state.clientId == 1 && state.config.VIP_ENABLE && rootState.user.isVip;
     }
   },
   mutations: {
