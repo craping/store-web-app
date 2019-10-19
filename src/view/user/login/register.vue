@@ -148,10 +148,6 @@ export default {
         Toast("请填写验证码")
         return
       }
-      if(!this.agentNo){
-        Toast("请填写邀请码")
-        return
-      }
       if(!this.password){
         Toast("请设置密码")
         return
