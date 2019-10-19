@@ -95,6 +95,7 @@ export default {
     },
     routeLink(active) {
       if((active == 2 || active == 3) && !this.isLogin){
+        this.$store.commit('user/SET_BEFOREPATH', this.tabbar[active].path)
         this.$router.push('/login')
       } else {
         this.$router.push(this.tabbar[active].path)
