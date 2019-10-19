@@ -34,6 +34,8 @@
 import Vue from "vue";
 import { NavBar, Icon } from "vant";
 import { CellGroup, Field, Toast } from "vant";
+import md5 from "js-md5";
+
 Vue.use(CellGroup)
   .use(Field)
   .use(Icon)
@@ -44,7 +46,6 @@ export default {
     return {
       mobile: "",
       verCode: "",
-      agentNo: "",
       password: "",
       codeText: "获取验证码",
       countDownSecond: -1,
@@ -69,10 +70,10 @@ export default {
       const params = {
         mobile: this.mobile,
         verCode: this.verCode,
-        type: ""
+        password: md5(this.password),
       };
       this.$http
-        .post("/login/verCodeOrPasswrodLogin", params)
+        .post("/login/forgetPassword ", params)
         .then(res => {
         })
         .catch(error => {
@@ -86,8 +87,7 @@ export default {
         Toast("请输入手机号码");
         return;
       }
-      this.timeCountDown();
-      if (this.isValidate()) {
+      if (this.isValidateTel()) {
         //手机号输入正确，才能获取验证码
         this.timeCountDown();
       }
@@ -117,20 +117,17 @@ export default {
      */
     getCodeReq() {
       const params = { mobile: this.mobile };
-      if (this.isValidate()) {
-        //手机号输入正确，才能获取验证码
-        this.$http
-          .post("/login/getVerCode", params)
-          .then(res => {})
-          .catch(error => {
-            Toast("获取验证码失败");
-          });
-      }
+      this.$http
+        .post("/login/getVerCode", params)
+        .then(() => {})
+        .catch((error) => {
+          Toast(error.message)
+        });
     },
     /**
      * 判断输入手机号
      */
-    isValidate() {
+    isValidateTel() {
       let flag = true;
       if (!new RegExp("^1[0-9]{10}$").test(this.mobile)) {
         flag = false;

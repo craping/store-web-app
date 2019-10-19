@@ -29,7 +29,7 @@
         <div class="btn-text" @click="getAll">全部提现</div>
       </div>
     </div>
-    <div class="btn" :class="{'disable':!canApply}" @click="sureHandle">下一步</div>
+    <div class="btn" :class="{'disable':!canApply}" @click="sureHandle">验证手机号</div>
   </div>
 </template>
 <script>
@@ -49,6 +49,7 @@ export default {
   },
   computed: {
     ...mapState("user", {
+      bindPhone: state => state.bindPhone,
       amsAccount: state => state.userInfo.amsAccount || {}
     }),
     ...mapState("bankCard", {
@@ -70,7 +71,11 @@ export default {
     },
     sureHandle() {
       if (!this.canApply) return;
-      this.jumpLink('verCodeCheck',{amount:this.money,bankCardId:this.currentCard.id})
+      if (!this.bindPhone) {
+        Toast('请去设置->账户安全中绑定手机号')
+        return
+      }
+      this.jumpLink('withdrawCheck',{amount:this.money,bankCardId:this.currentCard.id})
     }
   }
 };

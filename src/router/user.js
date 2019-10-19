@@ -79,6 +79,10 @@ export default [{
   component: () => import('@/view/user/bankCard/aditBankCard.vue')
 },
 {
+  path: '/bankCheck',
+  component: () => import('@/view/user/bankCard/bankCheck.vue')
+},
+{
   path: '/bill',
   component: () => import('@/view/user/bill/index.vue')
 },

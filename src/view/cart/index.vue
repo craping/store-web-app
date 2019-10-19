@@ -124,7 +124,7 @@ export default {
     changeOperate() {
       this.isOperate = !this.isOperate
     },
-    changeAll(val) {
+    changeAll() {
       if (this.isSelectAll) {
         this.checkedGoods = this.itemList.map(item => item.id)
       } else {
@@ -145,7 +145,7 @@ export default {
         }
         this.$http
           .post('/cartItem/updateQuantity', params)
-          .then(res => {})
+          .then(() => {})
           .catch(error => {
             Toast(error.message)
           })
@@ -170,7 +170,7 @@ export default {
     deleteItem() {
       this.$http
         .post('/cartItem/delete', { ids: this.checkedGoods })
-        .then(res => {
+        .then(() => {
           Toast('删除成功')
           this.checkedGoods = []
           this.getCartList()
@@ -184,7 +184,6 @@ export default {
         if (done) done()
       })
     },
-    onScroll(top) {},
     onLoad(done) {
       if (done) done(true)
       this.loading = false
