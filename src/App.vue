@@ -21,6 +21,7 @@ export default {
     this.getUserInfo().then(data => {
       sync.connect();
       service.init(data.info);
+      this.getCartList()
     }).catch(error => {
       console.log(error)
       if(getClientId() == 3 && !getToken()){
@@ -30,8 +31,6 @@ export default {
           window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_userinfo&connect_redirect=1#wechat_redirect`
         }
     });
-    
-    this.getCartList()
   },
   mounted() {
     
