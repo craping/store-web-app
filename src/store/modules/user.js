@@ -47,7 +47,7 @@ export default {
     }
   },
   actions: {
-    getUserInfo({ commit }) {
+    getUserInfo({ commit , dispatch}) {
       return new Promise((resolve, reject) => {
         if (!getToken()) {
           reject()
@@ -57,6 +57,7 @@ export default {
           .post('user/getUserInfo', {})
           .then(data => {
             commit('SET_USERINFO', data.info)
+            dispatch('cart/getCartList', null, { root: true })
             resolve(data)
           })
           .catch(error => {
