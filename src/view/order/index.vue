@@ -509,7 +509,6 @@ export default {
     onRefresh(done) {
       if (this.showProductList.length >= this.totalnum) {
         if (done) done(true)
-        return
       }
       this.pageNums += 1
       this.$store
@@ -519,7 +518,6 @@ export default {
         })
         .then(data => {
           this.showProductList = this.orderList
-          console.log('this.showProductList', this.showProductList)
           this.onClick(this.active)
         })
         .finally(() => {
@@ -560,7 +558,7 @@ export default {
     z-index: 10;
   }
   /deep/.van-tabs__content {
-    // margin-top: 115px;
+    margin-top: 115px;
     height: 100vh;
     width: 100%;
     .van-button {
@@ -581,9 +579,6 @@ export default {
     .van-tab {
       flex-basis: 20% !important;
     }
-  }
-  /deep/._v-container {
-    padding-top: 115px;
   }
 
   .mayLike {

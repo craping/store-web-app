@@ -6,11 +6,11 @@
     <van-nav-bar class="nav" title="账单详细" left-arrow @click-left="onClickLeft" fixed />
     <div class="content">
       <div class="top-row">
-        <div class="title">{{typeStr}}</div>
-        <div class="money">{{srcType=='0_1'?'-':'+'}}{{info.realAmount}}</div>
+        <div class="title">{{viewTypeStr}}</div>
+        <div class="money">{{type ?'+':'-'}}{{amount}}</div>
       </div>
       <div class="detail-row">
-        <template v-if="type == 1">
+        <template v-if="viewType == 1">
           <div class="cell">
             <span class="label">订单编号</span>
             <span>{{info.orderSn}}</span>
@@ -20,7 +20,7 @@
             <span>{{info.productName}}</span>
           </div>
         </template>
-        <template v-if="type == 2">
+        <template v-if="viewType == 2">
           <div class="cell">
             <span class="label">售后编号</span>
             <span>{{info.orderSn}}</span>
@@ -30,7 +30,7 @@
             <span>{{info.productName}}</span>
           </div>
         </template>
-        <template v-if="type == 3">
+        <template v-if="viewType == 3">
           <div class="cell">
             <span class="label">佣金渠道</span>
             <span>{{setChannelStr(info.channel)}}</span>
@@ -63,7 +63,7 @@
             </div>
           </div>
         </template>
-        <template v-if="type == 4">
+        <template v-if="viewType == 4">
           <div class="cell">
             <span class="label">当前状态</span>
             <span>{{status2Str(info.status)}}</span>
@@ -74,7 +74,7 @@
           </div>
           <div class="cell">
             <span class="label">提现银行</span>
-            <span>{{info.bankName}} ({{info.cardNo}}) {{info.cardName}}</span>
+            <span>{{info.bankName}}({{info.cardNo.slice(-4)}}) {{info.cardName}}</span>
           </div>
           <div class="cell">
             <span class="label">提现单号</span>
@@ -96,17 +96,18 @@
 <script>
 import Vue from "vue";
 import { format } from "@/utils/util";
-
 import { NavBar, Toast } from "vant";
 Vue.use(Toast).use(NavBar);
 export default {
   data() {
     return {
-      type: 3, // 1订单 ，2 售后 3 佣金 4.提现,
-      typeStr: "",
-      srcType: this.$route.query.srcType,
-      id: this.$route.query.id,
-      recordSn: this.$route.query.recordSn,
+      viewType: 3, // 1订单 ，2 售后 3 佣金 4.提现,
+      viewTypeStr: "",
+      srcType: this.$route.query.srcType, // 数据来源类型
+      id: this.$route.query.id, 
+      recordSn: this.$route.query.recordSn, // 账单编码
+      type: this.$route.query.type, // 资金类型[1：收入，0：支出]
+      amount: this.$route.query.amount, // 账变金额
       info: {}
     };
   },
@@ -124,34 +125,34 @@ export default {
     srcType2Type() {
       switch (this.srcType) {
         case "0_1":
-          this.typeStr = "订单交易";
-          this.type = 1;
+          this.viewTypeStr = "订单交易";
+          this.viewType = 1;
         case "1_4":
-          this.typeStr = "取消订单";
-          this.type = 1;
+          this.viewTypeStr = "取消订单";
+          this.viewType = 1;
           break;
         case "1_5":
-          this.typeStr = "售后退款";
-          this.type = 2;
+          this.viewTypeStr = "售后退款";
+          this.viewType = 2;
           break;
         case "1_1":
-          this.typeStr = "购物返现";
-          this.type = 3;
+          this.viewTypeStr = "购物返现";
+          this.viewType = 3;
         case "1_2":
-          this.typeStr = "直推佣金";
-          this.type = 3;
+          this.viewTypeStr = "直推佣金";
+          this.viewType = 3;
           break;
         case "1_3":
-          this.typeStr = "分销佣金";
-          this.type = 3;
+          this.viewTypeStr = "分销佣金";
+          this.viewType = 3;
           break;
         case "1_6":
-          this.typeStr = "感恩奖励";
-          this.type = 3;
+          this.viewTypeStr = "感恩奖励";
+          this.viewType = 3;
           break;
         case "0_2":
-          this.typeStr = "提现申请";
-          this.type = 4;
+          this.viewTypeStr = "提现申请";
+          this.viewType = 4;
           break;
       }
     },

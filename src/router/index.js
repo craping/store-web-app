@@ -71,10 +71,13 @@ router.beforeEach((to, from, next) => {
         return
     }
     let redirectPath = ""
-    if(!store.state.user.isLogin) {
-        if(to.path == '/main/user' || to.path == '/main/cart') { 
-            redirectPath = '/login'
-            store.commit("user/SET_BEFOREPATH", from.path);
+    if(to.path == '/login') { // 全局处理未登录跳登录页面
+        if(!store.state.user.isLogin) {
+            if (from.path != 'register') {
+                store.commit("user/SET_BEFOREPATH", from.path);
+            }
+        } else {
+            redirectPath = from.path
         }
     }
     if (from.query.shopId) {

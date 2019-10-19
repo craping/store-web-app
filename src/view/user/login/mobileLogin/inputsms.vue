@@ -36,6 +36,9 @@ export default {
       codeTimer: null
     };
   },
+  mounted() {
+    this.timeCountDown()
+  },
   destroyed() {
     clearInterval(this.codeTimer);
   },
@@ -52,7 +55,6 @@ export default {
     jumpLink(path) {
       this.$router.push(path);
     },
-
     sureHandle() {
       if (!this.verCode) {
         Toast("请输入验证码");
@@ -101,7 +103,9 @@ export default {
       const params = { mobile: this.mobile };
       this.$http
         .post("/authCode/getLoginCode", params)
-        .then(res => {})
+        .then(res => {
+          Toast("已发送");
+        })
         .catch(error => {
           Toast(error.message);
         });

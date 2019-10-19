@@ -22,9 +22,9 @@
         <div v-if="from && currentCard.id == item.id">
           <van-icon name="success" size="14px" color="#f44" />
         </div>
-        <div v-if="!from" @click.stop="removeHandle(item)">
+        <!-- <div v-if="!from" @click.stop="removeHandle(item)">
           <van-icon name="delete" size="20px" color="#f44" />
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

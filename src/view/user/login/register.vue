@@ -78,7 +78,7 @@ export default {
         Toast("请输入手机号码");
         return;
       }
-      if (this.isValidate()) {
+      if (this.isValidateTel()) {
         //手机号输入正确，才能获取验证码
         this.timeCountDown();
       }
@@ -129,7 +129,7 @@ export default {
     /**
      * 判断输入手机号
      */
-    isValidate() {
+    isValidateTel() {
       let flag = true;
       if (!new RegExp("^1[0-9]{10}$").test(this.mobile)) {
         flag = false;
@@ -148,19 +148,16 @@ export default {
         Toast("请填写验证码")
         return
       }
-      if(!this.agentNo){
-        Toast("请填写邀请码")
-        return
-      }
       if(!this.password){
         Toast("请设置密码")
         return
       }
-      if (this.isValidate()) {
+      if (this.isValidateTel()) {
         //手机号输入正确，才能获取验证码
         this.$http
           .post("/login/register", params)
           .then(res => {
+            Toast('注册成功')
             this.$router.go(-1)
           })
           .catch((error) => {
