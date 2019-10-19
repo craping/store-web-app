@@ -56,7 +56,9 @@ routes.forEach(route => {
         })
     }
 });
-
+//打包WAP包用此处
+// const router = new Router({ mode: 'history', routes });
+//打包APP用此处代码
 const router = new Router({ routes });
 
 router.beforeEach((to, from, next) => {
