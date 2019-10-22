@@ -30,8 +30,8 @@
                 <van-icon name="arrow-down" />
               </div>
               <div class="all-money">
-                <div>收入：￥111</div>
-                <div>支出：￥222</div>
+                <!-- <div>收入：￥111</div>
+                <div>支出：￥222</div> -->
               </div>
             </div>
           </van-sticky>
@@ -41,11 +41,11 @@
                 <van-icon name="cart" size="35" color="#fcc" />
               </div>
               <div class="col-2">
-                <div class="title">购买商品名购买商品名称是多少来得及称是多少来得及</div>
-                <div class="type">订单交易</div>
-                <div class="time">2019-07-23 12:13</div>
+                <div class="title">{{item.remark}}</div>
+                <div class="type">{{srcType2Type(item.srcType)}}</div>
+                <div class="time">{{formatDateTime(item.createTime)}}</div>
               </div>
-              <div class="col-3">+15.00</div>
+              <div class="col-3">{{item.type ?'+':'-'}}{{item.amount}}</div>
             </div>
           </div>
         </div>
@@ -239,11 +239,12 @@ export default {
     ...mapGetters(['billByMonth'])
   },
   methods: {
+    ...mapActions(["queryBill"]),
     handleDateSelectshow(time) {
       if (this.dateType) {
         this.dayDate2View()
       } else {
-        this.currentMonth = this.formatDate(new Date(time))
+        this.currentMonth = this.formatMonth(new Date(time))
         this.monthDate2View(time)
       }
       this.dateSelectshow = true
@@ -251,7 +252,26 @@ export default {
     getContainer() {
       return document.querySelector('.top-bar-wrapper');
     },
-    ...mapActions(["queryBill"]),
+    srcType2Type(srcType) {
+      switch (srcType) {
+        case "0_1":
+          return "订单交易";
+        case "1_4":
+          return "取消订单";
+        case "1_5":
+          return "售后退款";
+        case "1_1":
+          return "购物返现";
+        case "1_2":
+          return "直推佣金";
+        case "1_3":
+          return "分销佣金";
+        case "1_6":
+          return "感恩奖励";
+        case "0_2":
+          return "提现申请";
+      }
+    },
     onClickLeft() {
       this.$router.go(-1);
     },
@@ -288,14 +308,17 @@ export default {
         })
         .catch(() => {});
     },
-    formatDateTime(time) {
+    formatDate(time) {
       return format(time, "yyyy-MM-dd");
     },
-    formatDate(time) {
+    formatMonth(time) {
       return format(time, "yyyy-MM");
     },
-    formatDate2(time) {
+    formatMonthStr(time) {
       return format(time, "yyyy年MM月");
+    },
+    formatDateTime(time) {
+      return format(time, "yyyy-MM-dd hh:mm:ss");
     },
     changePickerMonthDate(picker) {
       this.currentMonth = picker.getValues().join("-");
@@ -314,7 +337,7 @@ export default {
         this.pickerDayDate = new Date(this[typeStr]);
       } else {
         this.pickerDayDate = new Date();
-        this[typeStr] = this.formatDateTime(new Date());
+        this[typeStr] = this.formatDate(new Date());
       }
     },
     monthDate2View(time) {
@@ -322,7 +345,7 @@ export default {
         this.pickerMonthDate = new Date(this.currentMonth)
       } else {
         this.pickerMonthDate = time ? new Date(time) : new Date()
-        this.currentMonth = this.formatDate(this.pickerMonthDate)
+        this.currentMonth = this.formatMonth(this.pickerMonthDate)
       }
     },
     selectMonthInput() {

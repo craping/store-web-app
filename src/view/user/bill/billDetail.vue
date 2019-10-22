@@ -127,6 +127,7 @@ export default {
         case "0_1":
           this.viewTypeStr = "订单交易";
           this.viewType = 1;
+          break;
         case "1_4":
           this.viewTypeStr = "取消订单";
           this.viewType = 1;
@@ -138,6 +139,7 @@ export default {
         case "1_1":
           this.viewTypeStr = "购物返现";
           this.viewType = 3;
+          break;
         case "1_2":
           this.viewTypeStr = "直推佣金";
           this.viewType = 3;
@@ -230,13 +232,16 @@ export default {
         height: 80px;
         padding: 0 15px 15px;
         box-sizing: content-box;
-
         .col-1 {
           width: 80px;
           height: 80px;
           background: #eee;
           margin-right: 15px;
           flex-shrink: 0;
+          img{
+            width: 100%;
+            height: 100%;
+          }
         }
         .col-2 {
           width: calc(100% - 100px);
