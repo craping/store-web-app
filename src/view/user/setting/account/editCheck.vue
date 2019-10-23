@@ -47,8 +47,9 @@ export default {
     onClickLeft() {
       this.$router.go(-1);
     },
-    jumpLink(path) {
-      this.$router.push(path);
+
+    jumpLink(path, query) {
+      this.$router.push({ path, query });
     },
     sureHandle() {
       if (!this.verCode) {
@@ -65,8 +66,8 @@ export default {
         .then(res => {
           if (this.mode == "mobile") {
             this.jumpLink("editMobile");
-          } else if (this.mode == "password") {
-            this.jumpLink("editPassword");
+          } else if (this.mode == "password" || this.mode == "payPassword") {
+            this.jumpLink("editPassword",{mode:this.mode});
           }
         })
         .catch(error => {

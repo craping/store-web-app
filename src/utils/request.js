@@ -2,6 +2,8 @@ import axios from 'axios'
 import sync from '@/utils/sync'
 import { Toast, Dialog } from 'vant'
 import { getToken } from '@/utils/auth'
+import router from '../router';
+
 
 // 创建axios实例
 const service = axios.create({
@@ -65,9 +67,10 @@ service.interceptors.response.use(
     const res = response.data
     if (res.result) {
       /* Toast.fail(res.msg) */
-
       // result:1 token错误集;
       if (res.result == 1) {
+        // token失效跳转到登录页面
+        router.push('/login')
         sync.disconnect()
       }
       let error = new Error(res.msg || 'Error')

@@ -6,7 +6,7 @@
       <div class="content">
         <van-card
           class="round"
-          v-for="(item) in likeList"
+          v-for="(item,index) in likeList"
           :key="item.productId"
           :price="item.price"
           :title="item.name"
@@ -16,7 +16,7 @@
           @click="toDetail(item)"
         >
           <template v-slot:num>
-            <van-button type="danger" size="mini" round @click.stop="cancelLike(item)">取消收藏</van-button>
+            <van-button type="danger" size="mini" round @click.stop="cancelLike(item,index)">取消收藏</van-button>
           </template>
         </van-card>
       </div>
@@ -77,10 +77,11 @@ export default {
     toDetail(item) {
       this.$router.push({name:'goods',params:{id:item.productId}})
     },
-    cancelLike(item) {
+    cancelLike(item,index) {
       this.$http
-        .post("/collec/deleteProduct", { id: item.productId })
+        .post("/collec/deleteProduct", { id: item.id })
         .then(res => {
+          this.likeList.splice(index,1);
           Toast('删除成功');
         })
         .catch(error => {

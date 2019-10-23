@@ -465,8 +465,6 @@ export default {
         }
         let temPrams = data.info
         temPrams.timestamp = parseInt(data.info.timestamp)
-        console.log(temPrams)
-        console.log('获取的通道', this.channel)
         plus.payment.request(
           this.channel,
           temPrams,

@@ -134,6 +134,7 @@ export default {
     }
   },
   created() {
+    this.getAddressList()
     this.initAddress()
   },
   mounted() {
@@ -141,8 +142,15 @@ export default {
       this.getPayChannel()
     })
   },
+  watch: {
+    addressInfo() {
+      this.initAddress()
+    }
+  },
   methods: {
     ...mapActions('user', ['getUserInfo']),
+    ...mapActions('address', ['getAddressList']),
+
     /*************返回点击事件***************/
     onClickLeft() {
       this.$router.go(-1)
@@ -161,16 +169,18 @@ export default {
     /*********获取用户的收货地址*********** */
     initAddress() {
       const { addressInfo } = this
-      this.confirmedAddress.name = addressInfo.name || '请先选择地址'
-      this.confirmedAddress.tel = addressInfo.tel || ''
-      console.log(addressInfo)
-      if (addressInfo.addressDetail) {
-        this.confirmedAddress.address = `${addressInfo.province}${
-          addressInfo.city
-        }${addressInfo.county}${addressInfo.addressDetail}`
-      } else {
-        this.confirmedAddress.address = ''
-      }
+      this.$nextTick(() => {
+        this.confirmedAddress.name = addressInfo.name || '请先选择地址'
+        this.confirmedAddress.tel = addressInfo.tel || ''
+        if (addressInfo.province) {
+          const detaliaddress = addressInfo.addressDetail || addressInfo.address
+          this.confirmedAddress.address = `${addressInfo.province}${
+            addressInfo.city
+          }${addressInfo.county}${detaliaddress}`
+        } else {
+          this.confirmedAddress.address = ''
+        }
+      })
     },
 
     //点击支付触发提交订单接口

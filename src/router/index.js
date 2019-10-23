@@ -78,7 +78,8 @@ router.beforeEach((to, from, next) => {
                 store.commit("user/SET_BEFOREPATH", from.path);
             }
         } else {
-            redirectPath = from.path
+            // 登录了就跳转到首页
+            redirectPath = '/main/home'
         }
     }
     if (from.query.shopId) {
