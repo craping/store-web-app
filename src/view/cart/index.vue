@@ -2,6 +2,7 @@
   <div class="cart-page">
     <div class="top-bar">
       <div class="fix-bar">
+        <van-icon v-if="isFormGoods" class="go-back" name="arrow-left" color="#fff" size="20" @click="onClickLeft"/>
         <span class="title">购物车</span>
         <span class="operate" @click="changeOperate">{{isOperate?'完成':'管理'}}</span>
       </div>
@@ -69,13 +70,14 @@
 import Vue from 'vue'
 import storeScroller from '@/components/store-scroller'
 import cardItem from './cartItem'
-import { Checkbox, CheckboxGroup, Stepper, SubmitBar, Toast } from 'vant'
+import { Checkbox, CheckboxGroup, Stepper, SubmitBar, Toast, Icon } from 'vant'
 import { mapActions, mapState } from 'vuex'
 Vue.use(Checkbox)
   .use(CheckboxGroup)
   .use(Stepper)
   .use(SubmitBar)
   .use(Toast)
+  .use(Icon)
 
 export default {
   components: {
@@ -88,7 +90,8 @@ export default {
       quantity: 2,
       checkedGoods: [],
       isSelectAll: false,
-      timeout: null
+      timeout: null,
+      isFormGoods: this.$route.query.isFormGoods
     }
   },
   mounted() {
@@ -121,6 +124,9 @@ export default {
 
   methods: {
     ...mapActions('cart', ['getCartList']),
+    onClickLeft() {
+      this.$router.go(-1);
+    },
     changeOperate() {
       this.isOperate = !this.isOperate
     },
@@ -206,8 +212,12 @@ export default {
     padding-top: 35px;
     top: 0;
     .title {
-      font-size: 14px;
+      font-size: 16px;
       color: #fff;
+    }
+    .go-back{
+      position: absolute;
+      left: 15px;
     }
     .operate {
       color: #fff;

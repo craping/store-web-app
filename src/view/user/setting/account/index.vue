@@ -32,7 +32,8 @@ import {
   CellGroup,
   ActionSheet,
   Popup,
-  DatetimePicker
+  DatetimePicker,
+  Toast
 } from "vant";
 Vue.use(Cell)
   .use(CellGroup)
@@ -53,12 +54,34 @@ export default {
       clientId: state => state.clientId
     })
   },
+  mounted() {
+    this.onPlusReady(() => {
+      this.initWeChatService();
+    });
+  },
   methods: {
     onClickLeft() {
       this.$router.go(-1);
     },
     jumpLink(path, query) {
       this.$router.push({ path, query });
+    },
+    
+    initWeChatService() {
+      if (window.aweixin) return;
+      // 微信授权登录对象
+      // 获取登录授权认证服务列表，单独保存微信登录授权对象
+      // 5+APP在plusready事件中调用，uni-app在vue页面的onLoad中调用
+      plus.oauth.getServices(
+        function(services) {
+          // alert('list+:'+JSON.stringify(services));
+          window.aweixin = services[0];
+          // alert('weService+:'+JSON.stringify(window.aweixin));
+        },
+        function(e) {
+          Toast("获取登录授权服务列表失败：" + JSON.stringify(e));
+        }
+      );
     },
     bindWx() {
       if (this.umsMember.openId) return;
@@ -74,7 +97,9 @@ export default {
               e => {
                 this.$http
                   .post("/wx/bindingWeChat", { code: e.code })
-                  .then(res => {})
+                  .then(res => {
+                    Toast('绑定成功');
+                  })
                   .catch(error => {
                     Toast(error.message);
                   });

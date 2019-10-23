@@ -188,6 +188,7 @@
 
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" @click="openService" :info="unread">客服</van-goods-action-icon>
+      <van-goods-action-icon icon="like-o" @click="onClickLike" >收藏</van-goods-action-icon>
       <van-goods-action-icon icon="cart-o" @click="onClickCart" :info="cartNum">购物车</van-goods-action-icon>
       <template v-if="vipEnable">
         <van-goods-action-button type="warning" @click="sku.show=true">
@@ -609,9 +610,19 @@ export default {
         (maxPrice ? '~¥' + new Big(maxPrice).toFixed(2) : '')
       )
     },
-
+    onClickLike() {
+      this.$http
+        .post("/collec/addProduct", {productId:this.$route.params.id})
+        .then(res => {
+          Toast('收藏成功');
+        })
+        .catch(error => {
+          Toast(error.message);
+        });
+      
+    },
     onClickCart() {
-      this.$router.push('/main/cart')
+      this.$router.push({path:'/main/cart',query:{isFormGoods:true}})
     },
 
     sorry() {
