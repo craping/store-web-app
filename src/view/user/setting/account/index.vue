@@ -12,13 +12,19 @@
       is-link
       :title="bindPhone ? '更换手机号' : '绑定手机号'"
       :value="bindPhone ? '更换' : '未绑定'"
-      @click="jumpLink('editCheck',{mode:'mobile'})"
+      @click="toUpdatePhone"
     />
     <van-cell
       is-link
       :title="umsMember.password ? '修改登录密码' : '设置登录密码'"
       :value="umsMember.password ? '修改' : '未设置'"
-      @click="jumpLink('editCheck',{mode:'password'})"
+      @click="toUpdatePassWord"
+    />
+    <van-cell
+      is-link
+      :title="umsMember.password ? '修改支付密码' : '设置支付密码'"
+      :value="umsMember.password ? '修改' : '未设置'"
+      @click="toUpdatePayPassWord"
     />
   </div>
 </template>
@@ -66,7 +72,25 @@ export default {
     jumpLink(path, query) {
       this.$router.push({ path, query });
     },
-    
+    toUpdatePhone() {
+      if (this.bindPhone) {
+        this.jumpLink('editCheck',{mode:'mobile'})
+      } else {
+        this.jumpLink("editMobile",{isNew:true});
+      }
+    },
+    toUpdatePassWord() {
+      if (!this.bindPhone) {
+        Toast('请先绑定手机号码')
+      }
+      this.jumpLink('editCheck',{mode:'password'})
+    },
+    toUpdatePayPassWord() {
+      if (!this.bindPhone) {
+        Toast('请先绑定手机号码')
+      }
+      this.jumpLink('editCheck',{mode:'payPassword'})
+    },
     initWeChatService() {
       if (window.aweixin) return;
       // 微信授权登录对象
