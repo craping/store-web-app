@@ -20,13 +20,20 @@ export default {
     },
     getAddressList({ commit }) {
       return new Promise((resolve, reject) => {
-        request.post("/address/getUserInfoAddress", {}).then(data => {
-          commit('SET_ADDRESSLIST', data.info)
-          resolve(data)
-        }).catch(error => {
-          reject(error)
-        })
+        request
+          .post('/address/getUserInfoAddress', {})
+          .then(data => {
+            commit('SET_ADDRESSLIST', data.info)
+            const defaultAddres = data.info.filter(item => {
+              return item.isDefault == 1
+            })
+            commit('SET_ADDRESSINFO', defaultAddres[0])
+            resolve(data)
+          })
+          .catch(error => {
+            reject(error)
+          })
       })
-    },
+    }
   }
 }

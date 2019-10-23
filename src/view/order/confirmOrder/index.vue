@@ -134,6 +134,7 @@ export default {
     }
   },
   created() {
+    this.getAddressList()
     this.initAddress()
   },
   mounted() {
@@ -143,6 +144,8 @@ export default {
   },
   methods: {
     ...mapActions('user', ['getUserInfo']),
+    ...mapActions('address', ['getAddressList']),
+
     /*************返回点击事件***************/
     onClickLeft() {
       this.$router.go(-1)
@@ -163,11 +166,11 @@ export default {
       const { addressInfo } = this
       this.confirmedAddress.name = addressInfo.name || '请先选择地址'
       this.confirmedAddress.tel = addressInfo.tel || ''
-      console.log(addressInfo)
-      if (addressInfo.addressDetail) {
+      if (addressInfo.province) {
+        const detaliaddress = addressInfo.addressDetail || addressInfo.address
         this.confirmedAddress.address = `${addressInfo.province}${
           addressInfo.city
-        }${addressInfo.county}${addressInfo.addressDetail}`
+        }${addressInfo.county}${detaliaddress}`
       } else {
         this.confirmedAddress.address = ''
       }
