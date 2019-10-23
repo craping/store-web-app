@@ -79,7 +79,7 @@ export default {
     },
     cancelLike(item,index) {
       this.$http
-        .post("/collec/deleteProduct", { id: item.productId })
+        .post("/collec/deleteProduct", { id: item.id })
         .then(res => {
           this.likeList.splice(index,1);
           Toast('删除成功');

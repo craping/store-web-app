@@ -33,6 +33,7 @@ export default {
       countDownSecond: -1,
       codeTimer: null,
       isEyeClose: true,
+      isNew: this.$route.query.isNew || false
     };
   },
   computed: {
@@ -59,9 +60,14 @@ export default {
       this.$http
         .post("/user/updataMobile", params)
         .then(res => {
+          if (this.isNew) {
+            Toast("绑定成功");
+            this.$router.go(-1);
+          } else {
             Toast("修改成功");
-            this.$store.commit('user/SET_PHONE',this.newMobile)
             this.$router.go(-2);
+          }
+          this.$store.commit('user/SET_PHONE',this.newMobile)
         })
         .catch(error => {
           Toast(error.message);
