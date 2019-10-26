@@ -553,10 +553,14 @@ export default {
           break
       }
       this.tabClick = true
-      window.scrollTo({
-        top: offsetTop,
-        behavior: 'smooth'
-      })
+      try{
+        window.scrollTo({
+          top: offsetTop,
+          behavior: 'smooth'
+        })
+      }catch(e){
+        window.scrollTo(0, offsetTop);
+      }
       setTimeout(() => {
         this.tabClick = false
       }, 500)
