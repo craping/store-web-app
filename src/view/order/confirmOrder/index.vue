@@ -68,6 +68,7 @@
 <script>
 import Vue from 'vue'
 import { mapState, mapActions } from 'vuex'
+import { wxpay } from '@/utils/wxpay'
 import storePayDialog from '@/components/store-pay-dialog'
 import {
   NavBar,
@@ -203,7 +204,6 @@ export default {
         addressId: this.addressInfo.id,
         type: this.$route.query.type,
         sourceType: this.platform
-        // sourceType: 1
       }
       if (this.$route.query.type == 'dir') {
         params = {
@@ -228,6 +228,7 @@ export default {
             // orderSn: data.info.orderSn,
             orderIds: data.info.orderIds.split(','),
             sourceType: this.platform
+            // sourceType: 1
           }
         })
         .catch(error => {
@@ -272,26 +273,48 @@ export default {
           this.$router.push('/order')
           return
         }
-        let temPrams = data.info
-        temPrams.timestamp = parseInt(data.info.timestamp)
-        console.log(temPrams)
-        console.log('获取的通道', this.channel)
-        plus.payment.request(
-          this.channel,
-          temPrams,
-          res => {
-            this.$http
-              .post('trade/tradeDetail', { tradeNo: temPrams.tradeNo })
-              .then(data => {
-                plus.nativeUI.alert('支付成功！', function() {
-                  this.$router.push('/order')
-                })
-              })
-          },
-          error => {
-            plus.nativeUI.alert('支付失败：' + error.code)
+
+        if (this.payType == 'WXPAY') {
+          if (this.platform == 2) {
+            //wap
+            window.location.href = data.info.mweb_url
+            return
           }
-        )
+          if (this.platform == 3) {
+            //wx
+            this.wxpay(data.info, payResult => {
+              if (payResult.err_msg == 'get_brand_wcpay_request:ok') {
+                //执行
+                Toast.success('支付成功')
+                this.$router.push('/order')
+              } else {
+                Toast.fail('支付失败')
+                this.$router.push('/order')
+              }
+            })
+            return
+          }
+          if (this.platform == 1) {
+            let temPrams = data.info
+            temPrams.timestamp = parseInt(data.info.timestamp)
+            plus.payment.request(
+              this.channel,
+              temPrams,
+              res => {
+                this.$http
+                  .post('trade/tradeDetail', { tradeNo: temPrams.tradeNo })
+                  .then(data => {
+                    plus.nativeUI.alert('支付成功！', function() {
+                      this.$router.push('/order')
+                    })
+                  })
+              },
+              error => {
+                plus.nativeUI.alert('支付失败：' + error.code)
+              }
+            )
+          }
+        }
       })
     },
     /*************支付弹框事件群end******/
