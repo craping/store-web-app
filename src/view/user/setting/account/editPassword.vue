@@ -5,7 +5,7 @@
       <van-cell-group>
         <van-field v-model="password" clearable label="新密码" placeholder="请输入新密码" />
         <van-field v-model="passwords" clearable label="确认新密码" placeholder="请再次输入新密码" />
-        <div class="main-btn" @click="sureHandle">修改</div>
+        <div class="main-btn" @click="sureHandle">确定</div>
       </van-cell-group>
     </div>
   </div>

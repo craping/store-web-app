@@ -83,6 +83,10 @@ export default [{
   component: () => import('@/view/user/bankCard/bankCheck.vue')
 },
 {
+  path: '/authentication',
+  component: () => import('@/view/user/bankCard/authentication.vue')
+},
+{
   path: '/bill',
   component: () => import('@/view/user/bill/index.vue')
 },
