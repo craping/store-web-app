@@ -20,7 +20,7 @@
           <van-cell
             v-for="item in payChannels"
             :key="item.id"
-            :title="item.name"
+            :title="item.name == '余额钱包' ? `余额钱包(余额:${userInfo.amsAccount.balance})`:item.name"
             :icon="icons[item.id]"
             clickable
             @click="getChannelClick(item.abbr)"
@@ -78,7 +78,8 @@ export default {
   },
   computed: {
     ...mapState({
-      payChannels: state => state.payChannel.payChannel
+      payChannels: state => state.payChannel.payChannel,
+      userInfo: state => state.user.userInfo
     })
   },
   methods: {

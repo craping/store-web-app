@@ -114,9 +114,6 @@ export default {
     this.$store.dispatch('home/content')
   },
   mounted() {
-    this.onPlusReady(() => {
-      Toast.success('plus加载成功')
-    })
   },
   methods: {
     onRefresh(done) {

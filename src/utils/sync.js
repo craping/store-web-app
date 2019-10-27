@@ -59,6 +59,13 @@ const Sync = {
                 store.commit("sys/SET_CONFIG_SINGLE", data);
             }
         },
+        USER:{
+            UPDATE(){
+                store.dispatch("user/getUserInfo").then(data => {
+                    console.log(data.info)
+                });
+            }
+        },
         MESSAGE:{
             
         }

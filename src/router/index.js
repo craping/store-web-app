@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import { getToken } from '@/utils/auth'
 import store from '@/store';
 
 import Router from 'vue-router';
@@ -57,8 +56,10 @@ routes.forEach(route => {
         })
     }
 });
-
-const router = new Router({routes });
+//打包WAP包用此处
+const router = new Router({ mode: 'history', routes });
+//打包APP用此处代码
+// const router = new Router({ routes });
 
 router.beforeEach((to, from, next) => {
     const title = to.meta && to.meta.title;

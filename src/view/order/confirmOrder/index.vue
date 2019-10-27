@@ -68,6 +68,7 @@
 <script>
 import Vue from 'vue'
 import { mapState, mapActions } from 'vuex'
+import { wxpay } from '@/utils/wxpay'
 import storePayDialog from '@/components/store-pay-dialog'
 import {
   NavBar,
@@ -134,6 +135,7 @@ export default {
     }
   },
   created() {
+    this.getAddressList()
     this.initAddress()
   },
   mounted() {
@@ -141,8 +143,15 @@ export default {
       this.getPayChannel()
     })
   },
+  watch: {
+    addressInfo() {
+      this.initAddress()
+    }
+  },
   methods: {
     ...mapActions('user', ['getUserInfo']),
+    ...mapActions('address', ['getAddressList']),
+
     /*************返回点击事件***************/
     onClickLeft() {
       this.$router.go(-1)
@@ -161,16 +170,18 @@ export default {
     /*********获取用户的收货地址*********** */
     initAddress() {
       const { addressInfo } = this
-      this.confirmedAddress.name = addressInfo.name || '请先选择地址'
-      this.confirmedAddress.tel = addressInfo.tel || ''
-      console.log(addressInfo)
-      if (addressInfo.addressDetail) {
-        this.confirmedAddress.address = `${addressInfo.province}${
-          addressInfo.city
-        }${addressInfo.county}${addressInfo.addressDetail}`
-      } else {
-        this.confirmedAddress.address = ''
-      }
+      this.$nextTick(() => {
+        this.confirmedAddress.name = addressInfo.name || '请先选择地址'
+        this.confirmedAddress.tel = addressInfo.tel || ''
+        if (addressInfo.province) {
+          const detaliaddress = addressInfo.addressDetail || addressInfo.address
+          this.confirmedAddress.address = `${addressInfo.province}${
+            addressInfo.city
+          }${addressInfo.county}${detaliaddress}`
+        } else {
+          this.confirmedAddress.address = ''
+        }
+      })
     },
 
     //点击支付触发提交订单接口
@@ -193,7 +204,6 @@ export default {
         addressId: this.addressInfo.id,
         type: this.$route.query.type,
         sourceType: this.platform
-        // sourceType: 1
       }
       if (this.$route.query.type == 'dir') {
         params = {
@@ -218,6 +228,7 @@ export default {
             // orderSn: data.info.orderSn,
             orderIds: data.info.orderIds.split(','),
             sourceType: this.platform
+            // sourceType: 1
           }
         })
         .catch(error => {
@@ -262,26 +273,48 @@ export default {
           this.$router.push('/order')
           return
         }
-        let temPrams = data.info
-        temPrams.timestamp = parseInt(data.info.timestamp)
-        console.log(temPrams)
-        console.log('获取的通道', this.channel)
-        plus.payment.request(
-          this.channel,
-          temPrams,
-          res => {
-            this.$http
-              .post('trade/tradeDetail', { tradeNo: temPrams.tradeNo })
-              .then(data => {
-                plus.nativeUI.alert('支付成功！', function() {
-                  this.$router.push('/order')
-                })
-              })
-          },
-          error => {
-            plus.nativeUI.alert('支付失败：' + error.code)
+
+        if (this.payType == 'WXPAY') {
+          if (this.platform == 2) {
+            //wap
+            window.location.href = data.info.mweb_url
+            return
           }
-        )
+          if (this.platform == 3) {
+            //wx
+            this.wxpay(data.info, payResult => {
+              if (payResult.err_msg == 'get_brand_wcpay_request:ok') {
+                //执行
+                Toast.success('支付成功')
+                this.$router.push('/order')
+              } else {
+                Toast.fail('支付失败')
+                this.$router.push('/order')
+              }
+            })
+            return
+          }
+          if (this.platform == 1) {
+            let temPrams = data.info
+            temPrams.timestamp = parseInt(data.info.timestamp)
+            plus.payment.request(
+              this.channel,
+              temPrams,
+              res => {
+                this.$http
+                  .post('trade/tradeDetail', { tradeNo: temPrams.tradeNo })
+                  .then(data => {
+                    plus.nativeUI.alert('支付成功！', function() {
+                      this.$router.push('/order')
+                    })
+                  })
+              },
+              error => {
+                plus.nativeUI.alert('支付失败：' + error.code)
+              }
+            )
+          }
+        }
       })
     },
     /*************支付弹框事件群end******/

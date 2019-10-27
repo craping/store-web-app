@@ -48,5 +48,10 @@ export default [
     path: '/confirmOrder', //退货详情
     name: 'confirmOrder',
     component: () => import('@/view/order/confirmOrder/index.vue')
+  },
+  {
+    path: '/payBack', //退货详情
+    name: 'payBack',
+    component: () => import('@/view/order/payBack/index.vue')
   }
 ]

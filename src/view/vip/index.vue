@@ -28,6 +28,10 @@
             <div>{{amsAccount.cashout}}</div>
           </div>
           <div>
+            <div class="title-2">总订单数</div>
+            <div>{{amsAccount.orders}}</div>
+          </div>
+          <div>
             <div class="title-2">未结算(元)</div>
             <div>{{amsAccount.unreceivedIncome}}</div>
           </div>
