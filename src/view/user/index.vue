@@ -49,11 +49,7 @@
           </div>
         </div>
       </div>
-<<<<<<< HEAD
-      <div class="no-vip-card" @click="jumpLink('/vipGrade')">
-=======
       <div v-else-if="!isVip && VIP_ENABLE" class="no-vip-card" @click="jumpLink('/vipGrade')">
->>>>>>> 07ce40f45fda31c833eaca9215d931e478d910e3
         成为<span class="vip-grade-bar">会员</span>享受更多优惠
       </div>
     </div>
