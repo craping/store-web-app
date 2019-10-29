@@ -74,7 +74,7 @@
           <span class="line-through">{{ formatPrice(goods.originalPrice) }}</span>
         </div>
       </van-cell>
-      <van-cell class="goods-level" icon="info-o" :center="true">
+      <van-cell v-if="vipEnable" class="goods-level" icon="info-o" :center="true">
         本品最高返现{{levelCommission}}，您当前级别返现为{{ commission }}
       </van-cell>
       <van-cell :title="goods.title" title-style="font-size:1rem;" :label="goods.subTitle"/>
@@ -129,7 +129,7 @@
         </div>
         <div class="row-2">
           <div class="overhide">{{item.content}}</div>
-          <div class="pic-area">
+          <div class="pic-area" v-if="item.pics">
             <img
               v-for="(pic,index) in JSON.parse(item.pics)"
               :key="index"
