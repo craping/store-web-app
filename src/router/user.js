@@ -31,6 +31,10 @@ export default [{
   component: () => import('@/view/user/setting/account/editPassword.vue')
 },
 {
+  path: '/editPayPassword',
+  component: () => import('@/view/user/setting/account/editPayPassword.vue')
+},
+{
   path: '/nameSet',
   component: () => import('@/view/user/setting/userInfo/nameSet.vue')
 },

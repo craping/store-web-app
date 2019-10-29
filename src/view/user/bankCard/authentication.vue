@@ -69,20 +69,25 @@ export default {
         this.backImg = data.content
       } else {
         this.frontImg = data.content
+        this.getInfoByPic(data.content,side)
       }
-      this.getInfoByPic(data.content,side)
     },
     getInfoByPic(imageBase64,side) {
+      Toast.loading({
+        message: '识别中...',
+        forbidClick: true
+      });
       // front:身份证带人脸一面，back:身份证带国徽片一面
       this.$http
         .post("/user/getIdendo", { imageBase64, side })
         .then(res => {
-          console.log(res)
+          this.idcard = res.info.code
+          this.name = res.info.name
+          Toast.clear();
         })
         .catch(error => {
           Toast(error.message);
         });
-      
     },
     authenticationHandle() {
       if (!this.backImg) {
@@ -100,7 +105,9 @@ export default {
       this.$http
         .post("/user/realName", { idcard: this.idcard, name: this.name })
         .then(res => {
+          this.$store.commit('user/SET_IDENTIFYLABEL')
           Toast('认证成功');
+          this.$router.go(-1);
         })
         .catch(error => {
           Toast(error.message);

@@ -118,8 +118,7 @@ export default {
         })
         .catch(error => {
           Toast(error.message);
-        });
-      
+        });  
     },
     getCode() {
       if (this.countDownSecond > 0) {

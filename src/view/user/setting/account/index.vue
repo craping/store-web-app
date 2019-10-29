@@ -22,8 +22,8 @@
     />
     <van-cell
       is-link
-      :title="umsMember.password ? '修改支付密码' : '设置支付密码'"
-      :value="umsMember.password ? '修改' : '未设置'"
+      :title="payLogo ? '修改支付密码' : '设置支付密码'"
+      :value="payLogo ? '修改' : '未设置'"
       @click="toUpdatePayPassWord"
     />
   </div>
@@ -54,6 +54,7 @@ export default {
   computed: {
     ...mapState("user", {
       bindPhone: state => state.bindPhone,
+      payLogo: state => state.userInfo.payLogo,
       umsMember: state => state.userInfo.umsMember || {}
     }),
     ...mapState('sys',{
