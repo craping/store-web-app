@@ -63,10 +63,10 @@ export default {
     },
     toAddBanKCard() {
       this.setCurrentCard();
-      // if (this.identifyLabel) {
-      //   this.$router.push("/editBankCard")
-      //   return
-      // }
+      if (this.identifyLabel) {
+        this.$router.push("/editBankCard")
+        return
+      }
       this.$router.push("/authentication")
       
     },
@@ -95,7 +95,7 @@ export default {
       if (this.from == "choose") {
         this.$router.go(-1);
       } else {
-        this.jumpLink("editBankCard");
+        this.jumpLink("editBankCard", param);
       }
     },
     // 删除银行卡
