@@ -74,6 +74,9 @@
           <span class="line-through">{{ formatPrice(goods.originalPrice) }}</span>
         </div>
       </van-cell>
+      <van-cell class="goods-level" icon="info-o" :center="true">
+        本品最高返现{{levelCommission}}，您当前级别返现为{{ commission }}
+      </van-cell>
       <van-cell :title="goods.title" title-style="font-size:1rem;" :label="goods.subTitle"/>
       <van-cell
         :title="'运费：'+(goods.baseCarriage?goods.baseCarriage:'免运费')"
@@ -340,6 +343,9 @@ export default {
     skuCommission: function() {
       return this.formatPrice(this.sku.commission, this.sku.maxCommission)
     },
+    levelCommission: function() {
+      return this.formatPrice(this.goods.levelCommission, this.goods.levelMaxCommission)
+    },
     recommenderId: function() {
       return this.goods.id == this.$route.query.shopId
         ? this.$route.query.recommenderId
@@ -432,11 +438,19 @@ export default {
         product.params = ''
         product.service = ''
         skus.sort((a, b) => {
+          if (a.price != b.price) {
+              return a.price - b.price;
+          }else {
+              return a.commission - b.commission;
+          }
+
           return a.price > b.price ? 1 : -1
         })
         product.commission = skus[0].commission
+        product.levelCommission = skus[0].maxCommission
         if (skus.length > 1) {
           product.maxCommission = skus[skus.length - 1].commission
+          product.levelMaxCommission = skus[skus.length - 1].maxCommission
           product.maxPrice = skus[skus.length - 1].price
         }
         //服务初始化
@@ -611,7 +625,7 @@ export default {
       return (
         '¥' +
         new Big(minPrice).toFixed(2) +
-        (maxPrice ? '~¥' + new Big(maxPrice).toFixed(2) : '')
+        (maxPrice && minPrice!=maxPrice ? '~¥' + new Big(maxPrice).toFixed(2) : '')
       )
     },
     onClickLike() {
@@ -853,6 +867,15 @@ export default {
     .originalPrice {
       color: #fff;
       font-size: 12px;
+    }
+  }
+
+  &-level {
+    padding: 5px 16px;
+    color: #895c29;
+    background: #fbe5ae;
+    .van-cell__value{
+      color: #895c29;
     }
   }
 
