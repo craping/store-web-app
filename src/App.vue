@@ -39,7 +39,7 @@ export default {
       var webview = plus.webview.currentWebview();  
       plus.key.addEventListener('backbutton', function() {  
           webview.canBack(function(e) {  
-              if (e.canBack) {  
+              if (e.canBack && !me.$route.path.includes("/main/") && me.$route.path != "/") {  
                   webview.back(); //这里不建议修改自己跳转的路径  
               } else {  
                   //首次按键，提示‘再按一次退出应用’  
