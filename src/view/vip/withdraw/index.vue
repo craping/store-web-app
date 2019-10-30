@@ -4,7 +4,7 @@
 <template>
   <div class="withdraw-page">
     <van-nav-bar title="提现" left-arrow @click-left="onClickLeft" />
-    <div class="bank-bar" @click="jumpLink('bankCard',{from:'choose'})">
+    <div class="bank-bar" @click="jumpLink('bankCard',{from:'choose',money:money})">
       <div class="col-left">
         <div class="col-mid" v-if="currentCard.id">
           <div class="title">{{currentCard.bankName}}</div>
@@ -19,26 +19,38 @@
       </div>
     </div>
     <div class="withdraw-info">
-      <div class="tip">提现金额（免收服务费）</div>
+      <div class="tip">
+        <div><span>提现金额</span> (最少提现{{config.ACCOUNT_MIN_WITHDRAW}}元)</div>
+        <div>
+          手续费:{{(money * config.ACCOUNT_FEE * 0.01).toFixed(2)}}元 ({{config.ACCOUNT_FEE}}%)
+        </div>
+      </div>
       <div class="input-wrapper">
         <span>￥</span>
-        <input type="tel" v-model="money" :maxlength="10" />
+        <van-field
+          input-align="right"
+          v-model="money"
+          type="number"
+        />
+        <!-- <input type="tel" v-model="money" :maxlength="10" /> -->
       </div>
       <div class="bottom-bar">
         <div class="can-use">可用余额 {{amsAccount.balance}}元</div>
         <div class="btn-text" @click="getAll">全部提现</div>
       </div>
     </div>
-    <div class="btn" :class="{'disable':!canApply}" @click="sureHandle">验证手机号</div>
+    <div class="btn" :class="{'disable':!canApply}" @click="sureHandle">下一步</div>
   </div>
 </template>
 <script>
 import Vue from "vue";
-import { NavBar, Icon, Field, Toast } from "vant";
+import {  } from 'vant';
+import { NavBar, Icon, Field, Toast, NumberKeyboard } from "vant";
 import { mapState } from "vuex";
 
 Vue.use(Field)
   .use(NavBar)
+  .use(NumberKeyboard)
   .use(Toast)
   .use(Icon);
 export default {
@@ -55,8 +67,11 @@ export default {
     ...mapState("bankCard", {
       currentCard: state => state.currentCard
     }),
+    ...mapState('sys',{
+      config: state => state.config,
+    }),
     canApply() {
-      return this.money && this.currentCard.id;
+      return this.money && this.currentCard.id && this.money >= this.config.ACCOUNT_MIN_WITHDRAW;
     }
   },
   methods: {
@@ -65,12 +80,17 @@ export default {
     },
     getAll() {
       this.money = this.amsAccount.balance;
+      this.$forceUpdate()
     },
     jumpLink(path, query) {
       this.$router.push({ path, query });
     },
     sureHandle() {
       if (!this.canApply) return;
+      if (this.money > this.amsAccount.balance) {
+        Toast('可用余额不足')
+        return
+      }
       if (!this.bindPhone) {
         Toast('请去设置->账户安全中绑定手机号')
         return
@@ -119,10 +139,15 @@ export default {
     overflow: hidden;
     padding: 0 15px;
     color: #888;
-
     .tip {
-      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
       margin-top: 20px;
+      span{
+        font-size: 15px;
+      }
     }
     .input-wrapper {
       margin: 20px 0 10px;
@@ -134,7 +159,7 @@ export default {
         width: 50px;
         font-size: 40px;
       }
-      input {
+      /deep/ input {
         flex: 1;
         height: 100%;
         border: 0;
