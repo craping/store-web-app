@@ -626,7 +626,7 @@ export default {
       
     },
     onClickCart() {
-      this.$router.push({path:'/main/cart',query:{isFormGoods:true}})
+      this.$router.push({path:'/main/cart', query:{hideBotBar:true}})
     },
 
     sorry() {

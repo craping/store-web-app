@@ -2,7 +2,7 @@
   <div class="cart-page">
     <div class="top-bar">
       <div class="fix-bar">
-        <van-icon v-if="isFormGoods" class="go-back" name="arrow-left" color="#fff" size="20" @click="onClickLeft"/>
+        <van-icon v-if="hideBotBar" class="go-back" name="arrow-left" color="#fff" size="20" @click="onClickLeft"/>
         <span class="title">购物车</span>
         <span class="operate" @click="changeOperate">{{isOperate?'完成':'管理'}}</span>
       </div>
@@ -91,7 +91,7 @@ export default {
       checkedGoods: [],
       isSelectAll: false,
       timeout: null,
-      isFormGoods: this.$route.query.isFormGoods
+      hideBotBar: this.$route.query.hideBotBar
     }
   },
   mounted() {

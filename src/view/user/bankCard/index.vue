@@ -31,8 +31,7 @@
 </template>
 <script>
 import Vue from "vue";
-import { createNamespacedHelpers } from "vuex";
-const { mapState, mapActions } = createNamespacedHelpers("bankCard");
+import { mapState, mapActions } from "vuex";
 import { NavBar, Field, Icon, Toast, Dialog } from "vant";
 Vue.use(Field)
   .use(Icon)
@@ -47,21 +46,29 @@ export default {
     };
   },
   computed: {
-    ...mapState({
+    ...mapState('bankCard', {
       currentCard: state => state.currentCard
+    }),
+    ...mapState('user', {
+      identifyLabel: state => state.userInfo.identifyLabel,
     })
   },
   mounted() {
     this.getCardList();
   },
   methods: {
-    ...mapActions(["setCurrentCard"]),
+    ...mapActions('bankCard', ["setCurrentCard"]),
     onClickLeft() {
       this.$router.go(-1);
     },
     toAddBanKCard() {
       this.setCurrentCard();
-      this.$router.push("/editBankCard");
+      if (this.identifyLabel) {
+        this.$router.push("/editBankCard")
+        return
+      }
+      this.$router.push("/authentication")
+      
     },
     jumpLink(path, query) {
       this.$router.push({ path, query });
@@ -88,7 +95,7 @@ export default {
       if (this.from == "choose") {
         this.$router.go(-1);
       } else {
-        this.jumpLink("editBankCard");
+        this.jumpLink("editBankCard", param);
       }
     },
     // 删除银行卡

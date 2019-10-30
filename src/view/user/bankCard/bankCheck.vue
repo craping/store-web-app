@@ -63,6 +63,7 @@ export default {
       if (this.id) {
         if (this.mode == 'del') {
           this.removeHandle()
+          return
         }
         this.updateHandle()
       } else {
@@ -80,8 +81,8 @@ export default {
           verCode: this.verCode
         })
         .then(data => {
-          Toast("添加成功");
-          this.$router.go(-1);
+          Toast("添加成功")
+          this.jumpLink('/bankCard')
         })
         .catch(error => {
           Toast(error.message)
@@ -99,8 +100,8 @@ export default {
           verCode: this.verCode
         })
         .then(data => {
-          Toast("添加成功");
-          this.$router.go(-1);
+          Toast("修改成功")
+          this.jumpLink('/bankCard')
         })
         .catch(error => {
           Toast(error.message)
@@ -114,12 +115,12 @@ export default {
           verCode: this.verCode
         })
         .then(data => {
-          Toast("删除成功");
+          Toast("删除成功")
+          this.jumpLink('/bankCard')
         })
         .catch(error => {
           Toast(error.message);
-        });
-      
+        });  
     },
     getCode() {
       if (this.countDownSecond > 0) {

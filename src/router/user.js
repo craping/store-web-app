@@ -31,6 +31,10 @@ export default [{
   component: () => import('@/view/user/setting/account/editPassword.vue')
 },
 {
+  path: '/editPayPassword',
+  component: () => import('@/view/user/setting/account/editPayPassword.vue')
+},
+{
   path: '/nameSet',
   component: () => import('@/view/user/setting/userInfo/nameSet.vue')
 },
@@ -81,6 +85,10 @@ export default [{
 {
   path: '/bankCheck',
   component: () => import('@/view/user/bankCard/bankCheck.vue')
+},
+{
+  path: '/authentication',
+  component: () => import('@/view/user/bankCard/authentication.vue')
 },
 {
   path: '/bill',

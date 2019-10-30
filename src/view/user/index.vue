@@ -19,7 +19,10 @@
           <div class="vip-agentNo" v-if="vipEnable">邀请码 {{amsAccount.agentNo}} | <span class="copyAgentNo" :data-clipboard-text="amsAccount.agentNo" @click="copyAgentNo">复制</span></div>
         </div>
       </div>
-      <div v-if="vipEnable" class="vip-card"  @click="jumpLink('/vip')">
+      <div v-if="isVip && vipEnable" class="invite-card" @click="share.show = true">
+        邀请注册链接（文案后面补充）>
+      </div>
+      <div v-if="isVip && vipEnable" class="vip-card"  @click="jumpLink('/vip')">
         <div class="vip-row-1">
           <span class="word-text">
             <span>可提现余额(元)</span>
@@ -46,7 +49,7 @@
           </div>
         </div>
       </div>
-      <div v-else-if="!isVip && VIP_ENABLE" class="no-vip-card" @click="jumpLink('/vipGrade')">
+      <div v-else-if="!isVip && vipEnable" class="no-vip-card" @click="jumpLink('/vipGrade')">
         成为<span class="vip-grade-bar">会员</span>享受更多优惠
       </div>
     </div>
@@ -83,6 +86,12 @@
         </van-grid>
       </div>
     </div>
+    <store-share
+      v-if="shareEnable"
+      v-model="share.msg"
+      :show="share.show"
+      @cancel="share.show=false"
+    ></store-share>
   </div>
 </template>
 
@@ -90,6 +99,7 @@
 import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import storeNavBar from "@/components/store-nav-bar";
+import storeShare from '@/components/store-share'
 import { Grid, GridItem, Icon, Toast } from "vant";
 import Clipboard from "clipboard";
 Vue.use(Grid).use(GridItem);
@@ -98,7 +108,8 @@ Vue.use(Grid).use(GridItem);
 export default {
   components: {
     [Icon.name]: Icon,
-    storeNavBar
+    storeNavBar,
+    storeShare
   },
 
   data() {
@@ -155,7 +166,16 @@ export default {
           link: "",
           icon: "service-o"
         }
-      ]
+      ],
+      share: {
+        show: false,
+        msg: { // 此处文案和图片需要后面配置
+          title: '邀请注册',
+          content: '邀请注册内容',
+          thumbs: ['http://macro-oss.oss-cn-shenzhen.aliyuncs.com/mall/images/20180615/5ad83a4fN6ff67ecd.jpg!cc_350x449.jpg'],
+          href: 'http://m.5gyungou.com/register'
+        }
+      },
     };
   },
   computed:{
@@ -164,11 +184,8 @@ export default {
       amsAccount: state => state.userInfo.amsAccount || {},
       umsMember: state => state.userInfo.umsMember || {},
     }),
-    ...mapState('sys',{
-      VIP_ENABLE: state => state.config.VIP_ENABLE,
-    }),
     ...mapGetters('user',['bindPhoneStr']),
-    ...mapGetters("sys", ["vipEnable"])
+    ...mapGetters("sys", ['shareEnable','vipEnable'])
   },
   methods: {
     jumpLink(path, params) {
@@ -280,6 +297,14 @@ export default {
       .vip-grade-bar {
         margin: 0 4px;
       }
+    }
+    .invite-card {
+      padding: 0 15px;
+      height: 36px;
+      line-height: 36px;
+      border-radius: 5px;
+      background: #895c29;
+      color: #fbe5ae;
     }
     .vip-card {
       margin: 0px 0 20px;
