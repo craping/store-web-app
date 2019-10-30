@@ -1,7 +1,7 @@
 <template>
   <div>
     <router-view class="main"></router-view>
-    <store-tabbar/>
+    <store-tabbar v-show="!hideBotBar"/>
   </div>
 </template>
 
@@ -9,7 +9,12 @@
 import storeTabbar from "../../components/store-tabbar";
 
 export default {
-  components: {storeTabbar}
+  components: {storeTabbar},
+  data() {
+    return {
+      hideBotBar: this.$route.query.hideBotBar
+    }
+  }
 };
 </script>
 

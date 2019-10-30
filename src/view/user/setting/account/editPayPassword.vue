@@ -3,8 +3,7 @@
     <van-nav-bar title="设置密码" left-arrow @click-left="onClickLeft" />
     <div class="login-body">
       <van-cell-group>
-        <van-field v-model="password" clearable label="新密码" placeholder="请输入新密码" />
-        <van-field v-model="passwords" clearable label="确认新密码" placeholder="请再次输入新密码" />
+        <van-field v-model="payPassword" clearable label="密码" placeholder="请输入密码" />
         <div class="main-btn" @click="sureHandle">确定</div>
       </van-cell-group>
     </div>
@@ -24,8 +23,7 @@ const aweixin = null;
 export default {
   data() {
     return {
-      password: "",
-      passwords: ""
+      payPassword: ""
     };
   },
 
@@ -37,18 +35,14 @@ export default {
       this.$router.push(path);
     },
     sureHandle() {
-      if (this.password !== this.passwords) {
-        Toast("两次输入的密码不一致");
-        return;
-      }
       const params = {
-        password: md5(this.password),
-        passwords: md5(this.passwords)
+        payPassword: md5(this.payPassword),
       };
       this.$http
-        .post("/user/updataPassword", params)
+        .post("/user/paymentCode", params)
         .then(res => {
-          Toast("修改成功");
+          this.$store.commit('user/SET_PAYLOGO')
+          Toast("设置成功");
           this.$router.go(-2);
         })
         .catch(error => {

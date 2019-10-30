@@ -22,8 +22,8 @@
     />
     <van-cell
       is-link
-      :title="umsMember.password ? '修改支付密码' : '设置支付密码'"
-      :value="umsMember.password ? '修改' : '未设置'"
+      :title="payLogo ? '修改支付密码' : '设置支付密码'"
+      :value="payLogo ? '修改' : '未设置'"
       @click="toUpdatePayPassWord"
     />
   </div>
@@ -54,6 +54,7 @@ export default {
   computed: {
     ...mapState("user", {
       bindPhone: state => state.bindPhone,
+      payLogo: state => state.userInfo.payLogo,
       umsMember: state => state.userInfo.umsMember || {}
     }),
     ...mapState('sys',{
@@ -98,6 +99,7 @@ export default {
       // 5+APP在plusready事件中调用，uni-app在vue页面的onLoad中调用
       plus.oauth.getServices(
         function(services) {
+          console.log('init')
           // alert('list+:'+JSON.stringify(services));
           window.aweixin = services[0];
           // alert('weService+:'+JSON.stringify(window.aweixin));
@@ -108,34 +110,29 @@ export default {
       );
     },
     bindWx() {
+      console.log(1)
+      console.log('2+:'+this.umsMember.openId)
+      console.log('3+:'+window.aweixin)
       if (this.umsMember.openId) return;
-      if (window.aweixin) return;
-      // 微信授权登录对象
-      // 获取登录授权认证服务列表，单独保存微信登录授权对象
-      // 5+APP在plusready事件中调用
-      plus.oauth.getServices(
-        services => {
-          window.aweixin = services[0];
-          if (!window.aweixin.authResult) {
-            window.aweixin.authorize(
-              e => {
-                this.$http
-                  .post("/wx/bindingWeChat", { code: e.code })
-                  .then(res => {
-                    Toast('绑定成功');
-                  })
-                  .catch(error => {
-                    Toast(error.message);
-                  });
-              },
-              e => {
-                Toast("微信授权失败" + JSON.stringify(e));
-              }
-            );
-          }
+      window.aweixin.authorize(
+        e => {
+          console.log("e.code+111:" + e.code); //app端获取到的code
+          this.$http
+            .post("/wx/bindingWeChat", { code: e.code })
+            .then(res => {
+              console.log("e.code+:" + e.code); //app端获取到的code
+              console.log(JSON.stringify(res))
+              console.log('token+:'+res.info.token)
+              Toast('绑定成功');
+            })
+            .catch(error => {
+              console.log('err+:'+JSON.stringify(error))
+              Toast(error.message);
+            });
         },
         e => {
-          Toast("获取登录授权服务列表失败：" + JSON.stringify(e));
+          console.log('dsds')
+          Toast("微信授权失败" + JSON.stringify(e));
         }
       );
     }

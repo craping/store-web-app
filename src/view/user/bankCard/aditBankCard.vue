@@ -24,11 +24,11 @@ Vue.use(Field)
 export default {
   data() {
     return {
-      bankCardNumber: "",
-      bankName: "",
-      userName: "",
-      openingBank: "",
-      id: null
+      bankCardNumber: this.$route.query.bankCardNumber,
+      bankName: this.$route.query.bankName,
+      openingBank: this.$route.query.openingBank,
+      userName: this.$route.query.userName,
+      id: this.$route.query.id || '',
     };
   },
   computed: {
@@ -40,14 +40,6 @@ export default {
 
   mounted() {
     // 从store中取带过来的数据,有id,说明是编辑
-    this.id = this.currentCard.id;
-    this.bankCardNumber = this.currentCard.bankCardNumber;
-    this.bankName = this.currentCard.bankName;
-    this.userName = this.currentCard.userName;
-    this.openingBank = this.currentCard.openingBank;
-  },
-  beforeDestroy() {
-    this.setCurrentCard();
   },
   methods: {
     ...mapActions('bankCard',["setCurrentCard"]),

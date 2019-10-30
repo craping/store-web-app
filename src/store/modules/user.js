@@ -44,7 +44,13 @@ export default {
     SET_LOGOUT(state){
       state.userInfo = {}
       state.isLogin = false
-    }
+    },
+    SET_PAYLOGO(state) {
+      state.userInfo.payLogo = true
+    },
+    SET_IDENTIFYLABEL(state) {
+      state.userInfo.identifyLabel = true
+    },
   },
   actions: {
     getUserInfo({ commit , dispatch}) {
