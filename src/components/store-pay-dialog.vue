@@ -20,7 +20,7 @@
           <van-cell
             v-for="item in payChannels"
             :key="item.id"
-            :title="item.name == '余额钱包' ? `余额钱包(余额:${userInfo.amsAccount.balance})`:item.name"
+            :title="item.name == '余额钱包' ? `余额钱包(余额:${userInfo.amsAccount.balance || 无})`:item.name"
             :icon="icons[item.id]"
             clickable
             @click="getChannelClick(item.abbr)"
