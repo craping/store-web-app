@@ -31,6 +31,7 @@
           input-align="right"
           v-model="money"
           type="number"
+          clearable
         />
         <!-- <input type="tel" v-model="money" :maxlength="10" /> -->
       </div>
