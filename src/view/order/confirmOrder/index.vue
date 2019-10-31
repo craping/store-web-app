@@ -149,6 +149,9 @@ export default {
       this.getPayChannel()
     })
   },
+  beforeDestroy() {
+    this.reInitAddressInfo()
+  },
   watch: {
     addressInfo() {
       this.initAddress()
@@ -156,7 +159,7 @@ export default {
   },
   methods: {
     ...mapActions('user', ['getUserInfo']),
-    ...mapActions('address', ['getAddressList']),
+    ...mapActions('address', ['getAddressList', 'reInitAddressInfo']),
 
     /*************返回点击事件***************/
     onClickLeft() {

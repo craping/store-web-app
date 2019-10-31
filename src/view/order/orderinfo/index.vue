@@ -89,7 +89,7 @@
             <!-- 使用 title 插槽来自定义标题 -->
             <template slot="title">
               <span class="custom-title">付款时间</span>
-              <span class="custom-content">暂时无</span>
+              <span class="custom-content">{{formatTime(checkInfoList.paymentTime) || '暂时无'}}</span>
             </template>
           </van-cell>
           <van-cell :border="false">
@@ -241,15 +241,7 @@ export default {
           tag: '七天无理由退货',
           freight: '0.00'
         }
-      ],
-      orderinfos: {
-        订单编号: '00000000000000',
-        交易号: '00000000000000',
-        创建时间: '00000000000000',
-        付款时间: '00000000000000',
-        发货时间: '00000000000000',
-        成交时间: '00000000000000'
-      }
+      ]
     }
   },
   computed: {
@@ -275,7 +267,7 @@ export default {
       )
     },
     isGetProduct() {
-      return (this.checkInfoList.status = '3')
+      return this.checkInfoList.status == '3'
     },
     isShowDelete() {
       return (
@@ -383,7 +375,6 @@ export default {
     padding-top: 0;
   }
   .ordercontent {
-    padding: 46px 0px;
     height: 100vh;
     position: relative;
   }

@@ -23,6 +23,10 @@ export default {
       commit('SET_ADDRESSINFO', data)
       commit('SET_IS_NEED_DEFAULT', false)
     },
+    reInitAddressInfo({ commit }) {
+      commit('SET_ADDRESSINFO', {})
+      commit('SET_IS_NEED_DEFAULT', true)
+    },
     getAddressList({ commit, state }) {
       return new Promise((resolve, reject) => {
         request
