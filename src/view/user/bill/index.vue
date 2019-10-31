@@ -21,7 +21,7 @@
           </div>
         </div>
       </van-sticky>
-      <van-list v-model="loading" :finished="finished" :immediate-check="false" finished-text="没有更多了" @load="onLoad">
+      <van-list v-model="loading" :finished="finished" :immediate-check="false" finished-text="没有更多了" :offset="50" @load="onLoad">
         <div class="month-item" ref="monthItem" v-for="(monthItem,index) in billByMonth" :key="index">
           <van-sticky :offset-top="96" :container="container1[index]">
             <div class="info-bar">
@@ -36,9 +36,12 @@
             </div>
           </van-sticky>
           <div class="bill-list">
-            <div class="bill-item" @click="jumpLink('/billDetail',{id:item.id,srcType:item.srcType,recordSn:item.recordSn})" v-for="item in monthItem.list" :key="item.id">
+            <div class="bill-item" @click="jumpLink('/billDetail',{id:item.id,srcType:item.srcType,recordSn:item.recordSn})" v-for="(item,index) in monthItem.list" :key="index">
               <div class="col-1">
-                <van-icon name="cart" size="35" color="#fcc" />
+                <van-icon v-if="item.srcType=='0_1'||item.srcType=='1_4'" name="cart" size="35" color="#fcc" />
+                <van-icon v-if="item.srcType=='1_5'||item.srcType=='1_1'" name="refund-o" size="35" color="#fcc" />
+                <van-icon v-if="item.srcType=='1_1'||item.srcType=='1_2'||item.srcType=='1_3'||item.srcType=='1_6'" name="friends" size="35" color="#fcc" />
+                <van-icon v-if="item.srcType=='0_2'" name="gold-coin" size="35" color="#fcc" />
               </div>
               <div class="col-2">
                 <div class="title">{{item.remark}}</div>
@@ -223,14 +226,14 @@ export default {
       dateType: 0, // 0按月，1按日
       monthInputType: 1, // 0未选择 1选择
       dayInputType: 1, // 0未选择 1开始，2结束 
-      loading: false,
+      loading: true,
       finished: false,
       maxDate: new Date(),
     };
   },
   mounted() {
-    this.container1 = this.$refs.monthItem;
     this.queryHandle()
+    
   },
   computed: {
     ...mapState({
@@ -294,17 +297,22 @@ export default {
       }
     },
     queryHandle() {
+      this.filterShow = false;
       this.loading = true
       this.$store.commit("bill/SET_PAGENUM", 1);
+      this.$store.commit("bill/SET_BILLS", []);
       this.queryBill()
         .then((data) => {
-          if (data.page >= data.totalpage) {
-            this.finished = true
-            this.loading = false
-          } else {
-            this.loading = false
-          }
-          this.filterShow = false;
+          this.$nextTick(()=>{
+            this.container1 = this.$refs.monthItem;
+            // console.log( this.container1)
+            if (data.page >= data.totalpage) {
+              this.finished = true
+              this.loading = false
+            } else {
+              this.loading = false
+            }
+          })
         })
         .catch(() => {});
     },
@@ -325,10 +333,10 @@ export default {
     },
     changePickerDayDate(picker) {
       let currentVal = picker.getValues().join("-");
-      if (this.dayInputType) {
-        this.endDate = currentVal;
-      } else {
+      if (this.dayInputType == 1) {
         this.startDate = currentVal;
+      } else {
+        this.endDate = currentVal;
       }
     },
     dayDate2View() {
@@ -366,6 +374,7 @@ export default {
       this.endDate = ''
     },
     sureSetDate() {
+      this.dateSelectshow = false
       if (this.dateType) {
         this.$store.commit("bill/SET_DATE", null);
         this.$store.commit("bill/SET_BEGINDATE", this.startDate || null);
@@ -378,7 +387,7 @@ export default {
       this.queryHandle()
     }, 
     onLoad() {
-      this.loading = true
+      console.log('onLoad')
       this.queryBill().then((data)=>{
         if (data.page >= data.totalpage) {
           this.finished = true

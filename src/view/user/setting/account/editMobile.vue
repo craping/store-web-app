@@ -107,9 +107,9 @@ export default {
      * 获取验证码接口
      */
     getCodeReq() {
-      const params = { mobile: this.mobile };
+      const params = { mobile: this.newmobile };
       this.$http
-        .post("/login/getVerCode", params)
+        .post("/authCode/getUpdateCode", params)
         .then(res => {
         })
         .catch(error => {

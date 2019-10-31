@@ -41,7 +41,7 @@ export default {
         if (config.hasOwnProperty(key) && key != "ABOUT_VERSION") {
           const value = config[key];
           const parseValue = parseFloat(value);
-          config[key] = isNaN(parseValue)?value:parseValue;
+          config[key] = isNaN(parseValue)?(value=="true"||value=="false"?value=="true":value):parseValue;
         }
       }
       console.log(config)
@@ -51,7 +51,7 @@ export default {
       const value = sysConfig.configValue;
       const parseValue = parseFloat(value);
       if(sysConfig.configCode != "ABOUT_VERSION"){
-        state.config[sysConfig.configCode] = isNaN(parseValue)?value:parseValue;
+        state.config[sysConfig.configCode] = isNaN(parseValue)?(value=="true"||value=="false"?value=="true":value):parseValue;
       } else {
         state.config[sysConfig.configCode] = sysConfig.configValue;
       }

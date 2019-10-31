@@ -86,6 +86,7 @@ service.interceptors.response.use(
   error => {
     console.log('err' + error) // for debug
     if (error.errcode) Toast.fail(error.message)
+    if(error.response.status == 500) Toast.fail("网络异常，请检查网络设置")
     return Promise.reject(error)
   }
 )

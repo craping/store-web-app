@@ -8,11 +8,11 @@
       </div>
     </div>
     <store-scroller @onRefresh="onRefresh">
-      <div class="content">
-        <van-checkbox-group class="card-goods" v-model="checkedGoods">
+      <div class="content" :class="{hideBotBar:hideBotBar}">
+        <van-checkbox-group class="card-goods"  v-model="checkedGoods">
           <van-checkbox
             class="card-goods-item van-hairline--bottom"
-            v-for="item in itemList"
+            v-for="item in normalList"
             :key="item.id"
             :name="item.id"
             icon-size="16px"
@@ -30,11 +30,35 @@
             </cardItem>
           </van-checkbox>
         </van-checkbox-group>
+        <div v-if="disableList&&disableList.length>0">
+          <div class="disable-bar">已失效</div>
+          <van-checkbox
+            class="card-goods-item van-hairline--bottom"
+            v-for="item in disableList"
+            :key="item.id"
+            :name="item.id"
+            disabled
+            icon-size="16px"
+            checked-color="#ff4444"
+          >
+            <cardItem :item="item">
+              <van-stepper
+                slot="num-step"
+                :value="item.quantity"
+                integer
+                disabled
+                input-width="26px"
+                button-size="20px"
+                @change="(val)=>onChangeNum(val,item)"
+              />
+            </cardItem>
+        </van-checkbox>
+        </div>
       </div>
     </store-scroller>
     <van-submit-bar
       v-show="!isOperate"
-      :style="{bottom:this.$route.meta.single?'0':'50px'}"
+      :style="{bottom:this.$route.meta.single || hideBotBar? '0' : '50px' }"
       :safe-area-inset-bottom="true"
       :price="totalPrice"
       :disabled="!checkedGoods.length"
@@ -65,13 +89,12 @@
     </div>
   </div>
 </template>
-
 <script>
 import Vue from 'vue'
 import storeScroller from '@/components/store-scroller'
 import cardItem from './cartItem'
 import { Checkbox, CheckboxGroup, Stepper, SubmitBar, Toast, Icon } from 'vant'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 Vue.use(Checkbox)
   .use(CheckboxGroup)
   .use(Stepper)
@@ -98,12 +121,10 @@ export default {
     this.getCartList()
   },
   computed: {
-    ...mapState({
-      itemList: state => state.cart.itemList || []
-    }),
+    ...mapGetters('cart',['normalList','disableList']),
     selectCount() {
       const count = this.checkedGoods.length
-      if (count == this.itemList.length && count != 0) {
+      if (count == this.normalList.length && count != 0) {
         this.isSelectAll = true
       } else {
         this.isSelectAll = false
@@ -111,7 +132,7 @@ export default {
       return count ? `(${count})` : ''
     },
     totalPrice() {
-      return this.itemList.reduce(
+      return this.normalList.reduce(
         (total, item) =>
           total +
           (this.checkedGoods.indexOf(item.id) !== -1
@@ -132,9 +153,9 @@ export default {
     },
     changeAll() {
       if (this.isSelectAll) {
-        this.checkedGoods = this.itemList.map(item => item.id)
+        this.checkedGoods = this.normalList.map(item => item.id)
       } else {
-        if (this.checkedGoods.length == this.itemList.length) {
+        if (this.checkedGoods.length == this.normalList.length) {
           this.checkedGoods = []
         }
       }
@@ -159,7 +180,7 @@ export default {
     },
     onSubmit() {
       let sku = []
-      this.itemList.forEach(element => {
+      this.normalList.forEach(element => {
         if (this.checkedGoods.includes(element.id)) {
           sku.push(element)
         }
@@ -238,34 +259,40 @@ export default {
     }
   }
   .content {
-    .card-goods {
-      background-color: #fff;
-      border-radius: 5px;
-      overflow: hidden;
-      min-height: calc(100vh - 186px);
-      /deep/ .van-card {
-        background: transparent;
-        width: 100%;
-      }
-      /deep/ .van-checkbox__label {
-        width: 100%;
-        flex: 1;
-      }
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+    min-height: calc(100vh - 186px);
+    &.hideBotBar{
+      min-height: calc(100vh - 106px);
+    }
+    /deep/ .van-card {
+      background: transparent;
+      width: 100%;
+    }
+    /deep/ .van-checkbox__label {
+      width: 100%;
+      flex: 1;
+    }
 
-      /deep/.card-goods-item {
-        padding: 0 10px;
-      }
-      .van-checkbox__icon {
-        top: 50%;
-        left: 10px;
-        z-index: 1;
-        position: absolute;
-        margin-top: -10px;
-      }
+    /deep/.card-goods-item {
+      padding: 0 10px;
+    }
+    .van-checkbox__icon {
+      top: 50%;
+      left: 10px;
+      z-index: 1;
+      position: absolute;
+      margin-top: -10px;
+    }
 
-      .van-card__price {
-        color: #f44;
-      }
+    .van-card__price {
+      color: #f44;
+    }
+    .disable-bar{
+      font-size: 14px;
+      color: #999;
+      padding: 15px 0 15px 15px;
     }
   }
   .van-submit-bar {

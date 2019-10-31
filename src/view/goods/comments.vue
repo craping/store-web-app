@@ -8,7 +8,7 @@
         </div>
         <div class="row-2">
           <div>{{item.content}}</div>
-          <div class="pic-area" >
+          <div class="pic-area" v-if="item.pics">
             <img v-for="(pic,index) in JSON.parse(item.pics)" :key="index" :src="pic.url" @click="showPre(JSON.parse(item.pics))" />
           </div>
         </div>

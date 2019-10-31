@@ -8,7 +8,13 @@ export default {
   getters: {
     cartNum: state => {
       return state.itemList.length?state.itemList.length:"";
-    }
+    },
+    disableList: state => {
+      return state.itemList.filter(ele => ele.publishStatus==0);
+    },
+    normalList: state => {
+      return state.itemList.filter(ele => ele.publishStatus==1);
+    },
   },
   mutations: {
     SET_CARTLIST(state, data) {

@@ -98,28 +98,45 @@ export default {
     storeScroller
   },
   computed: {
-    ...mapState({
-      content: state => state.home.content
-    })
+    // ...mapState({
+    //   content: state => state.home.content
+    // })
   },
 
   data() {
     return {
       isIOS: isIOS,
       images: ['', '', '', ''],
-      list: []
+      list: [],
+      content:{
+        advertiseList:[],
+        hotProductList:[]
+      }
     }
   },
   created() {
-    this.$store.dispatch('home/content')
+    this.content = JSON.parse(localStorage.getItem("cache_home"));
+    this.$http.get("home/content", {}).then(data => {
+      this.content = data.info;
+      localStorage.setItem("cache_home", JSON.stringify(data.info))
+    }).catch(error => {
+    })
+    // this.$store.dispatch('home/content')
   },
   mounted() {
   },
   methods: {
     onRefresh(done) {
-      this.$store.dispatch('home/content').finally(() => {
+      this.$http.get("home/content", {}).then(data => {
+        this.content = data.info;
+        localStorage.setItem("cache_home", JSON.stringify(data.info))
+      }).finally(() => {
         if (done) done()
       })
+
+      // this.$store.dispatch('home/content').finally(() => {
+      //   if (done) done()
+      // })
     },
     onScroll(top) {
       if (top > 0)
