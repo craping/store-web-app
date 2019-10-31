@@ -202,7 +202,7 @@ export default {
       ],
       showProductList: [],
       proEventList: {
-        event0: ['立即付款', '取消订单'],
+        event0: ['立即付款', '关闭订单'],
         event1: ['取消订单'],
         event2: ['确认收货', '查看物流', '退款'],
         event3: ['退货退款'],
@@ -291,6 +291,9 @@ export default {
         case '删除订单':
           this.confirmDialog('delete', product.orderItemList)
           break
+        case '关闭订单':
+          this.confirmDialog('close', product.orderItemList)
+          break
         case '查看物流':
           this.$store.commit('order/SET_CHECK_INFO_LIST', product)
           this.$router.push({
@@ -354,9 +357,12 @@ export default {
       if (type == 'cancel') {
         title = '取消订单'
         message = '确定取消这个订单吗？'
-      } else {
+      } else if (type == 'delete') {
         title = '删除订单'
         message = '确定删除这个订单吗？'
+      } else {
+        title = '关闭订单'
+        message = '确定关闭这个订单吗？'
       }
       const id = pArr[0].orderId
       Dialog.confirm({
@@ -365,7 +371,13 @@ export default {
       })
         .then(() => {
           // on confirm
-          type == 'cancel' ? this.cancelOrder(id) : this.deleteOrder(id)
+          if (type == 'cancel') {
+            this.cancelOrder(id)
+          } else if (type == 'delete') {
+            this.deleteOrder(id)
+          } else {
+            this.closeOrder(id)
+          }
         })
         .catch(() => {
           // on cancel
@@ -380,6 +392,22 @@ export default {
       }
       this.$http
         .post('/order/cancelOrder', params)
+        .then(data => {
+          this.initData()
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+
+    /***********关闭订单事件*********/
+    closeOrder(orderId) {
+      this.loding = true
+      const params = {
+        orderId
+      }
+      this.$http
+        .post('/order/closeOrder', params)
         .then(data => {
           this.initData()
         })

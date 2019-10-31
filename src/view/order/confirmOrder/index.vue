@@ -62,7 +62,12 @@
     <!-- <van-tabbar>
       <van-button type="info" @click="toSumbitOrder">去支付</van-button>
     </van-tabbar>-->
-    <store-pay-dialog @closeDialog="closeDialog" @toPay="toPay" :show="showPayDialog"></store-pay-dialog>
+    <store-pay-dialog
+      @getPayPassword="getPayPassword"
+      @closeDialog="closeDialog"
+      @toPay="toPay"
+      :show="showPayDialog"
+    ></store-pay-dialog>
   </van-row>
 </template>
 <script>
@@ -118,7 +123,8 @@ export default {
       channel: null,
       aliChannel: null,
       wxChannel: null,
-      isBalanceEnough: false
+      isBalanceEnough: false,
+      payPassword: '' //支付密码
     }
   },
   computed: {
@@ -183,7 +189,6 @@ export default {
         }
       })
     },
-
     //点击支付触发提交订单接口
     toSumbitOrder() {
       if (!this.confirmedAddress.address) {
@@ -241,6 +246,10 @@ export default {
     /***********隐藏弹框*********/
     closeDialog(bool) {
       this.showPayDialog = bool
+    },
+    /***********获取支付密码*********/
+    getPayPassword(pw) {
+      this.payParamsObj.password = pw
     },
     /***********点击支付按钮事件并获取支付方式*********/
     toPay(type) {
