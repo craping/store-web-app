@@ -3,7 +3,16 @@
     <van-nav-bar title="设置密码" left-arrow @click-left="onClickLeft" />
     <div class="login-body">
       <van-cell-group>
-        <van-field v-model="payPassword" clearable label="密码" placeholder="请输入密码" />
+        <van-field
+          v-model="payPassword"
+          clearable
+          label="密码"
+          placeholder="请输入密码"
+          left-icon="lock"
+          :type="isEyeClose ? 'password' : 'text'"
+          :right-icon="isEyeClose ? 'closed-eye' : 'eye-o'"
+          @click-right-icon="isEyeClose=!isEyeClose"
+        />
         <div class="main-btn" @click="sureHandle">确定</div>
       </van-cell-group>
     </div>
@@ -23,7 +32,8 @@ const aweixin = null;
 export default {
   data() {
     return {
-      payPassword: ""
+      payPassword: '',
+      isEyeClose: true
     };
   },
 

@@ -28,6 +28,7 @@
           @click-right-icon="changeShow"
         />
         <van-field
+          v-if="!recommenderNo"
           v-model="agentNo"
           clearable
           label="邀请码"
@@ -57,7 +58,8 @@ export default {
       codeText: "获取验证码",
       countDownSecond: -1,
       codeTimer: null,
-      isEyeClose: true
+      isEyeClose: true,
+      recommenderNo: this.$route.query.recommenderNo || '' // 链接上携带的邀请码，如有的话，用户不需再填写
     };
   },
   destroyed() {
@@ -141,7 +143,7 @@ export default {
       const params = {
         mobile: this.mobile,
         verCode: this.verCode,
-        agentNo: this.agentNo,
+        agentNo: this.recommenderNo ? this.recommenderNo : this.agentNo,
         password: md5(this.password)
       };
       if(!this.verCode){
