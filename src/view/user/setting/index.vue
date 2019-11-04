@@ -14,8 +14,6 @@ import Vue from "vue";
 import { removeToken } from '@/utils/auth'
 import { NavBar, Cell, CellGroup, Toast } from "vant";
 import { mapState } from 'vuex';
-import { getClient } from '@/utils/util'
-
 Vue.use(Cell)
 	.use(CellGroup)
   .use(Toast)
@@ -37,11 +35,8 @@ export default {
       this.$router.push(path);
     },
     logout() {
-		const params = {
-		  clientId: getClient()
-		};
       this.$http
-        .post("/login/loginOut", params)
+        .post("/login/loginOut", {})
         .then(res => {
           removeToken() 
           this.$store.commit('user/SET_LOGOUT')
