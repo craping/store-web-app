@@ -6,7 +6,7 @@ function resolve(dir) {
 
 module.exports = {
   //WAP打包时 此行代码需注释
-  // publicPath: './',
+  publicPath: './',
   assetsDir: './',
   devServer: {
     port: 9090,

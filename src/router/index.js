@@ -73,7 +73,6 @@ router.beforeEach((to, from, next) => {
     let redirectPath = ""
     if(to.path == '/login') { // 全局处理未登录跳登录页面
         if(!store.state.user.isLogin) {
-            console.log('from.path',from.path)
             if (from.path != '/register' && from.path != '/mobileLogin') {
                 store.commit("user/SET_BEFOREPATH", from.path);
             }
