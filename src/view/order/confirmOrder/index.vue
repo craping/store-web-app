@@ -141,8 +141,8 @@ export default {
     }
   },
   created() {
-    this.getAddressList()
-    this.initAddress()
+    this.getAddressList() // 获取地址列表
+    this.initAddress() // 获取用户的收货地址
   },
   mounted() {
     this.onPlusReady(() => {
@@ -192,7 +192,7 @@ export default {
         }
       })
     },
-    //点击支付触发提交订单接口
+    //去支付 点击支付触发提交订单接口
     toSumbitOrder() {
       if (!this.confirmedAddress.address) {
         Toast.fail('请选择地址')
@@ -287,7 +287,7 @@ export default {
         }
 
         if (this.payType == 'WXPAY') {
-          if (this.platform == 2) {
+          /* if (this.platform == 2) {
             //wap
             window.location.href = data.info.mweb_url
             return
@@ -305,8 +305,9 @@ export default {
               }
             })
             return
-          }
-          if (this.platform == 1) {
+          } */
+          // if (this.platform == 1) {
+            // h5+
             let temPrams = data.info
             temPrams.timestamp = parseInt(data.info.timestamp)
             plus.payment.request(
@@ -325,7 +326,7 @@ export default {
                 plus.nativeUI.alert('支付失败：' + error.code)
               }
             )
-          }
+          // }
         }
       })
     },
