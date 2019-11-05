@@ -42,18 +42,34 @@ export default {
     onClickLeft() {
       this.$router.go(-1);
     },
+    // 点击保存按钮时触发
     onSave(data) {
       const params = {
         name: data.name,
-        phone: data.tel,
+        phoneNumber: data.tel,
         province: data.province,
-        city: data.city,
+        city: data.city,          
         region: data.county,
         detailAddress: data.addressDetail,
-        defaultStatus: !data.isDefault * 1,
-        postalCode: data.postalCode,
+        defaultStatus: data.isDefault? 1 : 0,
+        postCode: data.postalCode,
         areaCode: data.areaCode
       };
+      /*
+        接口说明：添加或修改收货地址
+        address/saveOrUpdateAddress
+          token:用户Token [是否必要：true]
+          id:地址ID [是否必要：false]
+          name:收货人名称 [是否必要：true]
+          phoneNumber:收货人电话 [是否必要：true]
+          defaultStatus:是否为默认地址 [是否必要：true]
+          areaCode:地区码 [是否必要：true]
+          postCode:邮政编码 [是否必要：false]
+          province:省份/直辖市 [是否必要：true]
+          city:城市 [是否必要：true]
+          region:区 [是否必要：true]
+          detailAddress:详细地址(街道) [是否必要：true]
+      */
       if (data.id) {
         params.id = data.id;
       }
@@ -67,7 +83,7 @@ export default {
           Toast(error.message);
         });
     },
-
+    // 确认删除地址时触发
     onDelete(data) {
       const params = {
         id: data.id
