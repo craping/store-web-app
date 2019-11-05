@@ -5,6 +5,9 @@
  * @param fmt 要转换的时间格式
  */
 export function format(time, fmt) {
+  if (!time) {
+    return ''
+  }
   var d = new Date(time)
   var o = {
     'M+': d.getMonth() + 1, //月份

@@ -82,14 +82,14 @@
             <!-- 使用 title 插槽来自定义标题 -->
             <template slot="title">
               <span class="custom-title">创建时间</span>
-              <span class="custom-content">{{checkInfoList.createTime}}</span>
+              <span class="custom-content">{{formatTime(checkInfoList.createTime)}}</span>
             </template>
           </van-cell>
           <van-cell :border="false">
             <!-- 使用 title 插槽来自定义标题 -->
             <template slot="title">
               <span class="custom-title">付款时间</span>
-              <span class="custom-content">暂时无</span>
+              <span class="custom-content">{{formatTime(checkInfoList.paymentTime) || '暂时无'}}</span>
             </template>
           </van-cell>
           <van-cell :border="false">
@@ -121,7 +121,7 @@
     <van-tabbar v-show="isSendProduct || isGetProduct">
       <van-button type="danger" plain size="mini" v-show="isShowDelete" @click="deleteOrder">删除订单</van-button>
       <van-button type="danger" plain size="mini" v-show="isSendProduct" @click="checkFee">查看物流</van-button>
-      <van-button type="danger" plain size="mini" v-show="isGetProduct" @click="toAssess">评价</van-button>
+      <van-button type="danger" plain size="mini" v-show="isGetProduct" @click="toAssess">去评价</van-button>
     </van-tabbar>
     <store-loding v-show="loding"></store-loding>
   </van-row>
@@ -133,6 +133,7 @@ import storeScroller from '@/components/store-scroller'
 import storeCard from '@/components/store-card'
 import ClipboardJS from 'clipboard'
 import storeLoding from '@/components/store-loding'
+import { format } from '@/utils/util'
 import {
   AddressList,
   Tab,
@@ -240,15 +241,7 @@ export default {
           tag: '七天无理由退货',
           freight: '0.00'
         }
-      ],
-      orderinfos: {
-        订单编号: '00000000000000',
-        交易号: '00000000000000',
-        创建时间: '00000000000000',
-        付款时间: '00000000000000',
-        发货时间: '00000000000000',
-        成交时间: '00000000000000'
-      }
+      ]
     }
   },
   computed: {
@@ -274,11 +267,7 @@ export default {
       )
     },
     isGetProduct() {
-      return (
-        this.checkInfoList.status != '1' &&
-        this.checkInfoList.status != '2' &&
-        this.checkInfoList.status != '0'
-      )
+      return this.checkInfoList.status == '3'
     },
     isShowDelete() {
       return (
@@ -286,11 +275,24 @@ export default {
       )
     }
   },
-  created() {},
+  created() {
+    console.log(
+      'proStatus[checkInfoList.status]',
+      this.proStatus[this.checkInfoList.status]
+    )
+    console.log('proStatus[checkInfoList.status]', this.checkInfoList.status)
+  },
+  beforeDestroy() {
+    this.$store.commit('order/SET_CHECK_INFO_LIST', {})
+  },
   methods: {
     /*************返回点击事件***************/
     onClickLeft() {
       this.$router.go(-1)
+    },
+
+    formatTime(time) {
+      return format(time, 'yyyy-mm-dd MM:hh:ss')
     },
 
     /*************点击返回首页事件*********/
@@ -373,7 +375,6 @@ export default {
     padding-top: 0;
   }
   .ordercontent {
-    padding: 46px 0px;
     height: 100vh;
     position: relative;
   }

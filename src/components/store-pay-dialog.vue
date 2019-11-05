@@ -8,19 +8,10 @@
     >
       <van-radio-group v-model="radio">
         <van-cell-group>
-          <!-- <van-cell title="微信支付" icon="wechat" clickable @click="wxClick">
-            <van-radio slot="right-icon" name="wx"/>
-          </van-cell>
-          <van-cell title="支付宝支付" icon="alipay" clickable @click="aliClick">
-            <van-radio slot="right-icon" name="ali"/>
-          </van-cell>
-          <van-cell title="钱包-余额支付" icon="gold-coin" clickable @click="balanceClick">
-            <van-radio slot="right-icon" name="balance"/>
-          </van-cell>-->
           <van-cell
             v-for="item in payChannels"
             :key="item.id"
-            :title="item.name == '余额钱包' ? `余额钱包(余额:${userInfo.amsAccount.balance})`:item.name"
+            :title="item.name == '余额钱包' ? `余额钱包(余额:${userInfo.amsAccount.balance || 无})`:item.name"
             :icon="icons[item.id]"
             clickable
             @click="getChannelClick(item.abbr)"
@@ -33,6 +24,23 @@
         <van-button type="danger" size="large" @click="payClick">去支付</van-button>
       </div>
     </van-action-sheet>
+
+    <van-overlay :show="showOverlay" @click="closeOverLay"/>
+    <van-password-input
+      :value="password"
+      v-show="showOverlay"
+      info="密码为 6 位数字(点击外层取消)"
+      :focused="showKeyboard"
+      @focus="showKeyboard = true"
+    />
+    <van-number-keyboard
+      :show="showKeyboard"
+      theme="custom"
+      close-button-text="完成"
+      @blur="showKeyboard = false"
+      @input="onInput"
+      @delete="onDelete"
+    />
   </div>
 </template>
 
@@ -47,9 +55,15 @@ import {
   RadioGroup,
   Radio,
   Button,
-  Icon
+  Icon,
+  PasswordInput,
+  NumberKeyboard,
+  Overlay
 } from 'vant'
 import { get } from 'http'
+import { setTimeout } from 'timers'
+import md5 from 'js-md5'
+import { getToken } from '@/utils/auth'
 Vue.use(ActionSheet)
   .use(CellGroup)
   .use(Cell)
@@ -57,6 +71,9 @@ Vue.use(ActionSheet)
   .use(Radio)
   .use(Button)
   .use(Icon)
+  .use(PasswordInput)
+  .use(NumberKeyboard)
+  .use(Overlay)
 export default {
   name: 'store-pay-dialog',
   data() {
@@ -67,7 +84,10 @@ export default {
         '1': 'gold-coin',
         '2': 'wechat',
         '4': 'alipay'
-      }
+      },
+      showOverlay: false, //遮罩层
+      password: '',
+      showKeyboard: false
     }
   },
   props: {
@@ -86,20 +106,43 @@ export default {
     cancelDialog() {
       this.$emit('closeDialog', false)
     },
-    // wxClick() {
-    //   this.radio = 'wx'
-    // },
-    // aliClick() {
-    //   this.radio = 'ali'
-    // },
-    // balanceClick() {
-    //   this.radio = 'balance'
-    // },
     getChannelClick(c) {
+      if (c == 'BALANCE') {
+        if (this.userInfo.payLogo) {
+          this.showOverlay = true
+          this.showDialog = false
+        } else {
+          this.$router.push('editPayPassword')
+        }
+      }
       this.radio = c
     },
     payClick() {
       this.$emit('toPay', this.radio)
+    },
+    onInput(key) {
+      this.password = (this.password + key).slice(0, 6)
+      if (this.password.length == 6) {
+        const token = getToken()
+        this.$emit('getPayPassword', md5(token + md5(this.password)))
+        this.showOverlay = false
+        this.showKeyboard = false
+        this.showDialog = false
+        this.radio = ''
+        this.password = ''
+        setTimeout(() => {
+          this.$emit('toPay', 'BALANCE')
+        }, 0)
+      }
+    },
+    onDelete() {
+      this.password = this.password.slice(0, this.password.length - 1)
+    },
+    closeOverLay() {
+      this.showOverlay = false
+      this.showDialog = true
+      this.radio = ''
+      this.password = ''
     }
   },
   watch: {
@@ -137,6 +180,19 @@ export default {
     .van-button--large {
       border-radius: 25px;
     }
+  }
+  .van-overlay {
+    z-index: 200 !important;
+  }
+  .van-password-input {
+    z-index: 201;
+    transform: translateY(-100%);
+    .van-password-input__info {
+      color: #fff;
+    }
+  }
+  .van-number-keyboard {
+    z-index: 201 !important;
   }
 }
 </style>

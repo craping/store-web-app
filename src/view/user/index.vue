@@ -19,10 +19,10 @@
           <div class="vip-agentNo" v-if="vipEnable">邀请码 {{amsAccount.agentNo}} | <span class="copyAgentNo" :data-clipboard-text="amsAccount.agentNo" @click="copyAgentNo">复制</span></div>
         </div>
       </div>
-      <div v-if="isVip && vipEnable" class="invite-card" @click="share.show = true">
+      <div v-if="isVip " class="invite-card" @click="share.show = true">
         邀请注册链接（文案后面补充）>
       </div>
-      <div v-if="isVip && vipEnable" class="vip-card"  @click="jumpLink('/vip')">
+      <div v-if="isVip " class="vip-card"  @click="jumpLink('/vip')">
         <div class="vip-row-1">
           <span class="word-text">
             <span>可提现余额(元)</span>

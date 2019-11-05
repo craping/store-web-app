@@ -3,9 +3,9 @@ import request from '../../utils/request'
 export default {
   namespaced: true,
   state: {
-    addressInfo: {},
-    addressList: [],
-    isNeedDefault: true
+    addressInfo: {}, // 默认地址
+    addressList: [], // 收货地址信息
+    isNeedDefault: true // 是否默认
   },
   mutations: {
     SET_ADDRESSINFO(state, data) {
@@ -23,6 +23,11 @@ export default {
       commit('SET_ADDRESSINFO', data)
       commit('SET_IS_NEED_DEFAULT', false)
     },
+    reInitAddressInfo({ commit }) {
+      commit('SET_ADDRESSINFO', {})
+      commit('SET_IS_NEED_DEFAULT', true)
+    },
+    // 获取收货地址信息
     getAddressList({ commit, state }) {
       return new Promise((resolve, reject) => {
         request
@@ -31,7 +36,7 @@ export default {
             commit('SET_ADDRESSLIST', data.info)
             if (state.isNeedDefault) {
               const defaultAddres = data.info.filter(item => {
-                return item.isDefault == 1
+                return item.defaultStatus == 1
               })
               commit('SET_ADDRESSINFO', defaultAddres[0])
             }

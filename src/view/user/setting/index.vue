@@ -5,7 +5,7 @@
     <van-cell title="账户安全" is-link @click="jumpLink('account')" />
     <van-cell title="银行卡" is-link @click="jumpLink('bankCard')" />
     <van-cell title="关于我们" is-link @click="jumpLink('about')" />
-    <van-cell title="当前版本" value="1.0" />
+    <van-cell title="当前版本" :value="config.ABOUT_VERSION" />
     <div class="btn" @click="logout">退出登录</div>
   </div>
 </template>
@@ -13,6 +13,7 @@
 import Vue from "vue";
 import { removeToken } from '@/utils/auth'
 import { NavBar, Cell, CellGroup, Toast } from "vant";
+import { mapState } from 'vuex';
 Vue.use(Cell)
 	.use(CellGroup)
   .use(Toast)
@@ -20,6 +21,11 @@ Vue.use(Cell)
 export default {
   data() {
     return {};
+  },
+  computed:{
+    ...mapState('sys',{
+      config: state => state.config,
+    })
   },
   methods: {
     onClickLeft() {

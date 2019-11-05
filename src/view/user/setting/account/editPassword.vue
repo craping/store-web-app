@@ -3,6 +3,26 @@
     <van-nav-bar title="设置密码" left-arrow @click-left="onClickLeft" />
     <div class="login-body">
       <van-cell-group>
+        <van-field
+          v-model="password"
+          clearable
+          label="新密码"
+          placeholder="请输入新密码"
+          left-icon="lock"
+          :type="isEyeClose1 ? 'password' : 'text'"
+          :right-icon="isEyeClose1 ? 'closed-eye' : 'eye-o'"
+          @click-right-icon="isEyeClose1=!isEyeClose1"
+        />
+        <van-field
+          v-model="passwords"
+          clearable
+          label="确认新密码"
+          placeholder="请输入密码"
+          left-icon="lock"
+          :type="isEyeClose2 ? 'password' : 'text'"
+          :right-icon="isEyeClose2 ? 'closed-eye' : 'eye-o'"
+          @click-right-icon="isEyeClose2=!isEyeClose2"
+        />
         <van-field v-model="password" clearable label="新密码" placeholder="请输入新密码" />
         <van-field v-model="passwords" clearable label="确认新密码" placeholder="请再次输入新密码" />
         <div class="main-btn" @click="sureHandle">确定</div>
@@ -25,7 +45,9 @@ export default {
   data() {
     return {
       password: "",
-      passwords: ""
+      passwords: "",
+      isEyeClose1: true,
+      isEyeClose2: true
     };
   },
 

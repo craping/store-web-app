@@ -16,31 +16,52 @@ export default {
 		bills: []
 	},
 	getters: {
-		billByMonth: state => {
+		billGroup: state => {
 			let monthObj = {}
 			let result = []
-			state.bills.forEach(element => {
-				let monthKey = format(element.createTime, 'yyyy年MM月')
-				if (monthObj.hasOwnProperty(monthKey)) {
-					this.monthObj[monthKey].push(element)
+			if (state.bills.length > 0) {
+				if (!state.queryParams.beginDate && !state.queryParams.endDate) {
+					state.bills.forEach(element => {
+						let monthKey = format(element.createTime, 'yyyy-MM')
+						if (monthObj.hasOwnProperty(monthKey)) {
+							monthObj[monthKey].push(element)
+						} else {
+							monthObj[monthKey] = [element]
+						}
+					});
+					Object.keys(monthObj).forEach((key) => {
+						result.push({ monthStr: key, list: monthObj[key], dateType:'month'})
+					});
 				} else {
-					this.monthObj[monthKey] = []
+					let beginStr = format(state.queryParams.beginDate, 'yyyy-MM-dd')
+					let endStr = format(state.queryParams.endStr, 'yyyy-MM-dd')
+					result =[{ beginStr, endStr, list: state.bills, dateType: 1}]
 				}
-			});
-			Object.keys(monthObj).forEach((key) => {
-				result.push({ monthStr: key, list: monthObj[key] })
-			});
+			} else {
+				if (!state.queryParams.beginDate && !state.queryParams.endDate) {
+					if (state.queryParams.date) {
+						let monthKey = format(state.queryParams.date, 'yyyy-MM')
+						result = [{ monthStr: monthKey, list: [], dateType: 0}]
+					} else {
+						result = []
+					}
+				} else {
+					let beginStr = format(state.queryParams.beginDate, 'yyyy-MM-dd')
+					let endStr = format(state.queryParams.endStr, 'yyyy-MM-dd')
+					result =[{ beginStr, endStr, list: [], dateType: 1}]
+				}
+			}
 			return result
 		}
 	},
 	mutations: {
 		RESET_QUERYPARAMS(state) {
 			state.queryParams = {
-				type: null, 
-				srcType: null, 
+				type: null,
+				srcType: null,
 				date: null,
-				beginDate: null, 
-				endDate: null, 
+				beginDate: null,
+				endDate: null,
 				pageNum: 1,
 				pageSize: 10
 			}
@@ -52,13 +73,13 @@ export default {
 			state.queryParams.srcType = data
 		},
 		SET_DATE(state, data) {
-			state.queryParams.date = format(data, "yyyy-MM")
+			state.queryParams.date = data ? format(data, "yyyy-MM") : null
 		},
 		SET_BEGINDATE(state, data) {
-			state.queryParams.beginDate = format(data, "yyyy-MM-dd")
+			state.queryParams.beginDate = data ? format(data, "yyyy-MM-dd") : null
 		},
 		SET_ENDDATE(state, data) {
-			state.queryParams.endDate = format(data, "yyyy-MM-dd")
+			state.queryParams.endDate = data ? format(data, "yyyy-MM-dd") : null
 		},
 		SET_PAGENUM(state, data) {
 			state.queryParams.pageNum = data
@@ -71,7 +92,7 @@ export default {
 		queryBill({ commit, state }) {
 			return new Promise((resolve, reject) => {
 				request.post("/account/bill/list", state.queryParams).then(data => {
-					commit('SET_BILLS', data.info)
+					commit('SET_BILLS', state.bills.concat(data.info))
 					commit('SET_PAGENUM', data.page + 1)
 					resolve(data)
 				}).catch(error => {
