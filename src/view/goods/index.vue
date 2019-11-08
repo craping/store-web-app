@@ -513,8 +513,6 @@ export default {
           thumbs: [product.pic],
           href: process.env.VUE_APP_SHARE + product.id + '?shopId=' + product.id
         }
-        //初始化客服商品内容
-        service.product(product)
         this.comments = comments
       })
 
@@ -758,6 +756,9 @@ export default {
       //     sendByUser: umsMember.id
       // });
       // ysf('open');
+      
+      //初始化客服商品内容
+      service.product(this.goods)
       this.showService = true
     },
     formatTime(time) {
