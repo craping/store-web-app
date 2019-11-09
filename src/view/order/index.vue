@@ -9,71 +9,94 @@
       @click-left="onClickLeft"
     />
     <van-tabs @click="onClick" v-model="active">
-      <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad">
+      <!-- <store-scroller @onRefresh="onRefresh" @onInfinite="onLoad"> -->
+      <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+        
         <van-tab v-for="(item,index) in productStatus" :key="item.id" :title="item.title">
-          <div v-for="product in showProductList" :key="product.id" class="pro-container">
-            <div class="status">{{proStatus[product.status]}}</div>
-            <div>
-              <van-card
-                v-for="(item,index) in product.orderItemList"
-                :key="item.id"
-                :num="item.productQuantity"
-                :title="item.productName"
-                :price="item.productPrice"
-                :thumb="item.productPic"
-                @click="checkInfo(product)"
-              >
-                <div slot="tags">
-                  <van-tag
-                    plain
-                    type="danger"
-                    v-for="(item,index) in JSON.parse(item.productAttr)"
-                    :key="index"
-                  >{{item.key}}:{{item.value}}</van-tag>
-                </div>
-                <div slot="footer" v-show="(product.status == 3 || product.status == 5)">
-                  <div class="status" v-if="item.commentStatus == 1">已评论</div>
-                  <van-button v-else size="mini" @click.stop="proEventClick(item,'评价商品')">评价商品</van-button>
-                </div>
-                <div
-                  v-show="index == product.orderItemList.length-1"
-                  slot="footer"
-                  class="productSpec"
-                >
-                  <!-- <div v-show="product.orderItemList">共{{product.orderItemList[0].productQuantity}}件商品</div> -->
-                  <div>
-                    应付款：￥
-                    <span>{{product.payAmount}}</span>
-                    (含运费￥{{product.freightAmount}})
-                  </div>
-                </div>
 
-                <div slot="footer" v-show="index == product.orderItemList.length-1">
+          <van-list
+            v-model="loading"
+            :offset="50"
+            :immediate-check="false"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad">
+
+            <!-- 内容 -->
+            <div v-for="product in orderList" :key="product.id" class="pro-container">
+              <div class="status">{{proStatus[product.status]}}</div>
+              <div>
+                <van-card
+                  v-for="(item,index) in product.orderItemList"
+                  :key="item.id"
+                  :num="item.productQuantity"
+                  :title="item.productName"
+                  :price="item.productPrice"
+                  :thumb="item.productPic"
+                  @click="checkInfo(product)"
+                >
+                  <div slot="tags">
+                    <van-tag
+                      plain
+                      type="danger"
+                      v-for="(item,index) in JSON.parse(item.productAttr)"
+                      :key="index"
+                    >{{item.key}}:{{item.value}}</van-tag>
+                  </div>
+                  <div slot="footer" v-show="(product.status == 3 || product.status == 5)">
+                    <div class="status" v-if="item.commentStatus == 1">已评论</div>
+                    <van-button v-else size="mini" @click.stop="proEventClick(item,'评价商品')">评价商品</van-button>
+                  </div>
                   <div
-                    class="status"
-                  >售后状态：{{afterSaleStatus[product.orderItemList[0].serviceStatus + 1]}}</div>
-                  <van-button
-                    v-for="(item,index) in proEventList[`event${product.status}`]"
-                    :key="index"
-                    size="mini"
-                    :class="item == '立即付款' ? 'tored' : ''"
-                    @click.stop="proEventClick(product,item)"
-                  >{{item}}</van-button>
-                </div>
-              </van-card>
+                    v-show="index == product.orderItemList.length-1"
+                    slot="footer"
+                    class="productSpec"
+                  >
+                    <!-- <div v-show="product.orderItemList">共{{product.orderItemList[0].productQuantity}}件商品</div> -->
+                    <div>
+                      应付款：￥
+                      <span>{{product.payAmount}}</span>
+                      (含运费￥{{product.freightAmount}})
+                    </div>
+                  </div>
+
+                  <div slot="footer" v-show="index == product.orderItemList.length-1">
+                    <div
+                      class="status"
+                    >售后状态：{{afterSaleStatus[product.orderItemList[0].serviceStatus + 1]}}</div>
+                    <van-button
+                      v-for="(item,index) in proEventList[`event${product.status}`]"
+                      :key="index"
+                      size="mini"
+                      :class="item == '立即付款' ? 'tored' : ''"
+                      @click.stop="proEventClick(product,item)"
+                    >{{item}}</van-button>
+                  </div>
+                </van-card>
+              </div>
             </div>
-          </div>
-          <div class="mayLike" v-show="index != 0">
-            <div class="mayLikeTitle">
-              <div class="leftLine"></div>
-              <van-icon name="like"/>
-              <p>可能有你喜欢的</p>
-              <div class="roghtLine"></div>
+            <div class="not-list" v-if="notList">
+              <div>
+                <van-icon name="todo-list-o" />
+                <p>您还没有相关的订单</p>
+              </div>
             </div>
-            <store-card :proData="productList"></store-card>
-          </div>
+            <div class="mayLike" v-show="index != 0">
+              <div class="mayLikeTitle">
+                <div class="leftLine"></div>
+                <van-icon name="like"/>
+                <p>可能有你喜欢的</p>
+                <div class="roghtLine"></div>
+              </div>
+              <store-card :proData="productList"></store-card>
+            </div>
+          </van-list>
+
         </van-tab>
-      </store-scroller>
+
+        
+      </van-pull-refresh>
+      <!-- </store-scroller> -->
     </van-tabs>
     <store-pay-dialog @closeDialog="closeDialog" @toPay="toPay" :show="showPayDialog"></store-pay-dialog>
     <store-loding v-show="loding"></store-loding>
@@ -81,11 +104,12 @@
 </template>
 <script>
 import Vue from 'vue'
-import { mapState, mapActions } from 'vuex'
-import storeScroller from '@/components/store-scroller'
+import { mapState, mapMutations, mapActions } from 'vuex'
+// import storeScroller from '@/components/store-scroller'
 import storeCard from '@/components/store-card'
 import storePayDialog from '@/components/store-pay-dialog'
 import storeLoding from '@/components/store-loding'
+import request from '../../utils/request'
 import {
   Tab,
   Tabs,
@@ -96,7 +120,9 @@ import {
   Row,
   Toast,
   Dialog,
-  Icon
+  Icon,
+  PullRefresh,
+  List
 } from 'vant'
 Vue.use(NavBar)
   .use(Tab)
@@ -108,18 +134,24 @@ Vue.use(NavBar)
   .use(Toast)
   .use(Dialog)
   .use(Icon)
+  .use(PullRefresh)
+  .use(List)
 export default {
   name: 'order',
   components: {
-    storeScroller,
+    // storeScroller,
     storeCard,
     storePayDialog,
     storeLoding
   },
   data() {
     return {
+      isLoading: false,
+      loading: false,
+      finished: false, // 数据加载完成
       active: 0, //默认为1
       loding: false,
+      notList: false, // 提示：您还没有相关订单
       productStatus: [
         { id: '1', title: '全部' },
         { id: '2', title: '待付款' },
@@ -200,7 +232,7 @@ export default {
         '已拒绝',
         '已取消'
       ],
-      showProductList: [],
+      orderList: [], // 列表数据
       proEventList: {
         event0: ['立即付款', '关闭订单'],
         event1: ['取消订单'],
@@ -222,8 +254,9 @@ export default {
     }
   },
   created() {
+    this.active = this.$route.query.tabId  
     this.initData()
-    this.active = this.$route.query.tabId
+    console.log('tabID'+this.active)
   },
   mounted() {
     this.onPlusReady(() => {
@@ -232,8 +265,6 @@ export default {
   },
   computed: {
     ...mapState({
-      orderList: state => state.order.orderList,
-      totalnum: state => state.order.totalNum,
       platform: state => state.sys.clientId,
       userInfo: state => state.user.userInfo
     })
@@ -246,7 +277,7 @@ export default {
     },
 
     /*************初始化数据************ */
-    initData() {
+    /* initData() {
       this.loding = true
       this.$store.commit('order/SET_ORDER_LIST_INIT')
       this.$store
@@ -254,12 +285,121 @@ export default {
           pageNum: this.pageNums,
           pageSize: 10
         })
-        .then(data => {
-          this.showProductList = this.orderList
+        .then(() => {
+          this.orderList = this.orderList
         })
         .finally(() => {
           this.loding = false
         })
+    }, */
+
+    /********初始化数据********/
+    initData() {
+      console.log('初始化数据')
+      this.orderList = []
+      this.pageNums = 1
+      this.getListData(this.active, 'click')
+    },
+
+    /********获取列表数据********/ 
+    getListData(active, statusName) {
+      let url = '/order/getOrderList'
+      let params = {
+        pageNum: this.pageNums,
+        pageSize: 10
+      }
+
+      // 获取active   0=>全部 1=>待付款  2=>待发货 3=>待收货  4=>待评价
+      // 传给后台             0->待付款；1->待发货；2->已发货；3->已收货；4->已关闭；5->已完成
+      switch(active) {
+        case 0:
+          break;
+        case 1:
+          params.status = 0
+          break;
+        case 2:
+          params.status = 1
+          break;
+        case 3:
+          params.status = 2
+          break;
+        case 4:
+          // 待评价调另外一个接口
+          url = '/orderItem/unCommentItems'
+          break;
+      }
+
+      if (statusName == 'click'){
+        this.loding = true
+      }
+      
+      request
+        .post(url, params)
+        .then(data => {
+
+          /* 
+           *  操作列表 orderList
+           *    1.下拉刷新 => 只加载第一页, 赋值替换, 不显示数据loding, 
+           *    2.上拉加载 => push 追加, 不显示数据loding
+           *    3.点击切换 => 只加载第一页, 赋值替换, + 滚动到顶部
+           */
+
+          if (statusName == 'pull-down' || statusName == 'click') {
+            this.orderList = data.info
+            this.isLoading = false // 下拉loading
+            this.finished = false
+          } else if (statusName == 'pull-up') {
+            
+            let arr = data.info
+            for (let i in arr) {
+              this.orderList.push(arr[i])
+            }
+
+            this.loading = false // 上拉loading
+          }
+
+          // 数据全部加载完成
+          if (data.info.length == 0) {
+            this.finished = true
+          }
+
+          // console.log(JSON.parse(JSON.stringify(this.orderList)))
+
+          if (this.orderList.length == 0) {
+            this.notList = true
+          } else {
+            this.notList = false
+          }
+          
+        })
+        .catch(error => {
+          
+        })
+        .finally(() => {
+          this.loding = false
+        })
+    },
+
+    /*************下拉刷新*************/ 
+    onRefresh() {
+      console.log('下拉')
+      this.pageNums = 1 
+      this.getListData(this.active, 'pull-down')
+      
+    },
+
+    /*************上拉加载*************/ 
+    onLoad() {
+      console.log('触底了')
+      this.pageNums++
+      this.getListData(this.active, 'pull-up')
+    },
+
+    /*************tab切换标签点击事件*********/
+    onClick(name) {
+      document.documentElement.scrollTop = 0
+      this.pageNums = 1
+      this.getListData(name, 'click')
     },
 
     /*************点击查看详情事件***************/
@@ -268,18 +408,6 @@ export default {
         name: 'orderinfo'
       })
       this.$store.commit('order/SET_CHECK_INFO_LIST', item)
-    },
-
-    /*************tab切换标签点击事件*********/
-    onClick(name) {
-      // 0->待付款；1->待发货；2->已发货；3->已收货；4->已关闭；5->已完成
-      if (name != 0) {
-        this.showProductList = this.orderList.filter(item => {
-          return item.status == name - 1
-        })
-      } else {
-        this.showProductList = this.orderList
-      }
     },
 
     /************产品按钮点击点击事件*********/
@@ -398,6 +526,9 @@ export default {
         .catch(error => {
           console.log(error)
         })
+        .finally(() => {
+          this.loding = false
+        })
     },
 
     /***********关闭订单事件*********/
@@ -409,10 +540,14 @@ export default {
       this.$http
         .post('/order/closeOrder', params)
         .then(data => {
+          console.log('关闭订单成功')
           this.initData()
         })
         .catch(error => {
           console.log(error)
+        })
+        .finally(() => {
+          this.loding = false
         })
     },
 
@@ -429,6 +564,9 @@ export default {
         })
         .catch(error => {
           console.log(error)
+          this.loding = false
+        })
+        .finally(() => {
           this.loding = false
         })
     },
@@ -530,41 +668,21 @@ export default {
       )
     },
     /*************支付弹框事件群end******/
-
-    /***********下拉刷新事件*********/
-    onRefresh(done) {
-      if (this.showProductList.length >= this.totalnum) {
-        if (done) done(true)
-      }
-      this.pageNums += 1
-      this.$store
-        .dispatch('order/getOrderList', {
-          pageNum: this.pageNums,
-          pageSize: 10
-        })
-        .then(data => {
-          this.showProductList = this.orderList
-          this.onClick(this.active)
-        })
-        .finally(() => {
-          if (done) done()
-        })
-    },
-    onLoad(done) {
-      if (done) done(true)
-      this.loading = false
-      // this.finished = true
-    }
+ 
   },
   watch: {
-    active(newValue, oldValue) {
+    /* active(newValue, oldValue) {
       this.pageNums = 1
       this.onClick(newValue)
-    }
+    } */
   }
 }
 </Script>
 <style lang="scss" scoped>
+.van-pull-refresh{
+  padding-left: 15px;
+  padding-right: 15px;
+}
 .order {
   // padding-top: 46px;
   height: 100%;
@@ -585,7 +703,7 @@ export default {
   }
   /deep/.van-tabs__content {
     margin-top: 115px;
-    height: 100vh;
+    // height: 100vh;
     width: 100%;
     .van-button {
       margin: 0 5px;
@@ -607,6 +725,15 @@ export default {
     }
   }
 
+  .not-list{
+    color: #7d7e80;
+    text-align: center;
+    height: 160px;
+    padding-top: 60px;
+    .van-icon{
+      font-size: 18px;
+    }
+  }
   .mayLike {
     .mayLikeTitle {
       display: flex;
