@@ -22,15 +22,15 @@
         </div>
       </van-sticky>
       <van-list v-model="loading" :finished="finished" :immediate-check="false" finished-text="没有更多了" :offset="50" @load="onLoad">
-        <div class="month-item" ref="billGroup" v-for="(billGroup,index) in billGroup" :key="index">
+        <div class="month-item" ref="billGroup" v-for="(group,index) in billGroup" :key="index">
           <van-sticky :offset-top="96" :container="container1[index]">
             <div class="info-bar">
-              <div class="time" @click="handleDateSelectshow(billGroup)">
-                <template v-if="billGroup.dateType">
-                  {{billGroup.beginStr}} - {{billGroup.endStr}}
+              <div class="time" @click="handleDateSelectshow(group)">
+                <template v-if="group.dateType">
+                  {{group.beginStr}} 至 {{group.endStr}}
                 </template>
                 <template v-else>
-                  {{billGroup.monthStr}}
+                  {{group.monthStr}}
                 </template>
                 <van-icon name="arrow-down" />
               </div>
@@ -41,7 +41,7 @@
             </div>
           </van-sticky>
           <div class="bill-list">
-            <div class="bill-item" @click="jumpLink('/billDetail',{id:item.id,srcType:item.srcType,recordSn:item.recordSn})" v-for="(item,index) in billGroup.list" :key="index">
+            <div class="bill-item" @click="jumpLink('/billDetail',{id:item.id,srcType:item.srcType,recordSn:item.recordSn})" v-for="(item,index) in group.list" :key="index">
               <div class="col-1">
                 <van-icon v-if="item.srcType=='0_1'||item.srcType=='1_4'" name="cart" size="35" color="#fcc" />
                 <van-icon v-if="item.srcType=='1_5'||item.srcType=='1_1'" name="refund-o" size="35" color="#fcc" />
@@ -129,11 +129,18 @@
               <van-icon @click="resetDay" name="delete" />
             </div>
             <van-datetime-picker
-              v-show="dayInputType"
+              v-show="dayInputType == 1"
               v-model="pickerDayDate"
               type="date"
               :show-toolbar="false"
               :max-date="maxDate"
+              @change="changePickerDayDate"
+            />
+            <van-datetime-picker
+              v-show="dayInputType == 2"
+              v-model="pickerDayDate"
+              type="date"
+              :show-toolbar="false"
               @change="changePickerDayDate"
             />
           </van-tab>
@@ -249,9 +256,10 @@ export default {
   methods: {
     ...mapActions(["queryBill"]),
     handleDateSelectshow(item) {
+      this.dateType = item.dateType
       if (item.dateType) {
-        this.startDate = item.beginStr ? this.formatMonth(new Date(item.beginStr)) : ''
-        this.endDate = item.endStr ? this.formatMonth(new Date(item.endStr)) : ''
+        this.startDate = item.beginStr ? this.formatDate(new Date(item.beginStr)) : ''
+        this.endDate = item.endStr ? this.formatDate(new Date(item.endStr)) : ''
         this.dayDate2View()
       } else {
         this.currentMonth = this.formatMonth(new Date(item.monthStr))

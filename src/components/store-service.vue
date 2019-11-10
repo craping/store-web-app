@@ -65,7 +65,6 @@ export default {
   mounted() {},
   methods: {
     open() {
-      ysf("onready", () => {
         // this.src = ysf("url");
         let iframe = document.createElement("iframe");
         iframe.src = ysf("url");
@@ -76,9 +75,7 @@ export default {
         iframe.style.overflow = "hidden";
         iframe.style.border = "none";
         this.iframe = iframe;
-
         this.$refs.serviceWrap.appendChild(iframe);
-      });
     },
     close() {
       // ysf('logoff')

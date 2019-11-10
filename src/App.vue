@@ -20,7 +20,6 @@ export default {
     // 初始化获取用户信息
     this.getUserInfo().then(data => {
       sync.connect();
-      service.init(data.info);
       this.getCartList()
     }).catch(error => {
       console.log(error)
@@ -40,7 +39,9 @@ export default {
       plus.key.addEventListener('backbutton', function() {  
           webview.canBack(function(e) {  
               if (e.canBack && !me.$route.path.includes("/main/") && me.$route.path != "/") {  
+                if(!me.$route.path.includes("/goods/")){
                   webview.back(); //这里不建议修改自己跳转的路径  
+                }
               } else {  
                   //首次按键，提示‘再按一次退出应用’  
                   if (!first) {  

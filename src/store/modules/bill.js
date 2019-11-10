@@ -30,11 +30,11 @@ export default {
 						}
 					});
 					Object.keys(monthObj).forEach((key) => {
-						result.push({ monthStr: key, list: monthObj[key], dateType:'month'})
+						result.push({ monthStr: key, list: monthObj[key], dateType:0})
 					});
 				} else {
 					let beginStr = format(state.queryParams.beginDate, 'yyyy-MM-dd')
-					let endStr = format(state.queryParams.endStr, 'yyyy-MM-dd')
+					let endStr = format(state.queryParams.endDate, 'yyyy-MM-dd')
 					result =[{ beginStr, endStr, list: state.bills, dateType: 1}]
 				}
 			} else {
@@ -47,10 +47,11 @@ export default {
 					}
 				} else {
 					let beginStr = format(state.queryParams.beginDate, 'yyyy-MM-dd')
-					let endStr = format(state.queryParams.endStr, 'yyyy-MM-dd')
+					let endStr = format(state.queryParams.endDate, 'yyyy-MM-dd')
 					result =[{ beginStr, endStr, list: [], dateType: 1}]
 				}
 			}
+			console.log('sssGrpup',result)
 			return result
 		}
 	},
