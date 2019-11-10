@@ -13,51 +13,65 @@
         <template v-if="viewType == 1">
           <div class="cell">
             <span class="label">订单编号</span>
-            <span>{{info.orderSn}}</span>
+            <span>{{detail.length && detail[0].orderSn || '-'}}</span>
           </div>
           <div class="cell">
             <span class="label">商品说明</span>
-            <span>{{info.productName}}</span>
+          </div>
+          <div class="goos-list van-hairline--top">
+            <div class="goods-item" v-for="(item,index) in detail" :key="index">
+              <div class="col-1">
+                <img :src="item.productPic" alt />
+              </div>
+              <div class="col-2">
+                <div class="title two-over">{{item.productName}}</div>
+                <div class="num">数量 x{{item.productQuantity}}</div>
+              </div>
+            </div>
           </div>
         </template>
         <template v-if="viewType == 2">
           <div class="cell">
             <span class="label">售后编号</span>
-            <span>{{info.orderSn}}</span>
+            <span>{{detail.orderSn}}</span>
           </div>
           <div class="cell">
             <span class="label">商品说明</span>
-            <span>{{info.productName}}</span>
+            <span>{{detail.productName}}</span>
           </div>
         </template>
         <template v-if="viewType == 3">
           <div class="cell">
             <span class="label">佣金渠道</span>
-            <span>{{setChannelStr(info.channel)}}</span>
+            <span>{{setChannelStr(detail.channel)}}</span>
           </div>
           <div class="cell">
             <span class="label">结算等级</span>
-            <span>{{info.levelName}}</span>
+            <span>{{detail.levelName}}</span>
           </div>
           <div class="cell">
             <span class="label">下级结算等级</span>
-            <span>{{info.subLevelName}}</span>
+            <span>{{detail.subLevelName}}</span>
           </div>
           <div class="cell">
             <span class="label">订单编号</span>
-            <span>{{info.orderSn}}</span>
+            <span>{{detail.orderSn}}</span>
+          </div>
+          <div class="cell">
+            <span class="label">佣金明细</span>
+            <!-- <span>{{detail[0].productName}}</span> -->
           </div>
           <div class="goos-list van-hairline--top">
             <div class="goods-item">
               <div class="col-1">
-                <img :src="info.productPic" alt />
+                <img :src="detail.productPic" alt />
               </div>
               <div class="col-2">
-                <div class="title">{{info.productName}}</div>
-                <div class="num">数量x{{info.quantity}}</div>
+                <div class="title one-over">{{detail.productName}}</div>
+                <div class="num">数量 x{{detail.quantity}}</div>
                 <div class="money-row">
-                  <span>消费金额: ￥{{info.price}}</span>
-                  <span class="profit">佣金收益: ￥{{info.commission}}</span>
+                  <span>消费金额: ￥{{detail.price}}</span>
+                  <span class="profit">佣金收益: ￥{{detail.commission}}</span>
                 </div>
               </div>
             </div>
@@ -66,28 +80,28 @@
         <template v-if="viewType == 4">
           <div class="cell">
             <span class="label">当前状态</span>
-            <span>{{status2Str(info.status)}}</span>
+            <span>{{status2Str(detail.status)}}</span>
           </div>
           <div class="cell">
             <span class="label">服务费</span>
-            <span>{{info.fees}}</span>
+            <span>{{detail.fees}}</span>
           </div>
           <div class="cell">
             <span class="label">提现银行</span>
-            <span>{{info.bankName}}({{info.cardNo.slice(-4)}}) {{info.cardName}}</span>
+            <span>{{detail.bankName}}({{detail.cardNo.slice(-4)}}) {{detail.cardName}}</span>
           </div>
           <div class="cell">
             <span class="label">提现单号</span>
-            <span>{{info.recordNo}}</span>
+            <span>{{detail.recordNo}}</span>
           </div>
         </template>
-        <div class="cell van-hairline--top">
+        <div class="cell van-hairline--top" v-if="viewType">
           <span class="label">创建时间</span>
-          <span>{{formatTime(info.reateTime)}}</span>
+          <span>{{formatTime(record.createTime)}}</span>
         </div>
-        <div class="cell">
+        <div class="cell" v-if="viewType">
           <span class="label">账单编号</span>
-          <span>{{recordSn}}</span>
+          <span>{{record.recordSn}}</span>
         </div>
       </div>
     </div>
@@ -101,14 +115,15 @@ Vue.use(Toast).use(NavBar);
 export default {
   data() {
     return {
-      viewType: 3, // 1订单 ，2 售后 3 佣金 4.提现,
+      viewType: 0, // 1订单 ，2 售后 3 佣金 4.提现,
       viewTypeStr: "",
       srcType: this.$route.query.srcType, // 数据来源类型
       id: this.$route.query.id, 
       recordSn: this.$route.query.recordSn, // 账单编码
       type: this.$route.query.type, // 资金类型[1：收入，0：支出]
       amount: this.$route.query.amount, // 账变金额
-      info: {}
+      record: {},
+      detail: {}
     };
   },
   created() {
@@ -172,7 +187,12 @@ export default {
       this.$http
         .post("/account/bill/detail", { id: this.id })
         .then(res => {
-          this.info = res.data.info || {}
+          this.record = res.info.record || {}
+          if (this.record.srcType == '0_1' || this.record.srcType == '1_4') {
+            this.detail = res.info.detail || []
+          } else {
+            this.detail = res.info.detail || {}
+          }
         })
         .catch(error => {
           Toast(error.message);
@@ -250,10 +270,21 @@ export default {
           justify-content: space-between;
           .title {
             width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
             font-size: 14px;
+            &.one-over{
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+            &.two-over{
+              display: -webkit-box;
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 2;
+              overflow: hidden;
+            }
+          }
+          .num{
+            color: #999;
           }
           .money-row {
             display: flex;
