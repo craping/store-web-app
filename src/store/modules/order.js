@@ -3,21 +3,22 @@ import request from '../../utils/request'
 export default {
   namespaced: true,
   state: {
-    orderList: [],
-    totalNum: null,
+    /* orderList: [], // 订单列表
+    totalNum: 0, // 总条数
+    totalPage: 0, // 总页数 */
     confirmOrderList: [],
     checkInfoList: {}
   },
   mutations: {
-    SET_ORDER_LIST(state, content) {
-      state.orderList = [...content, ...state.orderList]
+    /* SET_ORDER_LIST(state, content) {
+      state.orderList = [...state.orderList, ...content]
     },
     SET_TOTALNUM(state, content) {
       state.totalNum = content
     },
     SET_ORDER_LIST_INIT(state) {
       state.orderList = []
-    },
+    },*/
     SET_CONFIRM_ORDER_LIST(state, content) {
       state.confirmOrderList = content
     },
@@ -26,7 +27,8 @@ export default {
     }
   },
   actions: {
-    getOrderList({ commit }, data) {
+    // 获取订单列表
+    /* getOrderList({ commit }, data) {
       return new Promise((resolve, reject) => {
         request
           .post('/order/getOrderList', data)
@@ -39,6 +41,6 @@ export default {
             reject(error)
           })
       })
-    }
+    } */
   }
 }

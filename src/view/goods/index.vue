@@ -191,7 +191,8 @@
 
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" @click="openService" :info="unread">客服</van-goods-action-icon>
-      <van-goods-action-icon icon="like-o" @click="onClickLike" >收藏</van-goods-action-icon>
+      <van-goods-action-icon icon="like-o" @click="addLike">收藏</van-goods-action-icon>
+      <!-- <van-goods-action-icon icon="like" icon-class="had-like" @click="cancelLike" >已收藏</van-goods-action-icon> -->
       <van-goods-action-icon icon="cart-o" @click="onClickCart" :info="cartNum">购物车</van-goods-action-icon>
       <template v-if="vipEnable">
         <van-goods-action-button type="warning" @click="sku.show=true">
@@ -524,12 +525,31 @@ export default {
   },
   mounted() {
     window.addEventListener('scroll', this.handleScroll, true)
+    this.onPlusReady(() => {
+      plus.key.addEventListener('backbutton', this.handleback)
+    });
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll, true)
+    this.onPlusReady(() => {
+      plus.key.removeEventListener("backbutton",this.handleback);
+    });
   },
   methods: {
     ...mapActions('comments', ['queryComments']),
+    handleback() {
+      if (this.prePicShow) {
+        this.prePicShow = false
+      } else if (this.video.show) {
+        this.video.show = false
+      } else if (this.share.show) {
+        this.share.show = false
+      } else if (this.showCommentsSheet) {
+        this.showCommentsSheet = false
+      } else {
+        this.$router.go(-1)
+      }
+    },
     handleScroll(e) {
       const scrollTop =
         window.pageYOffset ||
@@ -613,10 +633,12 @@ export default {
     },
     preview(index) {
       if (index == 0 && this.video.show) return
-      ImagePreview({
-        images: this.goods.thumb,
-        startPosition: index
-      })
+      this.preImage = this.goods.thumb
+      this.prePicShow = true
+      // ImagePreview({
+      //   images: this.goods.thumb,
+      //   startPosition: index
+      // })
     },
     formatPrice(minPrice, maxPrice) {
       if (!minPrice) return ''
@@ -626,7 +648,14 @@ export default {
         (maxPrice && minPrice!=maxPrice ? '~¥' + new Big(maxPrice).toFixed(2) : '')
       )
     },
-    onClickLike() {
+    // 添加收藏
+    addLike() {
+      if (!this.isLogin) {
+        this.$router.push('/login')
+        this.$store.commit('user/SET_BEFOREPATH', this.$route.path)
+        // Toast('用户未登录')
+        return
+      }
       this.$http
         .post("/collec/addProduct", {productId:this.$route.params.id})
         .then(res => {
@@ -635,7 +664,17 @@ export default {
         .catch(error => {
           Toast(error.message);
         });
-      
+    },
+    // 取消收藏
+    cancelLike(id) {
+      this.$http
+        .post("/collec/deleteProduct", { id: this.$route.params.id })
+        .then(res => {
+          Toast('取消收藏');
+        })
+        .catch(error => {
+          Toast(error.message);
+        });
     },
     onClickCart() {
       this.$router.push({path:'/main/cart', query:{hideBotBar:true}})
@@ -760,6 +799,18 @@ export default {
       //初始化客服商品内容
       service.product(this.goods)
       this.showService = true
+      // 获取客服组id
+      // this.$http.post("/url", {})
+      //   .then(res => {
+      //     ysf("onready", () => {
+      //       service.init(this.userInfo, this.goods , res.data.groupid, () => {
+      //         this.showService = true
+      //       });
+      //     });
+      //   })
+      //   .catch(error => {
+
+      //   });
     },
     formatTime(time) {
       return format(time, 'yyyy-MM-dd')
@@ -1066,5 +1117,9 @@ export default {
       border-radius: 20px;
     }
   }
+
+}
+/deep/.had-like{
+  color: #F00;
 }
 </style>
