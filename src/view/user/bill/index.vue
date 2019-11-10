@@ -41,7 +41,7 @@
             </div>
           </van-sticky>
           <div class="bill-list">
-            <div class="bill-item" @click="jumpLink('/billDetail',{id:item.id,srcType:item.srcType,recordSn:item.recordSn})" v-for="(item,index) in group.list" :key="index">
+            <div class="bill-item" @click="jumpLink('/billDetail',{id:item.id,srcType:item.srcType,recordSn:item.recordSn,type:item.type,amount:item.amount})" v-for="(item,index) in group.list" :key="index">
               <div class="col-1">
                 <van-icon v-if="item.srcType=='0_1'||item.srcType=='1_4'" name="cart" size="35" color="#fcc" />
                 <van-icon v-if="item.srcType=='1_5'||item.srcType=='1_1'" name="refund-o" size="35" color="#fcc" />
