@@ -191,8 +191,8 @@
 
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" @click="openService" :info="unread">客服</van-goods-action-icon>
-      <van-goods-action-icon icon="like-o" @click="addLike">收藏</van-goods-action-icon>
-      <!-- <van-goods-action-icon icon="like" icon-class="had-like" @click="cancelLike" >已收藏</van-goods-action-icon> -->
+      <van-goods-action-icon icon="like-o" v-show="!hadLike"  @click="addLike">收藏</van-goods-action-icon>
+      <van-goods-action-icon icon="like" icon-class="had-like" v-show="hadLike" @click="cancelLike" >已收藏</van-goods-action-icon>
       <van-goods-action-icon icon="cart-o" @click="onClickCart" :info="cartNum">购物车</van-goods-action-icon>
       <template v-if="vipEnable">
         <van-goods-action-button type="warning" @click="sku.show=true">
@@ -410,7 +410,8 @@ export default {
       showService: false,
       showCommentsSheet: false,
       prePicShow: false,
-      preImage: []
+      preImage: [],
+      hadLike : 0
     }
   },
   created() {
@@ -421,6 +422,7 @@ export default {
       .then(data => {
         //goods初始化
         let { product, skus, specifications, comments } = data.info
+        this.hadLike = data.info.productCollectFlag || 0
         product.title = product.name
         product.thumb =
           product.albumPics == '' ? [] : product.albumPics.split(',')
@@ -659,6 +661,7 @@ export default {
       this.$http
         .post("/collec/addProduct", {productId:this.$route.params.id})
         .then(res => {
+          this.hadLike = 1
           Toast('收藏成功');
         })
         .catch(error => {
@@ -670,6 +673,7 @@ export default {
       this.$http
         .post("/collec/deleteProduct", { id: this.$route.params.id })
         .then(res => {
+          this.hadLike = 0
           Toast('取消收藏');
         })
         .catch(error => {
