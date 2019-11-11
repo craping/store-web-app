@@ -35,7 +35,7 @@ export default {
           info: ""
         },
         {
-          name: "砍价",
+          name: "积分",
           path: "/main/bargain",
           pathName: "class",
           icon: "discount",
