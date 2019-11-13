@@ -17,7 +17,8 @@
     "vant": "^2.2.6",
     "vue": "^2.6.10",
     "vue-router": "^3.0.5",
-    "vuex": "^3.1.1"
+    "vuex": "^3.1.1",
+    "yarn": "^1.19.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.8.0",
@@ -34,6 +35,9 @@
     "root": true,
     "env": {
       "node": true
+    },
+    "globals":{
+      "plus":true
     },
     "extends": [
       "plugin:vue/essential",

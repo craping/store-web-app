@@ -5,7 +5,7 @@
 </template>
 <script>
 import sync from "@/utils/sync";
-import service from "@/utils/service";
+// import service from "@/utils/service";
 import { mapActions } from 'vuex';
 import { getClientId } from '@/utils/util'
 import { getToken } from '@/utils/auth'
@@ -18,7 +18,7 @@ export default {
     // 初始化APP配置信息
     this.getSysConfig();
     // 初始化获取用户信息
-    this.getUserInfo().then(data => {
+    this.getUserInfo().then(() => {
       sync.connect();
       this.getCartList()
     }).catch(error => {

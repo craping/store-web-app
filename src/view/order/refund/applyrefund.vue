@@ -258,7 +258,7 @@ export default {
       }
       this.$http
         .post('/orderReturnApply/create', params)
-        .then(data => {
+        .then(() => {
           this.$router.push('/afterSale')
         })
         .catch(error => {
