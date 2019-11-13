@@ -36,7 +36,7 @@ export default {
             commit('SET_ADDRESSLIST', data.info)
             if (state.isNeedDefault) {
               const defaultAddres = data.info.filter(item => {
-                return item.defaultStatus == 1
+                return item.isDefault == 1
               })
               commit('SET_ADDRESSINFO', defaultAddres[0])
             }

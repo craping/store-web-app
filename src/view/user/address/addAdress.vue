@@ -46,13 +46,13 @@ export default {
     onSave(data) {
       const params = {
         name: data.name,
-        phoneNumber: data.tel,
+        tel: data.tel,
         province: data.province,
         city: data.city,          
-        region: data.county,
-        detailAddress: data.addressDetail,
-        defaultStatus: data.isDefault? 1 : 0,
-        postCode: data.postalCode,
+        county: data.county,
+        address: data.addressDetail,
+        isDefault: data.isDefault? 1 : 0,
+        postalCode: data.postalCode,
         areaCode: data.areaCode
       };
       /*
@@ -61,14 +61,14 @@ export default {
           token:用户Token [是否必要：true]
           id:地址ID [是否必要：false]
           name:收货人名称 [是否必要：true]
-          phoneNumber:收货人电话 [是否必要：true]
-          defaultStatus:是否为默认地址 [是否必要：true]
+          tel:收货人电话 [是否必要：true]
+          isDefault:是否为默认地址 [是否必要：true]
           areaCode:地区码 [是否必要：true]
-          postCode:邮政编码 [是否必要：false]
+          postalCode:邮政编码 [是否必要：false]
           province:省份/直辖市 [是否必要：true]
           city:城市 [是否必要：true]
-          region:区 [是否必要：true]
-          detailAddress:详细地址(街道) [是否必要：true]
+          county:区 [是否必要：true]
+          address:详细地址(街道) [是否必要：true]
       */
       if (data.id) {
         params.id = data.id;
