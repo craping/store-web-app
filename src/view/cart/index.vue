@@ -118,6 +118,9 @@ export default {
     }
   },
   mounted() {
+	this.onPlusReady(() => {
+		plus.navigator.setStatusBarStyle('light')
+	});
     this.getCartList()
   },
   computed: {
