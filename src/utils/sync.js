@@ -1,6 +1,7 @@
 import axios from 'axios'
 import store from '@/store';
 import request from '@/utils/request'
+import router from '@/router'
 
 const Sync = {
     source: null,
@@ -68,6 +69,14 @@ const Sync = {
         },
         MESSAGE:{
             
+        },
+        ORDER:{
+            PAY(data){
+                const msg = '订单['+ data +']已支付';
+				// 支付成功跳转
+				localStorage.orderActive = 2
+                router.push('/order')
+            }
         }
     }
 }
