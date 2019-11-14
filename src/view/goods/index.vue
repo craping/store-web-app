@@ -191,7 +191,7 @@
 
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" @click="openService" :info="unread">客服</van-goods-action-icon>
-      <van-goods-action-icon icon="like-o" v-show="!hadLike"  @click="likeHandle">收藏</van-goods-action-icon>
+      <van-goods-action-icon icon="like-o" v-show="!hadLike"  @click="likeHandle()">收藏</van-goods-action-icon>
       <van-goods-action-icon icon="like" icon-class="had-like" v-show="hadLike" @click="likeHandle(1)" >已收藏</van-goods-action-icon>
       <van-goods-action-icon icon="cart-o" @click="onClickCart" :info="cartNum">购物车</van-goods-action-icon>
       <template v-if="vipEnable">
@@ -411,7 +411,8 @@ export default {
       showCommentsSheet: false,
       prePicShow: false,
       preImage: [],
-      hadLike : 0
+      hadLike : 0,
+      handleFlag: false //操作标识，防止重复操作
     }
   },
   created() {
@@ -652,6 +653,8 @@ export default {
     },
     // 收藏操作
     likeHandle(isCancel) {
+      if(this.handleFlag) return
+      this.handleFlag = true
       if (!this.isLogin) {
         this.$router.push('/login')
         this.$store.commit('user/SET_BEFOREPATH', this.$route.path)
@@ -661,6 +664,7 @@ export default {
       this.$http
         .post("/collec/addProduct", {productId:this.$route.params.id})
         .then(res => {
+          this.handleFlag = false
           if (isCancel) {
             this.hadLike = 0
             Toast('取消成功')
@@ -670,6 +674,7 @@ export default {
           }
         })
         .catch(error => {
+          this.handleFlag = false
           Toast(error.message);
         });
     },
