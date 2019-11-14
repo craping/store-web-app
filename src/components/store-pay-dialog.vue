@@ -4,19 +4,18 @@
       v-model="showDialog"
       @click-overlay="cancelDialog"
       @cancel="cancelDialog"
-      title="支付方式"
-    >
+      title="支付方式">
       <van-radio-group v-model="radio">
         <van-cell-group>
           <van-cell
             v-for="item in payChannels"
             :key="item.id"
-            :title="item.name == '余额钱包' ? `余额钱包(余额:${userInfo.amsAccount.balance || 无})`:item.name"
-            :icon="icons[item.id]"
+            :title="item.channelName == '余额支付' ? `余额支付(余额: ${userInfo.amsAccount.balance || 0})`:item.channelName"
+            :icon="icons[item.type]"
             clickable
-            @click="getChannelClick(item.abbr)"
+            @click="getChannelClick(item.type, item.methodType)"
           >
-            <van-radio slot="right-icon" :name="item.abbr"/>
+            <van-radio slot="right-icon" :name="item.type"/>
           </van-cell>
         </van-cell-group>
       </van-radio-group>
@@ -25,11 +24,11 @@
       </div>
     </van-action-sheet>
 
-    <van-overlay :show="showOverlay" @click="closeOverLay"/>
+    <van-overlay v-show="showOverlay" @click="closeOverLay"/>
     <van-password-input
+      v-if="showOverlay"
       :value="password"
-      v-show="showOverlay"
-      info="密码为 6 位数字(点击外层取消)"
+      info="请输入6位数字密码"
       :focused="showKeyboard"
       @focus="showKeyboard = true"
     />
@@ -79,11 +78,12 @@ export default {
   data() {
     return {
       showDialog: this.show,
-      radio: '',
+      radio: '', // 支付方式
+      methodType: '', // 支付类型
       icons: {
-        '1': 'gold-coin',
-        '2': 'wechat',
-        '4': 'alipay'
+        'ALIPAY': 'alipay',
+        'WXPAY': 'wechat',
+        'BALANCE': 'gold-coin'
       },
       showOverlay: false, //遮罩层
       password: '',
@@ -106,32 +106,39 @@ export default {
     cancelDialog() {
       this.$emit('closeDialog', false)
     },
-    getChannelClick(c) {
+    getChannelClick(c, t) {
+      // c=> BALANCE余额 WXPAY ALIPAYPAYS
+      console.log(c)
+      console.log(t)
+      this.radio = c
+      this.methodType = t
       if (c == 'BALANCE') {
-        if (this.userInfo.payLogo) {
+        if (this.userInfo.payLogo) { 
           this.showOverlay = true
           this.showDialog = false
         } else {
+          // 跳转到设置密码
           this.$router.push('editPayPassword')
         }
       }
-      this.radio = c
     },
+    /* 去支付 */
     payClick() {
-      this.$emit('toPay', this.radio)
+      this.$emit('toPay', this.radio, this.methodType)
     },
     onInput(key) {
       this.password = (this.password + key).slice(0, 6)
       if (this.password.length == 6) {
         const token = getToken()
-        this.$emit('getPayPassword', md5(token + md5(this.password)))
+        // this.$emit('getPayPassword', md5(token + md5(this.password)))
+        this.$emit('getPayPassword', md5(this.password))
         this.showOverlay = false
         this.showKeyboard = false
         this.showDialog = false
-        this.radio = ''
+        // this.radio = ''
         this.password = ''
         setTimeout(() => {
-          this.$emit('toPay', 'BALANCE')
+          this.$emit('toPay', this.radio, this.methodType)
         }, 0)
       }
     },

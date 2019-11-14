@@ -75,6 +75,7 @@ import Vue from 'vue'
 import { mapState, mapActions } from 'vuex'
 import { wxpay } from '@/utils/wxpay'
 import storePayDialog from '@/components/store-pay-dialog'
+import { getClient } from '@/utils/util'
 import {
   NavBar,
   Card,
@@ -113,6 +114,7 @@ export default {
     return {
       showPayDialog: false, //支付弹框默认隐藏
       payType: '', //获取支付方式
+      methodType: '', // 支付客户端
       showAddress: false, //显示地址列表
       confirmedAddress: {
         name: '',
@@ -130,7 +132,7 @@ export default {
   computed: {
     ...mapState({
       confirmOrderList: state => state.order.confirmOrderList,
-      platform: state => state.sys.clientId,
+      clientId: state => state.sys.clientId,
       addressInfo: state => state.address.addressInfo,
       userInfo: state => state.user.userInfo
     }),
@@ -178,6 +180,7 @@ export default {
 
     /*********获取用户的收货地址*********** */
     initAddress() {
+      console.log(addressInfo)
       const { addressInfo } = this
       this.$nextTick(() => {
         this.confirmedAddress.name = addressInfo.name || '请先选择地址'
@@ -211,7 +214,7 @@ export default {
         skuIds: temSkuids,
         addressId: this.addressInfo.id,
         type: this.$route.query.type,
-        sourceType: this.platform
+        sourceType: this.clientId
       }
       if (this.$route.query.type == 'dir') {
         params = {
@@ -231,12 +234,12 @@ export default {
       this.$http
         .post('/order/create', params)
         .then(data => {
-          console.log(data.info)
           this.payParamsObj = {
             // orderSn: data.info.orderSn,
             orderIds: data.info.orderIds.split(','),
-            sourceType: this.platform
-            // sourceType: 1
+
+            // sourceType: this.clientId
+            
           }
         })
         .catch(error => {
@@ -254,82 +257,123 @@ export default {
     getPayPassword(pw) {
       this.payParamsObj.password = pw
     },
-    /***********点击支付按钮事件并获取支付方式*********/
-    toPay(type) {
-      this.payType = type
-      console.log('sfsdf', this.payType)
-      var requestUrl = null
+    /* 去支付 */
+    toPay(method, type) {
+      // method 支付通道, type 客户端类型
+      this.payType = method
+      this.payParamsObj.methodType = type
+      this.payParamsObj.clientId = getClient()
+
       if (this.payType == 'WXPAY') {
-        requestUrl = '/trade/pay'
+        this.payParamsObj.payType = 'WXPAY'
         this.channel = this.wxChannel
-        this.payParamsObj.channelId = 2
-      } else if (this.payType == 'ALIPAYPAYS') {
-        requestUrl = '/ali/pay'
-        this.channel = this.aliChannel
-        this.payParamsObj.channelId = 4
+      } else if (this.payType == 'ALIPAY') {
+        this.payParamsObj.payType = 'ALIPAY'
       } else {
-        requestUrl = '/trade/pay'
-        this.channel = this.wxChannel
-        this.payParamsObj.channelId = 1
+        this.payParamsObj.payType = 'BALANCE'
         if (!this.isBalanceEnough) {
           Toast.fail('余额不足以支付该产品')
           return
         }
       }
 
-      this.$http.post(requestUrl, this.payParamsObj).then(data => {
-        if (this.payType == 'BALANCE') {
-          this.showPayDialog = false
-          Toast.success('支付成功')
-          this.getUserInfo()
-          this.$router.push('/order')
-          return
-        }
-
-        if (this.payType == 'WXPAY') {
-          /* if (this.platform == 2) {
-            //wap
-            window.location.href = data.info.mweb_url
+      this.$http.post('/trade/pay', this.payParamsObj).then(data => {
+          if (this.payType == 'BALANCE') {
+            this.showPayDialog = false
+            Toast.success('支付成功')
+            this.getUserInfo()
             return
           }
-          if (this.platform == 3) {
-            //wx
-            this.wxpay(data.info, payResult => {
-              if (payResult.err_msg == 'get_brand_wcpay_request:ok') {
-                //执行
-                Toast.success('支付成功')
-                this.$router.push('/order')
-              } else {
-                Toast.fail('支付失败')
-                this.$router.push('/order')
-              }
-            })
-            return
-          } */
-          // if (this.platform == 1) {
-            // h5+
-            let temPrams = data.info
-            temPrams.timestamp = parseInt(data.info.timestamp)
-            plus.payment.request(
-              this.channel,
-              temPrams,
-              res => {
-                this.$http
-                  .post('trade/tradeDetail', { tradeNo: temPrams.tradeNo })
-                  .then(data => {
-                    plus.nativeUI.alert('支付成功！', function() {
-                      this.$router.push('/order')
-                    })
-                  })
-              },
-              error => {
-                plus.nativeUI.alert('支付失败：' + error.code)
-              }
-            )
-          // }
-        }
-      })
+
+          if (this.payType == 'WXPAY') {
+            // 接口返回来的微信H5支付的连接地址
+            let payUrl = data.info.mweb_url; 
+            
+            // App
+            if (this.clientId == 1) {
+              let self = plus.webview.currentWebview();
+              
+              let payView = plus.webview.create(payUrl, 'pay-url', {
+                top: '1000px',bottom: '1000px',
+                additionalHttpHeaders:{referer:'http://m.5gyungou.com'}
+              });
+              self.append(payView);
+            }
+            // 网页 wap
+            if (this.clientId == 2) {
+              window.location.href = payUrl
+              return
+            }
+            // wx 内置浏览器
+            if (this.clientId == 3) {
+              wxpay(data.info, payResult => {
+                if (payResult.err_msg == 'get_brand_wcpay_request:ok') {
+                  //执行
+                  Toast.success('支付成功')
+				  localStorage.orderActive = 2
+				  router.push('/order')
+                } else {
+                  Toast.fail('支付失败')
+				  localStorage.orderActive = 2
+				  router.push('/order')
+                }
+              })
+              return
+            }
+          }
+        })
+        .catch(err => {
+          Toast.fail(err.message)
+        })
     },
+    /***********点击支付按钮事件并获取支付方式*********/
+    
+			
+    //       /* 黄亮
+		//   if (this.clientId == 2) {
+    //         //wap
+    //         window.location.href = data.info.mweb_url
+    //         return
+    //       }
+    //       if (this.clientId == 3) {
+    //         //wx
+    //         this.wxpay(data.info, payResult => {
+    //           if (payResult.err_msg == 'get_brand_wcpay_request:ok') {
+    //             //执行
+    //             Toast.success('支付成功')
+    //             this.$router.push('/order')
+    //           } else {
+    //             Toast.fail('支付失败')
+    //             this.$router.push('/order')
+    //           }
+    //         })
+    //         return
+    //       } 
+    //       if (this.clientId == 1) {
+    //         // app
+    //         let temPrams = data.info
+    //         temPrams.timestamp = parseInt(data.info.timestamp)
+    //         plus.payment.request(
+    //           this.channel,
+    //           temPrams,
+    //           res => {
+    //             this.$http
+    //               .post('trade/tradeDetail', { tradeNo: temPrams.tradeNo })
+    //               .then(data => {
+    //                 plus.nativeUI.alert('支付成功！', function() {
+    //                   this.$router.push('/order')
+    //                 })
+    //               })
+    //           },
+    //           error => {
+    //             plus.nativeUI.alert('支付失败：' + error.code)
+    //           }
+    //         )
+    //       }
+		//   */
+    //     }
+    //   })
+    // },
     /*************支付弹框事件群end******/
 
     /*************取消订单******/

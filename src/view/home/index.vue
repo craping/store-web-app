@@ -124,6 +124,9 @@ export default {
     // this.$store.dispatch('home/content')
   },
   mounted() {
+	  this.onPlusReady(() => {
+	  	plus.navigator.setStatusBarStyle('light');
+	  })
   },
   methods: {
     onRefresh(done) {

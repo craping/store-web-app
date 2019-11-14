@@ -28,6 +28,11 @@ export default {
       config: state => state.config,
     })
   },
+  mounted() {
+	this.onPlusReady(() => {
+		plus.navigator.setStatusBarStyle('dark');
+	})
+  },
   methods: {
     onClickLeft() {
       this.$router.go(-1);

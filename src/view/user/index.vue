@@ -57,9 +57,7 @@
       <div class="my-order grid-panel">
         <div class="grid-top">
           <span>订单中心</span>
-          <router-link :to="'/order'">
-            <span class="link">查看全部订单></span>
-          </router-link>
+          <span class="link" @click="toOrderCenter">查看全部订单></span>
         </div>
         <van-grid :border="false" :column-num="5">
           <van-grid-item
@@ -178,6 +176,11 @@ export default {
       },
     };
   },
+  mounted() {
+	this.onPlusReady(() => {
+		plus.navigator.setStatusBarStyle('light')
+	})
+  },
   computed:{
     ...mapState('user',{
       isVip: state => state.isVip,
@@ -188,7 +191,9 @@ export default {
     ...mapGetters("sys", ['shareEnable','vipEnable'])
   },
   methods: {
+    /********* 订单中心板块,跳转 **********/
     jumpLink(path, params) {
+      localStorage.orderActive = params
       this.$router.push({
         path,
         query: {
@@ -196,7 +201,9 @@ export default {
         }
       });
     },
+    /********* 跳转到全部订单 **********/
     toOrderCenter() {
+      localStorage.orderActive = 0
       this.$router.push("/order");
     },
     copyAgentNo(){

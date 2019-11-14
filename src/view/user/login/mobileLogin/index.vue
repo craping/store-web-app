@@ -48,6 +48,11 @@ export default {
       isEyeClose: true
     };
   },
+  mounted() {
+	this.onPlusReady(() => {
+		plus.navigator.setStatusBarStyle('dark')
+	})
+  },
   computed: {
     ...mapState('user',{
       beforePath: state => state.beforePath,

@@ -4,7 +4,7 @@
       fixed
       :z-index="100"
       title="订单中心"
-      left-text="返回"
+      left-text=""
       left-arrow
       @click-left="onClickLeft"
     />
@@ -81,7 +81,7 @@
                 <p>您还没有相关的订单</p>
               </div>
             </div>
-            <div class="mayLike" v-show="index != 0">
+            <div class="mayLike">
               <div class="mayLikeTitle">
                 <div class="leftLine"></div>
                 <van-icon name="like"/>
@@ -153,11 +153,11 @@ export default {
       loding: false,
       notList: false, // 提示：您还没有相关订单
       productStatus: [
-        { id: '1', title: '全部' },
-        { id: '2', title: '待付款' },
-        { id: '3', title: '待发货' },
-        { id: '4', title: '待收货' },
-        { id: '5', title: '待评价' }
+        { id: '0', title: '全部' },
+        { id: '1', title: '待付款' },
+        { id: '2', title: '待发货' },
+        { id: '3', title: '待收货' },
+        { id: '4', title: '待评价' }
       ],
       productList: [
         {
@@ -254,13 +254,15 @@ export default {
     }
   },
   created() {
-    this.active = this.$route.query.tabId  
+    // this.active = this.$route.query.tabId
+    let orderActive = localStorage.orderActive
+    if (orderActive)  this.active = parseInt(orderActive)
     this.initData()
-    console.log('tabID'+this.active)
   },
   mounted() {
     this.onPlusReady(() => {
-      this.getPayChannel()
+		plus.navigator.setStatusBarStyle('dark');  //dark 黑色 ，light 白色
+		this.getPayChannel()
     })
   },
   computed: {
@@ -275,23 +277,6 @@ export default {
     onClickLeft() {
       this.$router.push('/main/user')
     },
-
-    /*************初始化数据************ */
-    /* initData() {
-      this.loding = true
-      this.$store.commit('order/SET_ORDER_LIST_INIT')
-      this.$store
-        .dispatch('order/getOrderList', {
-          pageNum: this.pageNums,
-          pageSize: 10
-        })
-        .then(() => {
-          this.orderList = this.orderList
-        })
-        .finally(() => {
-          this.loding = false
-        })
-    }, */
 
     /********初始化数据********/
     initData() {
@@ -397,6 +382,7 @@ export default {
 
     /*************tab切换标签点击事件*********/
     onClick(name) {
+      localStorage.orderActive = name
       document.documentElement.scrollTop = 0
       this.pageNums = 1
       this.getListData(name, 'click')

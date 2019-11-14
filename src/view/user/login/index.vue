@@ -41,6 +41,7 @@ export default {
   },
   mounted() {
     this.onPlusReady(() => {
+	  plus.navigator.setStatusBarStyle('dark')
       this.initWeChatService();
     });
   },

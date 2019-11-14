@@ -535,6 +535,7 @@ export default {
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll, true)
     this.onPlusReady(() => {
+	  puls.navigator.setStatusBarStyle('dark')
       plus.key.removeEventListener("backbutton",this.handleback);
     });
   },

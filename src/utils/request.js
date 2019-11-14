@@ -70,6 +70,7 @@ service.interceptors.response.use(
       // result:1 token错误集;
       if (res.result == 1) {
         // token失效跳转到登录页面
+        console.log('登录失效')
         router.push('/login')
         sync.disconnect()
       }
